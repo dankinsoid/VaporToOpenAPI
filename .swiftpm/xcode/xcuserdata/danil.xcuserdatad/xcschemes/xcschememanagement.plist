@@ -52,5 +52,18 @@
 			<integer>0</integer>
 		</dict>
 	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>VaporToOpenAPI</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>VaporToOpenAPITests</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+	</dict>
 </dict>
 </plist>

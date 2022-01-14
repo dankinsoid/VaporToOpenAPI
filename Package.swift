@@ -17,7 +17,7 @@ let package = Package(
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-			.package(url: "https://github.com/mczachurski/Swiftgger.git", from: "1.4.0")
+			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.8")
 		],
     targets: [
 			.target(

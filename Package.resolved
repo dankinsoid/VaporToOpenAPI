@@ -138,11 +138,11 @@
       },
       {
         "package": "Swiftgger",
-        "repositoryURL": "https://github.com/mczachurski/Swiftgger.git",
+        "repositoryURL": "https://github.com/dankinsoid/Swiftgger.git",
         "state": {
           "branch": null,
-          "revision": "25d9ea884067764ab314cd3bf7e0ca19867b3f45",
-          "version": "1.5.0"
+          "revision": "64b678dc4cd148102ea1e9171a7d431d748c7703",
+          "version": "2.0.8"
         }
       },
       {
@@ -152,6 +152,15 @@
           "branch": null,
           "revision": "34bf1b303623de04801d2b9bef5b2ed48b3e9319",
           "version": "4.54.0"
+        }
+      },
+      {
+        "package": "VDCodable",
+        "repositoryURL": "https://github.com/dankinsoid/VDCodable",
+        "state": {
+          "branch": null,
+          "revision": "0f65b2850465964f6f3048892d0c954ae6ffe8c4",
+          "version": "2.6.0"
         }
       },
       {
