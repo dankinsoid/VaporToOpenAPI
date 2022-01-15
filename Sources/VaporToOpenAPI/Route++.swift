@@ -48,10 +48,7 @@ extension Route {
 	}
 	
 	public var openAPIResponseType: Any.Type {
-		guard responseCustomType == nil else {
-			return responseCustomType!
-		}
-		let type = (responseType as? EventLoopType.Type)?.valueType ?? responseType
+		let type = responseCustomType ?? (responseType as? EventLoopType.Type)?.valueType ?? responseType
 		if type == View.self {
 			return HTML.self
 		} else if type == Response.self {
