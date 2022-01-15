@@ -13,9 +13,9 @@ extension Route {
 	public func openAPI(
 		summary: String = "",
 		description: String = "",
-		content: OpenAPIObject.Type? = nil,
-		query: OpenAPIObject.Type = EmptyAPIObject.self,
-		headers: (OpenAPIObject & AnyHeadersType).Type = EmptyAPIObject.self,
+		content: EmptyInitable.Type? = nil,
+		query: EmptyInitable.Type = EmptyAPIObject.self,
+		headers: (EmptyInitable & AnyHeadersType).Type = EmptyAPIObject.self,
 		responses: [APIResponse] = []
 	) -> Route {
 		set(\.contentType, to: content)
@@ -45,15 +45,39 @@ extension Route {
 		contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
 	}
 	
-	public var contentType: OpenAPIObject.Type? {
+	public var openAPIResponseType: Any.Type {
+		let type = (responseType as? EventLoopType.Type)?.valueType ?? responseType
+		if type == View.self {
+			return HTML.self
+		} else {
+			return type
+		}
+	}
+	
+	public var contentType: EmptyInitable.Type? {
 		values.contentType == EmptyAPIObject.self ? nil : values.contentType
 	}
 	
-	public var queryType: OpenAPIObject.Type {
+	public var queryType: EmptyInitable.Type {
 		values.queryType ?? EmptyAPIObject.self
 	}
 	
-	public var headersType: (OpenAPIObject & AnyHeadersType).Type {
+	public var headersType: (EmptyInitable & AnyHeadersType).Type {
 		values.headersType ?? EmptyAPIObject.self
+	}
+}
+
+private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
+	static var defaultContentType: HTTPMediaType { .html }
+	let description = "<html>HTML text</html>"
+	
+	init() {}
+	
+	init(from decoder: Decoder) throws {
+		_ = try String(from: decoder)
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		try description.encode(to: encoder)
 	}
 }

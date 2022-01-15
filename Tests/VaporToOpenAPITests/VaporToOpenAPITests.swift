@@ -23,8 +23,8 @@ final class VDTests: XCTestCase {
 			content: String.self
 		)
 
-		app.post("users", "eee") { _ in
-			return ""
+		app.post("users", "eee") { req in
+			req.view.render(app.directory.publicDirectory + "Swagger/index.html")
 		}
 		.openAPI(
 			content: SomeContent.self

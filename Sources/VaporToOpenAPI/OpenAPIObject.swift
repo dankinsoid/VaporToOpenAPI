@@ -9,11 +9,13 @@ import Swiftgger
 import Foundation
 import VDCodable
 
-public protocol OpenAPIObject: Codable {
+public protocol EmptyInitable: Codable {
 	init()
 }
 
-extension OpenAPIObject {
+public protocol OpenAPIObject: EmptyInitable {}
+
+extension EmptyInitable {
 	public static func properties() -> [(String, (APIDataType, isOptional: Bool))] {
 		guard let dict = try? DictionaryEncoder().encode(Self.init()) as? [String: Any] else {
 			return []
@@ -32,11 +34,11 @@ private protocol OptionalProtocol {}
 
 extension Optional: OptionalProtocol {}
 
-extension Array: OpenAPIObject where Element: OpenAPIObject {}
-extension Set: OpenAPIObject where Element: OpenAPIObject {}
-extension ContiguousArray: OpenAPIObject where Element: OpenAPIObject {}
-extension String: OpenAPIObject {}
-extension Data: OpenAPIObject {}
+extension Array: EmptyInitable where Element: Codable {}
+extension Set: EmptyInitable where Element: Codable {}
+extension ContiguousArray: EmptyInitable where Element: Codable {}
+extension String: EmptyInitable {}
+extension Data: EmptyInitable {}
 extension JSON: OpenAPIObject {
 	public init() {
 		self = .object([:])
