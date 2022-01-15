@@ -10,8 +10,19 @@ import Swiftgger
 
 extension Route {
 	@discardableResult
-	public func openAPI() -> Route {
-		self
+	public func openAPI(
+		summary: String = "",
+		description: String = "",
+		content: OpenAPIObject.Type? = nil,
+		query: OpenAPIObject.Type = EmptyAPIObject.self,
+		headers: (OpenAPIObject & AnyHeadersType).Type = EmptyAPIObject.self,
+		responses: [APIResponse] = []
+	) -> Route {
+		set(\.contentType, to: content)
+			.set(\.queryType, to: query)
+			.set(\.headersType, to: headers)
+			.set(\.summary, to: summary)
+			.description(description)
 	}
 }
 
@@ -19,6 +30,11 @@ extension Route {
 	
 	public var summary: String {
 		values.summary ?? ""
+	}
+	
+	@discardableResult
+	public func summary(_ value: String) -> Route {
+		set(\.summary, to: value)
 	}
 	
 	public var responses: [APIResponse] {
@@ -37,7 +53,7 @@ extension Route {
 		values.queryType ?? EmptyAPIObject.self
 	}
 	
-	public var headersType: OpenAPIObject.Type {
+	public var headersType: (OpenAPIObject & AnyHeadersType).Type {
 		values.headersType ?? EmptyAPIObject.self
 	}
 }

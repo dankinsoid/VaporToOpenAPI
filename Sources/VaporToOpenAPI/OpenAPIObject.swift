@@ -9,8 +9,12 @@ import Swiftgger
 import Foundation
 import VDCodable
 
+public protocol OpenAPIObject: Codable {
+	init()
+}
+
 extension OpenAPIObject {
-	public static func properties(flat: Bool = false) -> [(String, (APIDataType, isOptional: Bool))] {
+	public static func properties() -> [(String, (APIDataType, isOptional: Bool))] {
 		guard let dict = try? DictionaryEncoder().encode(Self.init()) as? [String: Any] else {
 			return []
 		}
@@ -20,7 +24,7 @@ extension OpenAPIObject {
 	}
 }
 
-private func isOptional(_ any: Any) -> Bool {
+func isOptional(_ any: Any) -> Bool {
 	(any as? OptionalProtocol) != nil
 }
 
@@ -31,3 +35,10 @@ extension Optional: OptionalProtocol {}
 extension Array: OpenAPIObject where Element: OpenAPIObject {}
 extension Set: OpenAPIObject where Element: OpenAPIObject {}
 extension ContiguousArray: OpenAPIObject where Element: OpenAPIObject {}
+extension String: OpenAPIObject {}
+extension Data: OpenAPIObject {}
+extension JSON: OpenAPIObject {
+	public init() {
+		self = .object([:])
+	}
+}

@@ -17,14 +17,14 @@ let package = Package(
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.8")
+			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.10")
 		],
     targets: [
 			.target(
 				name: "VaporToOpenAPI",
 				dependencies: [
 					.product(name: "Vapor", package: "vapor"),
-					.product(name: "Swiftgger", package: "swiftgger")
+					.product(name: "Swiftgger", package: "Swiftgger")
 				],
 				swiftSettings: [
 					// Enable better optimizations when building in Release configuration. Despite the use of

@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/dankinsoid/Swiftgger.git",
         "state": {
           "branch": null,
-          "revision": "64b678dc4cd148102ea1e9171a7d431d748c7703",
-          "version": "2.0.8"
+          "revision": "81be8add5038f57226772cb502624959d04ce3df",
+          "version": "2.0.10"
         }
       },
       {
@@ -159,8 +159,8 @@
         "repositoryURL": "https://github.com/dankinsoid/VDCodable",
         "state": {
           "branch": null,
-          "revision": "0f65b2850465964f6f3048892d0c954ae6ffe8c4",
-          "version": "2.6.0"
+          "revision": "f536b225c1a9a9589173cb5f0633467de39f2339",
+          "version": "2.8.0"
         }
       },
       {
