@@ -33,3 +33,7 @@ public protocol OpenAPIContent: Codable {
 extension String: OpenAPIContent {
 	public static var defaultContentType: HTTPMediaType { .plainText }
 }
+
+extension Data: OpenAPIContent {
+	public static var defaultContentType: HTTPMediaType { .binary }
+}

@@ -18,7 +18,7 @@ extension Route {
 			description: userInfo(for: DescriptionKey.self) ?? "",
 			parameters: pathAPIParameters + queryAPIParameters + headerAPIParameters + cookieAPIParameters,
 			request: openAPIRequestType.map {
-				APIRequest(type: .init(type: $0, example: ($0 as? OpenAPIObject.Type)?.init()), contentType: contentType(for: $0))
+				APIRequest(type: .init(type: $0, example: ($0 as? EmptyInitable.Type)?.init()), contentType: contentType(for: $0))
 			},
 			responses: [successAPIResponse] + responses,
 			authorization: responseType is Authenticatable
@@ -26,7 +26,7 @@ extension Route {
 	}
 	
 	public var successAPIResponse: APIResponse {
-		APIResponse(code: "200", description: "Success response", type: (openAPIResponseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? OpenAPIObject.Type)?.init()) } ?? .object(openAPIResponseType, asCollection: false), contentType: contentType(type: openAPIResponseType))
+		APIResponse(code: "200", description: "Success response", type: (openAPIResponseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? EmptyInitable.Type)?.init()) } ?? .object(openAPIResponseType, asCollection: false), contentType: contentType(type: openAPIResponseType))
 	}
 	
 	public var pathAPIParameters: [APIParameter] {

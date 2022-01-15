@@ -13,6 +13,7 @@ extension Route {
 	public func openAPI(
 		summary: String = "",
 		description: String = "",
+		response: EmptyInitable.Type? = nil,
 		content: EmptyInitable.Type? = nil,
 		query: EmptyInitable.Type = EmptyAPIObject.self,
 		headers: (EmptyInitable & AnyHeadersType).Type = EmptyAPIObject.self,
@@ -22,6 +23,7 @@ extension Route {
 			.set(\.queryType, to: query)
 			.set(\.headersType, to: headers)
 			.set(\.summary, to: summary)
+			.set(\.responseCustomType, to: response)
 			.description(description)
 	}
 }
@@ -46,9 +48,14 @@ extension Route {
 	}
 	
 	public var openAPIResponseType: Any.Type {
+		guard responseCustomType == nil else {
+			return responseCustomType!
+		}
 		let type = (responseType as? EventLoopType.Type)?.valueType ?? responseType
 		if type == View.self {
 			return HTML.self
+		} else if type == Response.self {
+			return Unknown.self
 		} else {
 			return type
 		}
@@ -56,6 +63,10 @@ extension Route {
 	
 	public var contentType: EmptyInitable.Type? {
 		values.contentType == EmptyAPIObject.self ? nil : values.contentType
+	}
+	
+	public var responseCustomType: EmptyInitable.Type? {
+		values.responseCustomType
 	}
 	
 	public var queryType: EmptyInitable.Type {
@@ -80,4 +91,8 @@ private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
 	func encode(to encoder: Encoder) throws {
 		try description.encode(to: encoder)
 	}
+}
+
+private struct Unknown: OpenAPIContent, EmptyInitable {
+	public static var defaultContentType: HTTPMediaType { .any }
 }
