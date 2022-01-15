@@ -13,10 +13,10 @@ extension Route {
 	public func openAPI(
 		summary: String = "",
 		description: String = "",
-		response: EmptyInitable.Type? = nil,
-		content: EmptyInitable.Type? = nil,
-		query: EmptyInitable.Type = EmptyAPIObject.self,
-		headers: (EmptyInitable & AnyHeadersType).Type = EmptyAPIObject.self,
+		response: WithAnyExample.Type? = nil,
+		content: WithAnyExample.Type? = nil,
+		query: WithAnyExample.Type = EmptyAPIObject.self,
+		headers: (WithAnyExample & AnyHeadersType).Type = EmptyAPIObject.self,
 		responses: [APIResponse] = []
 	) -> Route {
 		set(\.contentType, to: content)
@@ -58,19 +58,19 @@ extension Route {
 		}
 	}
 	
-	public var contentType: EmptyInitable.Type? {
+	public var contentType: WithAnyExample.Type? {
 		values.contentType == EmptyAPIObject.self ? nil : values.contentType
 	}
 	
-	public var responseCustomType: EmptyInitable.Type? {
+	public var responseCustomType: WithAnyExample.Type? {
 		values.responseCustomType
 	}
 	
-	public var queryType: EmptyInitable.Type {
+	public var queryType: WithAnyExample.Type {
 		values.queryType ?? EmptyAPIObject.self
 	}
 	
-	public var headersType: (EmptyInitable & AnyHeadersType).Type {
+	public var headersType: (WithAnyExample & AnyHeadersType).Type {
 		values.headersType ?? EmptyAPIObject.self
 	}
 }
@@ -78,6 +78,8 @@ extension Route {
 private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
 	static var defaultContentType: HTTPMediaType { .html }
 	let description = "<html>HTML text</html>"
+	
+	static var example: HTML { HTML() }
 	
 	init() {}
 	
@@ -90,6 +92,7 @@ private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
 	}
 }
 
-private struct Unknown: OpenAPIContent, EmptyInitable {
+private struct Unknown: OpenAPIContent, WithAnyExample {
+	static var anyExample: Codable { Unknown() }
 	public static var defaultContentType: HTTPMediaType { .any }
 }

@@ -55,7 +55,7 @@ public struct SomeContent: OpenAPIObject {
 	public var name: [[Int]] = []
 	public var decimal: Decimal? = 2.43
 	
-	public init() {}
+	public static var example: SomeContent { SomeContent() }
 }
 
 @propertyWrapper

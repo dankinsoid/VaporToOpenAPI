@@ -9,15 +9,24 @@ import Swiftgger
 import Foundation
 import VDCodable
 
-public protocol EmptyInitable: Codable {
-	init()
+public protocol WithAnyExample: Codable {
+	static var anyExample: Codable { get }
 }
 
-public protocol OpenAPIObject: EmptyInitable {}
+public protocol WithExample: WithAnyExample {
+	static var example: Self { get }
+}
 
-extension EmptyInitable {
+extension WithAnyExample where Self: WithExample {
+	public static var anyExample: Codable { example }
+}
+
+public protocol AnyOpenAPIObject: WithAnyExample {}
+public protocol OpenAPIObject: AnyOpenAPIObject, WithExample {}
+
+extension WithAnyExample {
 	public static func properties() -> [(String, (APIDataType, isOptional: Bool))] {
-		guard let dict = try? DictionaryEncoder().encode(Self.init()) as? [String: Any] else {
+		guard let dict = try? DictionaryEncoder().encode(AnyEncodable(Self.anyExample)) as? [String: Any] else {
 			return []
 		}
 		return dict.compactMap { v in
@@ -34,13 +43,33 @@ private protocol OptionalProtocol {}
 
 extension Optional: OptionalProtocol {}
 
-extension Array: EmptyInitable where Element: Codable {}
-extension Set: EmptyInitable where Element: Codable {}
-extension ContiguousArray: EmptyInitable where Element: Codable {}
-extension String: EmptyInitable {}
-extension Data: EmptyInitable {}
-extension JSON: OpenAPIObject {
-	public init() {
-		self = .object([:])
+extension Array: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { Array() }
+}
+extension Set: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { Set() }
+}
+extension ContiguousArray: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { ContiguousArray() }
+}
+extension String: WithAnyExample {
+	public static var anyExample: Codable { "some string" }
+}
+extension Data: WithAnyExample {
+	public static var anyExample: Codable { Data() }
+}
+extension JSON: WithAnyExample {
+	public static var anyExample: Codable { ["key": "value"] as JSON }
+}
+
+private struct AnyEncodable: Encodable {
+	var any: Encodable
+	
+	init(_ any: Encodable) {
+		self.any = any
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		try any.encode(to: encoder)
 	}
 }

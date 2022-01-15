@@ -18,7 +18,7 @@ extension Route {
 			description: userInfo(for: DescriptionKey.self) ?? "",
 			parameters: pathAPIParameters + queryAPIParameters + headerAPIParameters + cookieAPIParameters,
 			request: openAPIRequestType.map {
-				APIRequest(type: .init(type: $0, example: ($0 as? EmptyInitable.Type)?.init()), contentType: contentType(for: $0))
+				APIRequest(type: .init(type: $0, example: ($0 as? WithAnyExample.Type)?.anyExample), contentType: contentType(for: $0))
 			},
 			responses: [successAPIResponse] + responses,
 			authorization: responseType is Authenticatable
@@ -26,7 +26,7 @@ extension Route {
 	}
 	
 	public var successAPIResponse: APIResponse {
-		APIResponse(code: "200", description: "Success response", type: (openAPIResponseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? EmptyInitable.Type)?.init()) } ?? .object(openAPIResponseType, asCollection: false), contentType: contentType(type: openAPIResponseType))
+		APIResponse(code: "200", description: "Success response", type: (openAPIResponseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? WithAnyExample.Type)?.anyExample) } ?? .object(openAPIResponseType, asCollection: false), contentType: contentType(type: openAPIResponseType))
 	}
 	
 	public var pathAPIParameters: [APIParameter] {
@@ -52,7 +52,8 @@ extension Route {
 	}
 	
 	public var cookieAPIParameters: [APIParameter] {
-		let properties = ((try? DictionaryEncoder().encode(AnyEncodable(headersType.init().anyCookie))) as? [String: Any]) ?? [:]
+		let value = (headersType.anyExample as? AnyHeadersType)?.anyCookie ?? ""
+		let properties = ((try? DictionaryEncoder().encode(AnyEncodable(value))) as? [String: Any]) ?? [:]
 		return properties.map {
 			APIParameter(name: $0.key, parameterLocation: .cookie, description: nil, required: !isOptional($0.value), deprecated: false, allowEmptyValue: false, dataType: APIDataType(fromSwiftValue: $0.value) ?? .string)
 		}
