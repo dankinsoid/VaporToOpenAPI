@@ -17,6 +17,7 @@ let package = Package(
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+			.package(url: "https://github.com/dankinsoid/VDCodable", from: "2.8.0"),
 			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.10")
 		],
     targets: [
@@ -24,7 +25,8 @@ let package = Package(
 				name: "VaporToOpenAPI",
 				dependencies: [
 					.product(name: "Vapor", package: "vapor"),
-					.product(name: "Swiftgger", package: "Swiftgger")
+					.product(name: "Swiftgger", package: "Swiftgger"),
+					.product(name: "VDCodable", package: "VDCodable")
 				]
 			),
 			.testTarget(
