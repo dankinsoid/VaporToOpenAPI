@@ -51,6 +51,7 @@ extension Routes {
 				all.flatMap {
 					[$0.openAPIResponseType as? WithAnyExample.Type, $0.openAPIRequestType as? WithAnyExample.Type].compactMap({ $0 })
 				}
+					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
 					.map { APIObject(object: $0.anyExample) }
 			)
