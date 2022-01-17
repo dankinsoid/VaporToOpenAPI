@@ -66,6 +66,10 @@ extension JSON: WithAnyExample {
 	public static var anyExample: Codable { ["key": "value"] as JSON }
 }
 
+extension Array: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
+extension Set: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
+extension ContiguousArray: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
+
 private struct AnyEncodable: Encodable {
 	var any: Encodable
 	
