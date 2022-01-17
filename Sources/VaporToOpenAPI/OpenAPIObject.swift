@@ -25,7 +25,16 @@ extension APIPrimitiveType where Self: WithExample {
 	public static var anyExample: Codable { example }
 }
 
-public protocol AnyOpenAPIObject: WithAnyExample {}
+public protocol AnyOpenAPIObjectConvertable: WithAnyExample {
+	static var anyObjectAPIType: AnyOpenAPIObject.Type { get }
+}
+
+public protocol AnyOpenAPIObject: AnyOpenAPIObjectConvertable {}
+
+extension AnyOpenAPIObjectConvertable where Self: AnyOpenAPIObject {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Self.self }
+}
+
 public protocol OpenAPIObject: AnyOpenAPIObject, WithExample {}
 
 extension WithAnyExample {
@@ -66,9 +75,15 @@ extension JSON: WithAnyExample {
 	public static var anyExample: Codable { ["key": "value"] as JSON }
 }
 
-extension Array: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
-extension Set: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
-extension ContiguousArray: AnyOpenAPIObject where Element: AnyOpenAPIObject {}
+extension Array: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
+extension Set: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
+extension ContiguousArray: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
 
 private struct AnyEncodable: Encodable {
 	var any: Encodable

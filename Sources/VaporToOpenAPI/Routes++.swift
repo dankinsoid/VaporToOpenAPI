@@ -49,7 +49,7 @@ extension Routes {
 		openAPIBuilder = openAPIBuilder
 			.add(
 				all.flatMap {
-					[$0.openAPIResponseType as? AnyOpenAPIObject.Type, $0.openAPIRequestType as? AnyOpenAPIObject.Type].compactMap({ $0 })
+					[$0.openAPIResponseType as? AnyOpenAPIObjectConvertable.Type, $0.openAPIRequestType as? AnyOpenAPIObjectConvertable.Type].compactMap({ $0?.anyObjectAPIType })
 				}
 					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
