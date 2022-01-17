@@ -18,7 +18,7 @@ let package = Package(
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
 			.package(url: "https://github.com/dankinsoid/VDCodable", from: "2.8.0"),
-			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.13")
+			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.0.15")
 		],
     targets: [
 			.target(

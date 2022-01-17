@@ -75,7 +75,8 @@ extension Route {
 	}
 }
 
-private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
+private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
+	static var apiDataType: APIDataType { .string }
 	static var defaultContentType: HTTPMediaType { .html }
 	let description = "<html>HTML text</html>"
 	
@@ -92,7 +93,8 @@ private struct HTML: OpenAPIContent, CustomStringConvertible, OpenAPIObject {
 	}
 }
 
-private struct Unknown: OpenAPIContent, WithAnyExample {
+private struct Unknown: OpenAPIContent, WithAnyExample, APIPrimitiveType {
+	static var apiDataType: APIDataType { .string }
 	static var anyExample: Codable { Unknown() }
 	public static var defaultContentType: HTTPMediaType { .any }
 }

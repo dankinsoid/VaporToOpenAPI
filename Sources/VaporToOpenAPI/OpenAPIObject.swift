@@ -21,6 +21,10 @@ extension WithAnyExample where Self: WithExample {
 	public static var anyExample: Codable { example }
 }
 
+extension APIPrimitiveType where Self: WithExample {
+	public static var anyExample: Codable { example }
+}
+
 public protocol AnyOpenAPIObject: WithAnyExample {}
 public protocol OpenAPIObject: AnyOpenAPIObject, WithExample {}
 
