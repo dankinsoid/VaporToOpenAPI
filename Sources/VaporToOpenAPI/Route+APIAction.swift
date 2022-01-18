@@ -26,7 +26,7 @@ extension Route {
 	}
 	
 	public var successAPIResponse: APIResponse {
-		return APIResponse(code: "200", description: "Success response", type: (responseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? OpenAPIObject.Type)?.init()) } ?? .object(responseType, asCollection: false), contentType: contentType(type: responseType))
+		APIResponse(code: "200", description: "Success response", type: (responseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? OpenAPIObject.Type)?.init()) } ?? .object(responseType, asCollection: false), contentType: contentType(type: responseType))
 	}
 	
 	public var pathAPIParameters: [APIParameter] {
@@ -56,10 +56,14 @@ extension Route {
 	}
 	
 	private func contentType(type: Any.Type) -> String? {
-	  nil//(type as? Content.Type)?.defaultContentType.type
+	  (type as? OpenAPICustomContent.Type)?.defaultContentType.type
 	}
 	
 	private func contentType(for object: Any) -> String? {
 		contentType(type: type(of: object))
 	}
+}
+
+public protocol OpenAPICustomContent {
+	static var defaultContentType: HTTPMediaType { get }
 }
