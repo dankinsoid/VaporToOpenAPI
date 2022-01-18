@@ -51,10 +51,11 @@ extension Routes {
 		openAPIBuilder = openAPIBuilder
 			.add(
 				routes.flatMap {
-					[$0.responseType as? OpenAPIObject.Type, $0.openAPIRequestType as? OpenAPIObject.Type].compactMap({ $0 })
+					[$0.openAPIResponseType as? AnyOpenAPIObjectConvertable.Type, $0.openAPIRequestType as? AnyOpenAPIObjectConvertable.Type].compactMap({ $0?.anyObjectAPIType })
 				}
+					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
-					.map { APIObject(object: $0.init()) } + objects
+					.map { APIObject(object: $0.anyExample) } + objects
 			)
 		
 		openAPIBuilder = servers.reduce(into: openAPIBuilder, { $0 = $0.add($1) })

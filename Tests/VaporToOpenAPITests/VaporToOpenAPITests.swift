@@ -16,15 +16,19 @@ final class VDTests: XCTestCase {
 	func tests() {
 		let app = Application()
 		defer { app.shutdown() }
-		app.on(.GET, "users", "some", types: .empty) { _ in
+		app.get("users", "some") { _ in
 			return ""
 		}
+		.openAPI(
+			content: String.self
+		)
 
-		app.on(.POST, "users", "eee", types: .content(SomeContent.self)) { _ in
-			return ""
+		app.post("users", "eee") { req in
+			req.view.render(app.directory.publicDirectory + "Swagger/index.html")
 		}
-		
-//		app.webSocket(<#T##path: PathComponent...##PathComponent#>, maxFrameSize: <#T##WebSocketMaxFrameSize#>, shouldUpgrade: <#T##((Request) -> EventLoopFuture<HTTPHeaders?>)##((Request) -> EventLoopFuture<HTTPHeaders?>)##(Request) -> EventLoopFuture<HTTPHeaders?>#>, onUpgrade: <#T##(Request, WebSocket) -> ()#>)
+		.openAPI(
+			content: SomeContent.self
+		)
 		
 		let openAPI = app.routes.openAPI(title: "My Server API", version: "1.0.0", description: "It's our generated API")
 		
@@ -46,12 +50,12 @@ final class VDTests: XCTestCase {
 	]
 }
 
-struct SomeContent: OpenAPIObject {
-	var id: UUID = UUID()
-	var name: [[Int]] = []
-	var decimal: Decimal = 2.43
+public struct SomeContent: OpenAPIObject {
+	public var id: UUID = UUID()
+	public var name: [[Int]] = []
+	public var decimal: Decimal? = 2.43
 	
-	init() {}
+	public static var example: SomeContent { SomeContent() }
 }
 
 @propertyWrapper

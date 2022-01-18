@@ -9,9 +9,37 @@ import Swiftgger
 import Foundation
 import VDCodable
 
-extension OpenAPIObject {
-	public static func properties(flat: Bool = false) -> [(String, (APIDataType, isOptional: Bool))] {
-		guard let dict = try? DictionaryEncoder().encode(Self.init()) as? [String: Any] else {
+public protocol WithAnyExample: Codable {
+	static var anyExample: Codable { get }
+}
+
+public protocol WithExample: WithAnyExample {
+	static var example: Self { get }
+}
+
+extension WithAnyExample where Self: WithExample {
+	public static var anyExample: Codable { example }
+}
+
+extension APIPrimitiveType where Self: WithExample {
+	public static var anyExample: Codable { example }
+}
+
+public protocol AnyOpenAPIObjectConvertable: WithAnyExample {
+	static var anyObjectAPIType: AnyOpenAPIObject.Type { get }
+}
+
+public protocol AnyOpenAPIObject: AnyOpenAPIObjectConvertable {}
+
+extension AnyOpenAPIObjectConvertable where Self: AnyOpenAPIObject {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Self.self }
+}
+
+public protocol OpenAPIObject: AnyOpenAPIObject, WithExample {}
+
+extension WithAnyExample {
+	public static func properties() -> [(String, (APIDataType, isOptional: Bool))] {
+		guard let dict = try? DictionaryEncoder().encode(AnyEncodable(Self.anyExample)) as? [String: Any] else {
 			return []
 		}
 		return dict.compactMap { v in
@@ -20,7 +48,7 @@ extension OpenAPIObject {
 	}
 }
 
-private func isOptional(_ any: Any) -> Bool {
+func isOptional(_ any: Any) -> Bool {
 	(any as? OptionalProtocol) != nil
 }
 
@@ -28,6 +56,43 @@ private protocol OptionalProtocol {}
 
 extension Optional: OptionalProtocol {}
 
-extension Array: OpenAPIObject where Element: OpenAPIObject {}
-extension Set: OpenAPIObject where Element: OpenAPIObject {}
-extension ContiguousArray: OpenAPIObject where Element: OpenAPIObject {}
+extension Array: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { Array() }
+}
+extension Set: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { Set() }
+}
+extension ContiguousArray: WithAnyExample where Element: Codable {
+	public static var anyExample: Codable { ContiguousArray() }
+}
+extension String: WithAnyExample {
+	public static var anyExample: Codable { "some string" }
+}
+extension Data: WithAnyExample {
+	public static var anyExample: Codable { Data() }
+}
+extension JSON: WithAnyExample {
+	public static var anyExample: Codable { ["key": "value"] as JSON }
+}
+
+extension Array: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
+extension Set: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
+extension ContiguousArray: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
+	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+}
+
+private struct AnyEncodable: Encodable {
+	var any: Encodable
+	
+	init(_ any: Encodable) {
+		self.any = any
+	}
+	
+	func encode(to encoder: Encoder) throws {
+		try any.encode(to: encoder)
+	}
+}
