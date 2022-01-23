@@ -56,6 +56,15 @@
         }
       },
       {
+        "package": "SimpleCoders",
+        "repositoryURL": "https://github.com/dankinsoid/SimpleCoders.git",
+        "state": {
+          "branch": null,
+          "revision": "f81ce04342797cad52e1194c0c958c18d7394b7f",
+          "version": "1.1.0"
+        }
+      },
+      {
         "package": "swift-backtrace",
         "repositoryURL": "https://github.com/swift-server/swift-backtrace.git",
         "state": {
@@ -141,8 +150,8 @@
         "repositoryURL": "https://github.com/dankinsoid/Swiftgger.git",
         "state": {
           "branch": null,
-          "revision": "8e8de65a94f52c7fe53a2ef92de25db8aa997f1c",
-          "version": "2.0.20"
+          "revision": "732d9a0ec04bbca1eb1f1899131cfa8895703cef",
+          "version": "2.3.0"
         }
       },
       {
@@ -159,8 +168,8 @@
         "repositoryURL": "https://github.com/dankinsoid/VDCodable",
         "state": {
           "branch": null,
-          "revision": "f536b225c1a9a9589173cb5f0633467de39f2339",
-          "version": "2.8.0"
+          "revision": "e7dca8b305ac2f73e68218b34adee959de121dd0",
+          "version": "2.9.0"
         }
       },
       {
