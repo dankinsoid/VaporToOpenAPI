@@ -33,7 +33,7 @@ extension Routes {
 		let routes = all.map(map)
 		Dictionary(
 			routes.map {
-				($0.path.first?.description ?? "", [$0])
+				($0.path.first?.name ?? "Any", [$0])
 			}
 		) {
 			$0 + $1
@@ -61,5 +61,20 @@ extension Routes {
 		openAPIBuilder = servers.reduce(into: openAPIBuilder, { $0 = $0.add($1) })
 		
 		return openAPIBuilder.built()
+	}
+}
+
+extension PathComponent {
+	var name: String {
+		switch self {
+		case .constant(let string):
+			return string
+		case .parameter(let string):
+			return string
+		case .anything:
+			return "Any"
+		case .catchall:
+			return "Catchhall"
+		}
 	}
 }
