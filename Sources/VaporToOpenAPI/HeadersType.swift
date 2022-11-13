@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 10.01.2022.
-//
-
 import Vapor
 
 public protocol AnyHeadersType {
