@@ -1,51 +1,54 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 09.01.2022.
-//
-
 import Swiftgger
 import Foundation
 import VDCodable
 
-public protocol WithAnyExample: Codable {
-	static var anyExample: Codable { get }
-}
-
-public protocol WithExample: WithAnyExample {
+public protocol WithExample: Codable {
+    
 	static var example: Self { get }
 }
 
-extension WithAnyExample where Self: WithExample {
-	public static var anyExample: Codable { example }
-}
-
 extension APIPrimitiveType where Self: WithExample {
+    
 	public static var anyExample: Codable { example }
 }
 
-public protocol AnyOpenAPIObjectConvertable: WithAnyExample {
-	static var anyObjectAPIType: AnyOpenAPIObject.Type { get }
+public protocol OpenAPIObjectConvertable: WithExample {
+    
+    associatedtype OpenAPIType: OpenAPIObject
 }
 
-public protocol AnyOpenAPIObject: AnyOpenAPIObjectConvertable {}
-
-extension AnyOpenAPIObjectConvertable where Self: AnyOpenAPIObject {
-	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Self.self }
+extension OpenAPIObjectConvertable {
+    
+    static var openAPIType: OpenAPIType.Type {
+        OpenAPIType.self
+    }
 }
 
-public protocol OpenAPIObject: AnyOpenAPIObject, WithExample {}
+public protocol OpenAPIObject: OpenAPIObjectConvertable {
+    
+    override associatedtype OpenAPIType: OpenAPIObject = Self
+}
 
-extension WithAnyExample {
+extension WithExample {
+    
 	public static func properties() -> [(String, (APIDataType, isOptional: Bool))] {
-		guard let dict = try? DictionaryEncoder().encode(AnyEncodable(Self.anyExample)) as? [String: Any] else {
+		guard let dict = try? DictionaryEncoder().encode(AnyEncodable(Self.example)) as? [String: Any] else {
 			return []
 		}
-		return dict.compactMap { v in
+      return dict.sorted(by: { $0.key < $1.key }).compactMap { v in
 			APIDataType(fromSwiftValue: v.value).map { (v.key, ($0, isOptional(v.value))) }
 		}
 	}
+}
+
+extension [any WithExample.Type] {
+    
+    public func properties() -> [(String, (APIDataType, isOptional: Bool))] {
+        flatMap {
+            $0.properties()
+        }
+        .sorted(by: { $0.0 < $1.0 })
+    }
 }
 
 func isOptional(_ any: Any) -> Bool {
@@ -56,33 +59,49 @@ private protocol OptionalProtocol {}
 
 extension Optional: OptionalProtocol {}
 
-extension Array: WithAnyExample where Element: Codable {
-	public static var anyExample: Codable { Array() }
-}
-extension Set: WithAnyExample where Element: Codable {
-	public static var anyExample: Codable { Set() }
-}
-extension ContiguousArray: WithAnyExample where Element: Codable {
-	public static var anyExample: Codable { ContiguousArray() }
-}
-extension String: WithAnyExample {
-	public static var anyExample: Codable { "some string" }
-}
-extension Data: WithAnyExample {
-	public static var anyExample: Codable { Data() }
-}
-extension JSON: WithAnyExample {
-	public static var anyExample: Codable { ["key": "value"] as JSON }
+extension Array: WithExample where Element: Codable {
+    
+	public static var example: Array { Array() }
 }
 
-extension Array: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
-	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+extension Set: WithExample where Element: Codable {
+    
+	public static var example: Set { Set() }
 }
-extension Set: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
-	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+
+extension ContiguousArray: WithExample where Element: Codable {
+    
+	public static var example: ContiguousArray { ContiguousArray() }
 }
-extension ContiguousArray: AnyOpenAPIObjectConvertable where Element: AnyOpenAPIObjectConvertable {
-	public static var anyObjectAPIType: AnyOpenAPIObject.Type { Element.anyObjectAPIType }
+
+extension String: WithExample {
+    
+	public static var example: String { "some string" }
+}
+
+extension Data: WithExample {
+    
+	public static var example: Data { Data() }
+}
+
+extension JSON: WithExample {
+    
+	public static var example: JSON { ["key": "value"] }
+}
+
+extension Array: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+    
+    public typealias OpenAPIType = Element.OpenAPIType
+}
+
+extension Set: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+    
+    public typealias OpenAPIType = Element.OpenAPIType
+}
+
+extension ContiguousArray: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+    
+    public typealias OpenAPIType = Element.OpenAPIType
 }
 
 private struct AnyEncodable: Encodable {

@@ -45,15 +45,13 @@ extension Routes {
 					routes: $0.value
 				)
 		}
-		
+      
 		openAPIBuilder = openAPIBuilder
 			.add(
-				all.flatMap {
-					[$0.openAPIResponseType as? AnyOpenAPIObjectConvertable.Type, $0.openAPIRequestType as? AnyOpenAPIObjectConvertable.Type].compactMap({ $0?.anyObjectAPIType })
-				}
+        all.flatMap(\.openAPIObjectTypes)
 					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
-					.map { APIObject(object: $0.anyExample) }
+					.map { APIObject(object: $0.example) }
 			)
 		
 		openAPIBuilder = servers.reduce(into: openAPIBuilder, { $0 = $0.add($1) })
