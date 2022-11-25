@@ -9,6 +9,7 @@ import Foundation
 import NIOHTTP1
 import SimpleCoders
 import VDCodable
+import SimpleCoders
 
 public struct HTTPHeadersDecoder: HTTPHeadersDecoderType {
 	public var dateDecodingStrategy: JSONDecoder.DateDecodingStrategy

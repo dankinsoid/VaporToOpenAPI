@@ -17,7 +17,9 @@ extension Routes {
 		contact: APIContact? = nil,
 		license: APILicense? = nil,
 		authorizations: [APIAuthorizationType]? = nil,
-		servers: [APIServer] = []
+		servers: [APIServer] = [],
+		objects: [APIObject] = [],
+		map: (Route) -> Route = { $0 }
 	) -> OpenAPIDocument {
 		var openAPIBuilder = OpenAPIBuilder(
 			title: title,
@@ -28,10 +30,10 @@ extension Routes {
 			license: license, 
 			authorizations: authorizations
 		)
-		
+		let routes = all.map(map)
 		Dictionary(
-			all.map {
-				($0.path.first?.description ?? "", [$0])
+			routes.map {
+				($0.path.first?.name ?? "Any", [$0])
 			}
 		) {
 			$0 + $1
@@ -48,14 +50,29 @@ extension Routes {
       
 		openAPIBuilder = openAPIBuilder
 			.add(
-        all.flatMap(\.openAPIObjectTypes)
+        routes.flatMap(\.openAPIObjectTypes)
 					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
-					.map { APIObject(object: $0.example) }
+					.map { APIObject(object: $0.example) }  + objects
 			)
 		
 		openAPIBuilder = servers.reduce(into: openAPIBuilder, { $0 = $0.add($1) })
 		
 		return openAPIBuilder.built()
+	}
+}
+
+extension PathComponent {
+	var name: String {
+		switch self {
+		case .constant(let string):
+			return string
+		case .parameter(let string):
+			return string
+		case .anything:
+			return "Any"
+		case .catchall:
+			return "Catchhall"
+		}
 	}
 }
