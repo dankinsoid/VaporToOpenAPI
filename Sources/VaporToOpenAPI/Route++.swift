@@ -42,7 +42,15 @@ extension Route {
 	public var responses: [APIResponse] {
 		values.responses ?? []
 	}
-	
+    
+	var _excludeFromOpenAPI: Bool {
+    values._excludeFromOpenAPI ?? false
+	}
+    
+	public func excludeFromOpenAPI() -> Route {
+    set(\._excludeFromOpenAPI, to: true)
+	}
+    
 	public var openAPIRequestType: Decodable.Type? {
 		contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
 	}
@@ -88,6 +96,7 @@ extension Route {
 }
 
 private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
+    
 	static var apiDataType: APIDataType { .string }
 	static var defaultContentType: HTTPMediaType { .html }
 	let description = "<html>HTML text</html>"

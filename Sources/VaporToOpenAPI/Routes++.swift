@@ -30,7 +30,7 @@ extension Routes {
 			license: license, 
 			authorizations: authorizations
 		)
-		let routes = all.map(map)
+      let routes = all.map(map).filter { !$0._excludeFromOpenAPI }
 		Dictionary(
 			routes.map {
 				($0.path.first?.name ?? "Any", [$0])
