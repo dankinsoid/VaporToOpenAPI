@@ -1,10 +1,3 @@
-//
-//  swagger.swift
-//  
-//
-//  Created by Данил Войдилов on 26.12.2021.
-//
-
 import Vapor
 import Swiftgger
 
@@ -30,7 +23,7 @@ extension Routes {
 			license: license, 
 			authorizations: authorizations
 		)
-        let routes = all.map(map).filter { !$0.excludeFromOpenApi }
+      let routes = all.map(map).filter { !$0._excludeFromOpenAPI }
 		Dictionary(
 			routes.map {
 				($0.path.first?.name ?? "Any", [$0])
@@ -47,15 +40,13 @@ extension Routes {
 					routes: $0.value
 				)
 		}
-		
+      
 		openAPIBuilder = openAPIBuilder
 			.add(
-				routes.flatMap {
-					[$0.openAPIResponseType as? AnyOpenAPIObjectConvertable.Type, $0.openAPIRequestType as? AnyOpenAPIObjectConvertable.Type].compactMap({ $0?.anyObjectAPIType })
-				}
+        routes.flatMap(\.openAPIObjectTypes)
 					.filter({ $0 as? APIPrimitiveType == nil })
 					.removeEqual(by: { String(reflecting: $0) })
-					.map { APIObject(object: $0.anyExample) } + objects
+					.map { APIObject(object: $0.example) }  + objects
 			)
 		
 		openAPIBuilder = servers.reduce(into: openAPIBuilder, { $0 = $0.add($1) })

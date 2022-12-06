@@ -7,10 +7,10 @@ extension Route {
 	public func openAPI(
 		summary: String = "",
 		description: String = "",
-		response: WithAnyExample.Type? = nil,
-		content: WithAnyExample.Type? = nil,
-		query: WithAnyExample.Type = EmptyAPIObject.self,
-		headers: (WithAnyExample & AnyHeadersType).Type = EmptyAPIObject.self,
+    response: (any WithExample.Type)? = nil,
+    content: (any WithExample.Type)? = nil,
+    query: any WithExample.Type...,
+    headers: any HeadersType.Type...,
 		responses: [APIResponse] = []
 	) -> Route {
 		set(\.contentType, to: content)
@@ -41,7 +41,15 @@ extension Route {
 	public var responses: [APIResponse] {
 		values.responses ?? []
 	}
-	
+    
+	var _excludeFromOpenAPI: Bool {
+    values._excludeFromOpenAPI ?? false
+	}
+    
+	public func excludeFromOpenAPI() -> Route {
+    set(\._excludeFromOpenAPI, to: true)
+	}
+    
 	public var openAPIRequestType: Decodable.Type? {
 		contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
 	}
@@ -57,20 +65,32 @@ extension Route {
 		}
 	}
 	
-	public var contentType: WithAnyExample.Type? {
-		values.contentType == EmptyAPIObject.self ? nil : values.contentType
+    var openAPIObjectTypes: [any OpenAPIObject.Type] {
+        var result: [any OpenAPIObject.Type] = []
+        if let openAPIRequestType,
+           let objectType = openAPIRequestType as? any OpenAPIObjectConvertable.Type {
+            result.append(objectType.openAPIType)
+        }
+        if let objectType = openAPIResponseType as? any OpenAPIObjectConvertable.Type {
+            result.append(objectType.openAPIType)
+        }
+        return result
+    }
+    
+	public var contentType: (any WithExample.Type)? {
+		values.contentType
 	}
 	
-	public var responseCustomType: WithAnyExample.Type? {
+	public var responseCustomType: (any WithExample.Type)? {
 		values.responseCustomType
 	}
 	
-	public var queryType: WithAnyExample.Type {
-		values.queryType ?? EmptyAPIObject.self
+	public var queryType: [any WithExample.Type] {
+		values.queryType ?? []
 	}
 	
-	public var headersType: (WithAnyExample & AnyHeadersType).Type {
-		values.headersType ?? EmptyAPIObject.self
+	public var headersType: [any HeadersType.Type] {
+		values.headersType ?? []
 	}
     
     public var excludeFromOpenApi: Bool {
@@ -79,6 +99,7 @@ extension Route {
 }
 
 private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
+    
 	static var apiDataType: APIDataType { .string }
 	static var defaultContentType: HTTPMediaType { .html }
 	let description = "<html>HTML text</html>"
@@ -96,8 +117,9 @@ private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, 
 	}
 }
 
-private struct Unknown: OpenAPIContent, WithAnyExample, APIPrimitiveType {
+private struct Unknown: OpenAPIContent, WithExample, APIPrimitiveType {
+    
 	static var apiDataType: APIDataType { .string }
-	static var anyExample: Codable { Unknown() }
+	static var example: Unknown { Unknown() }
 	public static var defaultContentType: HTTPMediaType { .any }
 }

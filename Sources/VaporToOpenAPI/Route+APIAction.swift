@@ -18,7 +18,13 @@ extension Route {
 			description: userInfo(for: DescriptionKey.self) ?? "",
 			parameters: pathAPIParameters + queryAPIParameters + headerAPIParameters + cookieAPIParameters,
 			request: openAPIRequestType.map {
-				APIRequest(type: .init(type: $0, example: ($0 as? WithAnyExample.Type)?.anyExample), contentType: contentType(for: $0))
+				APIRequest(
+            type: APIBodyType(
+                type: $0,
+                example: ($0 as? any WithExample.Type)?.example
+            ),
+            contentType: contentType(for: $0)
+        )
 			},
 			responses: [successAPIResponse] + responses,
 			authorization: responseType is Authenticatable
@@ -26,7 +32,17 @@ extension Route {
 	}
 	
 	public var successAPIResponse: APIResponse {
-		APIResponse(code: "200", description: "Success response", type: (openAPIResponseType as? Decodable.Type).map { APIBodyType(type: $0, example: ($0 as? WithAnyExample.Type)?.anyExample) } ?? .object(openAPIResponseType, asCollection: false), contentType: contentType(type: openAPIResponseType))
+		APIResponse(
+        code: "200",
+        description: "Success response",
+        type: (openAPIResponseType as? Decodable.Type).map {
+            APIBodyType(
+                type: $0,
+                example: ($0 as? any WithExample.Type)?.example
+            )
+        } ?? .object(openAPIResponseType, asCollection: false),
+        contentType: contentType(type: openAPIResponseType)
+    )
 	}
 	
 	public var pathAPIParameters: [APIParameter] {
@@ -41,21 +57,49 @@ extension Route {
 	
 	public var queryAPIParameters: [APIParameter] {
 		queryType.properties().map {
-			APIParameter(name: $0.0, parameterLocation: .query, description: nil, required: !$0.1.isOptional, deprecated: false, allowEmptyValue: false, dataType: $0.1.0)
+			APIParameter(
+        name: $0.0,
+        parameterLocation: .query,
+        description: nil,
+        required: !$0.1.isOptional,
+        deprecated: false,
+        allowEmptyValue: false,
+        dataType: $0.1.0
+      )
 		}
 	}
 	
 	public var headerAPIParameters: [APIParameter] {
-		headersType.properties().filter({ $0.0 != "cookie" }).map {
-			APIParameter(name: $0.0, parameterLocation: .header, description: nil, required: !$0.1.isOptional, deprecated: false, allowEmptyValue: false, dataType: $0.1.0)
+      (headersType as [any WithExample.Type]).properties()
+          .filter({ $0.0 != "cookie" })
+          .map {
+			APIParameter(
+        name: $0.0,
+        parameterLocation: .header,
+        description: nil,
+        required: !$0.1.isOptional,
+        deprecated: false,
+        allowEmptyValue: false,
+        dataType: $0.1.0
+      )
 		}
 	}
 	
 	public var cookieAPIParameters: [APIParameter] {
-		let value = (headersType.anyExample as? AnyHeadersType)?.anyCookie ?? ""
-		let properties = ((try? DictionaryEncoder().encode(AnyEncodable(value))) as? [String: Any]) ?? [:]
-		return properties.map {
-			APIParameter(name: $0.key, parameterLocation: .cookie, description: nil, required: !isOptional($0.value), deprecated: false, allowEmptyValue: false, dataType: APIDataType(fromSwiftValue: $0.value) ?? .string)
+      let values = headersType.map { $0.example.cookie }
+      let properties = values.compactMap {
+          try? DictionaryEncoder().encode(AnyEncodable($0)) as? [String: Any]
+      }
+      return properties.joined().sorted(by: { $0.key < $1.key }).map {
+			APIParameter(
+        name: $0.key,
+        parameterLocation: .cookie,
+        description: nil,
+        required: !isOptional($0.value),
+        deprecated: false,
+        allowEmptyValue: false,
+        dataType: APIDataType(fromSwiftValue: $0.value) ?? .string
+      )
 		}
 	}
 	

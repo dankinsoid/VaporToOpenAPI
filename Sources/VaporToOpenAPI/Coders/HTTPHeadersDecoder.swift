@@ -7,6 +7,7 @@
 
 import Foundation
 import NIOHTTP1
+import SimpleCoders
 import VDCodable
 import SimpleCoders
 

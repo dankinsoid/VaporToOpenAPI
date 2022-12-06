@@ -1,19 +1,13 @@
 import Vapor
 
-public protocol AnyHeadersType {
-	var anyCookie: Codable { get }
-}
-
-public protocol HeadersType: AnyHeadersType {
+public protocol HeadersType: WithExample {
+    
 	associatedtype Cookies: Codable = EmptyAPIObject
 	var cookie: Cookies { get }
 }
 
-extension AnyHeadersType where Self: HeadersType {
-	public var anyCookie: Codable { cookie }
-}
-
 extension HeadersType where Cookies == EmptyAPIObject {
+    
 	public var cookie: EmptyAPIObject { EmptyAPIObject() }
 }
 
