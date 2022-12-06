@@ -1,14 +1,8 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 09.01.2022.
-//
-
 import Vapor
 import Swiftgger
 
 extension Route {
+    
 	@discardableResult
 	public func openAPI(
 		summary: String = "",
@@ -26,6 +20,11 @@ extension Route {
 			.set(\.responseCustomType, to: response)
 			.description(description)
 	}
+    
+    @discardableResult
+    public func excludeFromOpenAPI() -> Route {
+        set(\.excludeFromOpenApi, to: true)
+    }
 }
 
 extension Route {
@@ -73,6 +72,10 @@ extension Route {
 	public var headersType: (WithAnyExample & AnyHeadersType).Type {
 		values.headersType ?? EmptyAPIObject.self
 	}
+    
+    public var excludeFromOpenApi: Bool {
+        values.excludeFromOpenApi ?? false
+    }
 }
 
 private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
