@@ -43,11 +43,7 @@ extension Route {
 	}
     
 	var _excludeFromOpenAPI: Bool {
-    values._excludeFromOpenAPI ?? false
-	}
-    
-	public func excludeFromOpenAPI() -> Route {
-    set(\._excludeFromOpenAPI, to: true)
+        values._excludeFromOpenAPI ?? false
 	}
     
 	public var openAPIRequestType: Decodable.Type? {
