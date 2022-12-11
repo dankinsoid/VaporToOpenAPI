@@ -17,8 +17,8 @@ let package = Package(
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.67.4"),
-			.package(url: "https://github.com/dankinsoid/VDCodable", from: "2.10.0"),
-			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.6.0")
+			.package(url: "https://github.com/dankinsoid/VDCodable", from: "2.11.0"),
+			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.7.0")
 		],
     targets: [
 			.target(

@@ -83,7 +83,7 @@ fileprivate struct SingleContainer: DecodingUnboxer {
 	private func dictionary<C: Collection>(httpHeaders: C) -> [String: Input] where C.Element == (name: String, value: String) {
 		var result: [String: Input] = [:]
 		for (key, header) in httpHeaders {
-			let key = KeyDecodingStrategy.keyFromSnakeCase(key, separators: CharacterSet(charactersIn: "-"))
+            let key = (try? SnakeCasesCodingKeyStrategy(separator: "-").decode(currentKey: PlainCodingKey(key), codingPath: [])) ?? key
 			switch result[key] {
 			case .value(let current):
 				result[key] = .headers(HTTPHeaders([(key, current), (key, header)]))

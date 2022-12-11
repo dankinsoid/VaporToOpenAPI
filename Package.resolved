@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dankinsoid/SimpleCoders.git",
       "state" : {
-        "revision" : "851020895e17b77180234a465c2d8b8050f11ca0",
-        "version" : "1.2.0"
+        "revision" : "1527a7ab9a00a7a8a5a031c3102efc9cfccb49d4",
+        "version" : "1.4.0"
       }
     },
     {
@@ -185,8 +185,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dankinsoid/Swiftgger.git",
       "state" : {
-        "revision" : "6703c344c6e2bd47e48d720a0921f2a4caa4ef35",
-        "version" : "2.6.0"
+        "revision" : "ecad19478074b9f12151215f6a7b850643d547d1",
+        "version" : "2.7.0"
       }
     },
     {
@@ -203,8 +203,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/dankinsoid/VDCodable",
       "state" : {
-        "revision" : "9fb2c81036253593b5864557325e014fa2177d62",
-        "version" : "2.10.0"
+        "revision" : "9cafa42f64f8f28b7d1b2d2fe590fab96dd4356c",
+        "version" : "2.11.0"
       }
     },
     {
