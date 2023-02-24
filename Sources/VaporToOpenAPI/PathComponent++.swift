@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 09.01.2022.
-//
-
 import Vapor
 
 extension PathComponent {

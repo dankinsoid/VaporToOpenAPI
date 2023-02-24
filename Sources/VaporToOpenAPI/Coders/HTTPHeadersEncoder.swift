@@ -7,7 +7,7 @@
 
 //import Foundation
 //import NIOHTTP1
-//import VDCodable
+//import SimpleCoders
 //
 //public struct HTTPHeadersEncoder: HTTPHeadersEncoderType {
 //	public func encode<E: Encodable & HeadersType>(_ encodable: E, to headers: inout HTTPHeaders) throws {

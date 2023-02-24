@@ -1,6 +1,6 @@
 import Swiftgger
 import Foundation
-import VDCodable
+import SimpleCoders
 
 public protocol WithExample: Codable {
     
@@ -12,21 +12,21 @@ extension APIPrimitiveType where Self: WithExample {
 	public static var anyExample: Codable { example }
 }
 
-public protocol OpenAPIObjectConvertable: WithExample {
+public protocol OpenAPIComponentConvertable: WithExample {
     
-    associatedtype OpenAPIType: OpenAPIObject
+    associatedtype OpenAPIType: OpenAPIComponent
 }
 
-extension OpenAPIObjectConvertable {
+extension OpenAPIComponentConvertable {
     
     static var openAPIType: OpenAPIType.Type {
         OpenAPIType.self
     }
 }
 
-public protocol OpenAPIObject: OpenAPIObjectConvertable {
+public protocol OpenAPIComponent: OpenAPIComponentConvertable {
     
-    override associatedtype OpenAPIType: OpenAPIObject = Self
+    override associatedtype OpenAPIType: OpenAPIComponent = Self
 }
 
 extension WithExample {
@@ -89,17 +89,17 @@ extension JSON: OpenAPIObject {
 	public static var example: JSON { ["key": "value"] }
 }
 
-extension Array: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+extension Array: OpenAPIComponentConvertable where Element: OpenAPIComponentConvertable {
     
     public typealias OpenAPIType = Element.OpenAPIType
 }
 
-extension Set: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+extension Set: OpenAPIComponentConvertable where Element: OpenAPIComponentConvertable {
     
     public typealias OpenAPIType = Element.OpenAPIType
 }
 
-extension ContiguousArray: OpenAPIObjectConvertable where Element: OpenAPIObjectConvertable {
+extension ContiguousArray: OpenAPIComponentConvertable where Element: OpenAPIComponentConvertable {
     
     public typealias OpenAPIType = Element.OpenAPIType
 }

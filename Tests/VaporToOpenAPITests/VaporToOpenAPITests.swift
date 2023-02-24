@@ -8,7 +8,7 @@
 import XCTest
 import Vapor
 import Swiftgger
-import VDCodable
+import SimpleCoders
 @testable import VaporToOpenAPI
 
 final class VDTests: XCTestCase {
@@ -50,7 +50,7 @@ final class VDTests: XCTestCase {
 	]
 }
 
-public struct SomeContent: OpenAPIObject {
+public struct SomeContent: OpenAPIComponent {
 	public var id: UUID = UUID()
 	public var name: [[Int]] = []
 	public var decimal: Decimal? = 2.43

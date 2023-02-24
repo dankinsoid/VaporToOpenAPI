@@ -8,7 +8,7 @@
 import Foundation
 import NIOHTTP1
 import SimpleCoders
-import VDCodable
+import SimpleCoders
 import SimpleCoders
 
 public struct HTTPHeadersDecoder: HTTPHeadersDecoderType {

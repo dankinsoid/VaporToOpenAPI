@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 11.01.2022.
-//
-
 import NIOHTTP1
 
 public protocol HTTPHeadersDecoderType {

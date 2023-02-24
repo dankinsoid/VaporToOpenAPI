@@ -1,15 +1,6 @@
 {
   "pins" : [
     {
-      "identity" : "anycodable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Flight-School/AnyCodable",
-      "state" : {
-        "revision" : "b1a7a8a6186f2fcb28f7bda67cfc545de48b3c80",
-        "version" : "0.6.2"
-      }
-    },
-    {
       "identity" : "async-http-client",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swift-server/async-http-client.git",
@@ -181,30 +172,12 @@
       }
     },
     {
-      "identity" : "swiftgger",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dankinsoid/Swiftgger.git",
-      "state" : {
-        "revision" : "ecad19478074b9f12151215f6a7b850643d547d1",
-        "version" : "2.7.0"
-      }
-    },
-    {
       "identity" : "vapor",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/vapor/vapor.git",
       "state" : {
         "revision" : "2d54398d50951f177eb899c05154636e381f3bc6",
         "version" : "4.67.4"
-      }
-    },
-    {
-      "identity" : "vdcodable",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/dankinsoid/VDCodable",
-      "state" : {
-        "revision" : "9cafa42f64f8f28b7d1b2d2fe590fab96dd4356c",
-        "version" : "2.11.0"
       }
     },
     {

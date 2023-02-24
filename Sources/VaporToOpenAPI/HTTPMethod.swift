@@ -1,14 +1,8 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 09.01.2022.
-//
-
 import Vapor
 import Swiftgger
 
 extension HTTPMethod {
+    
 	public var openAPI: APIHttpMethod {
 		switch self {
 		case .GET:

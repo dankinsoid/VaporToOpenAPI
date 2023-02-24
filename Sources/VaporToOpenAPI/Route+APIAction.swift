@@ -1,13 +1,6 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 09.01.2022.
-//
-
 import Vapor
 import Swiftgger
-import VDCodable
+import SimpleCoders
 
 extension Route {
 	public var apiAction: APIAction {

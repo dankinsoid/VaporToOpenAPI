@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 15.01.2022.
-//
-
 import NIO
 
 protocol EventLoopType {

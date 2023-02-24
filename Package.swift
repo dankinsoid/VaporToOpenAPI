@@ -17,16 +17,14 @@ let package = Package(
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.67.4"),
-			.package(url: "https://github.com/dankinsoid/VDCodable", from: "2.11.0"),
-			.package(url: "https://github.com/dankinsoid/Swiftgger.git", from: "2.7.0")
+			.package(url: "https://github.com/dankinsoid/SimpleCoders", from: "1.4.0"),
 		],
     targets: [
 			.target(
 				name: "VaporToOpenAPI",
 				dependencies: [
 					.product(name: "Vapor", package: "vapor"),
-					.product(name: "Swiftgger", package: "Swiftgger"),
-					.product(name: "VDCodable", package: "VDCodable")
+					.product(name: "SimpleCoders", package: "SimpleCoders")
 				]
 			),
 			.testTarget(
