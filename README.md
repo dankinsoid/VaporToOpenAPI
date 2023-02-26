@@ -62,7 +62,7 @@ let api = app.routes.openAPI(
 ```
 ### 3. Saving OpenAPI
 ```swift
-let json = try VDJSONEncoder().encode(api)
+let json = try JSONEncoder().encode(api)
   try? FileManager.default.createDirectory(
     at: URL(fileURLWithPath: app.directory.publicDirectory + "Swagger"),
 		withIntermediateDirectories: true,
@@ -84,7 +84,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "0.29.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "0.30.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
