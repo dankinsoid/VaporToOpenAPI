@@ -7,9 +7,9 @@ extension Route {
 	public func openAPI(
 		summary: String = "",
 		description: String = "",
-    response: (any WithExample.Type)? = nil,
-    content: (any WithExample.Type)? = nil,
-    query: any WithExample.Type...,
+    response: (any OpenAPIObjectConvertable.Type)? = nil,
+    content: (any OpenAPIObjectConvertable.Type)? = nil,
+    query: any OpenAPIObjectConvertable.Type...,
     headers: any HeadersType.Type...,
 		responses: [APIResponse] = []
 	) -> Route {

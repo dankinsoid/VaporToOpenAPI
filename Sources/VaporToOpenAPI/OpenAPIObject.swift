@@ -105,6 +105,7 @@ extension ContiguousArray: OpenAPIObjectConvertable where Element: OpenAPIObject
 }
 
 private struct AnyEncodable: Encodable {
+    
 	var any: Encodable
 	
 	init(_ any: Encodable) {
