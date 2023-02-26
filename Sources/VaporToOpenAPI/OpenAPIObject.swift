@@ -74,17 +74,17 @@ extension ContiguousArray: WithExample where Element: Codable {
 	public static var example: ContiguousArray { ContiguousArray() }
 }
 
-extension String: WithExample {
+extension String: OpenAPIObject {
     
 	public static var example: String { "some string" }
 }
 
-extension Data: WithExample {
+extension Data: OpenAPIObject {
     
 	public static var example: Data { Data() }
 }
 
-extension JSON: WithExample {
+extension JSON: OpenAPIObject {
     
 	public static var example: JSON { ["key": "value"] }
 }

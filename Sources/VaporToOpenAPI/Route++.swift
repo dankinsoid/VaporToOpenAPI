@@ -3,23 +3,26 @@ import Swiftgger
 
 extension Route {
     
-	@discardableResult
-	public func openAPI(
-		summary: String = "",
-		description: String = "",
-    response: (any OpenAPIObjectConvertable.Type)? = nil,
-    content: (any OpenAPIObjectConvertable.Type)? = nil,
-    query: any OpenAPIObjectConvertable.Type...,
-    headers: any HeadersType.Type...,
-		responses: [APIResponse] = []
-	) -> Route {
-		set(\.contentType, to: content)
-			.set(\.queryType, to: query)
-			.set(\.headersType, to: headers)
-			.set(\.summary, to: summary)
-			.set(\.responseCustomType, to: response)
-			.description(description)
-	}
+    @discardableResult
+    public func openAPI(
+        summary: String = "",
+        description: String = "",
+        response: (any OpenAPIObjectConvertable.Type)? = nil,
+        content: (any OpenAPIObjectConvertable.Type)? = nil,
+        query: any OpenAPIObjectConvertable.Type...,
+        headers: any HeadersType.Type...,
+        responses: [APIResponse] = [],
+        error: (any OpenAPIObjectConvertable.Type)? = nil
+    ) -> Route {
+        set(\.contentType, to: content)
+            .set(\.queryType, to: query)
+            .set(\.headersType, to: headers)
+            .set(\.summary, to: summary)
+            .set(\.responses, to: responses)
+            .set(\.errorType, to: error)
+            .set(\.responseCustomType, to: response)
+            .description(description)
+    }
     
     @discardableResult
     public func excludeFromOpenAPI() -> Route {
@@ -28,39 +31,35 @@ extension Route {
 }
 
 extension Route {
-	
-	public var summary: String {
-		values.summary ?? ""
-	}
-	
-	@discardableResult
-	public func summary(_ value: String) -> Route {
-		set(\.summary, to: value)
-	}
-	
-	public var responses: [APIResponse] {
-		values.responses ?? []
-	}
     
-	var _excludeFromOpenAPI: Bool {
-        values._excludeFromOpenAPI ?? false
-	}
+    public var summary: String {
+        values.summary ?? ""
+    }
     
-	public var openAPIRequestType: Decodable.Type? {
-		contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
-	}
-	
-	public var openAPIResponseType: Any.Type {
-		let type = responseCustomType ?? (responseType as? EventLoopType.Type)?.valueType ?? responseType
-		if type == View.self {
-			return HTML.self
-		} else if type == Response.self {
-			return Unknown.self
-		} else {
-			return type
-		}
-	}
-	
+    @discardableResult
+    public func summary(_ value: String) -> Route {
+        set(\.summary, to: value)
+    }
+    
+    public var responses: [APIResponse] {
+        values.responses ?? []
+    }
+    
+    public var openAPIRequestType: Decodable.Type? {
+        contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
+    }
+    
+    public var openAPIResponseType: Any.Type {
+        let type = responseCustomType ?? (responseType as? EventLoopType.Type)?.valueType ?? responseType
+        if type == View.self {
+            return HTML.self
+        } else if type == Response.self {
+            return Unknown.self
+        } else {
+            return type
+        }
+    }
+    
     var openAPIObjectTypes: [any OpenAPIObject.Type] {
         var result: [any OpenAPIObject.Type] = []
         if let openAPIRequestType,
@@ -70,24 +69,31 @@ extension Route {
         if let objectType = openAPIResponseType as? any OpenAPIObjectConvertable.Type {
             result.append(objectType.openAPIType)
         }
+        if let objectType = errorType as? any OpenAPIObjectConvertable.Type {
+            result.append(objectType.openAPIType)
+        }
         return result
     }
     
-	public var contentType: (any WithExample.Type)? {
-		values.contentType
-	}
-	
-	public var responseCustomType: (any WithExample.Type)? {
-		values.responseCustomType
-	}
-	
-	public var queryType: [any WithExample.Type] {
-		values.queryType ?? []
-	}
-	
-	public var headersType: [any HeadersType.Type] {
-		values.headersType ?? []
-	}
+    public var contentType: (any WithExample.Type)? {
+        values.contentType
+    }
+    
+    public var responseCustomType: (any WithExample.Type)? {
+        values.responseCustomType
+    }
+    
+    public var errorType: (any WithExample.Type)? {
+        values.errorType
+    }
+    
+    public var queryType: [any WithExample.Type] {
+        values.queryType ?? []
+    }
+    
+    public var headersType: [any HeadersType.Type] {
+        values.headersType ?? []
+    }
     
     public var excludeFromOpenApi: Bool {
         values.excludeFromOpenApi ?? false
@@ -96,26 +102,27 @@ extension Route {
 
 private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
     
-	static var apiDataType: APIDataType { .string }
-	static var defaultContentType: HTTPMediaType { .html }
-	let description = "<html>HTML text</html>"
-	
-	static var example: HTML { HTML() }
-	
-	init() {}
-	
-	init(from decoder: Decoder) throws {
-		_ = try String(from: decoder)
-	}
-	
-	func encode(to encoder: Encoder) throws {
-		try description.encode(to: encoder)
-	}
+    static var apiDataType: APIDataType { .string }
+    static var defaultContentType: HTTPMediaType { .html }
+    let description = "<html>HTML text</html>"
+    
+    static var example: HTML { HTML() }
+    
+    init() {}
+    
+    init(from decoder: Decoder) throws {
+        _ = try String(from: decoder)
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        try description.encode(to: encoder)
+    }
 }
 
 private struct Unknown: OpenAPIContent, WithExample, APIPrimitiveType {
     
-	static var apiDataType: APIDataType { .string }
-	static var example: Unknown { Unknown() }
-	public static var defaultContentType: HTTPMediaType { .any }
+    static var apiDataType: APIDataType { .string }
+    static var example: Unknown { Unknown() }
+    public static var defaultContentType: HTTPMediaType { .any }
 }
+
