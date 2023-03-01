@@ -5,26 +5,20 @@ import PackageDescription
 
 let package = Package(
     name: "VaporToOpenAPI",
-    platforms: [
-			.macOS(.v10_15),
-			.iOS(.v13),
-			.tvOS(.v13),
-			.watchOS(.v6)
-    ],
 		products: [
 			.library(name: "VaporToOpenAPI", targets: ["VaporToOpenAPI"]),
 		],
 		dependencies: [
 			// 💧 A server-side Swift web framework.
 			.package(url: "https://github.com/vapor/vapor.git", from: "4.67.4"),
-			.package(url: "https://github.com/dankinsoid/SimpleCoders", from: "1.4.0"),
+			.package(url: "https://github.com/dankinsoid/SwiftToOpenAPI", from: "0.7.0"),
 		],
     targets: [
 			.target(
 				name: "VaporToOpenAPI",
 				dependencies: [
 					.product(name: "Vapor", package: "vapor"),
-					.product(name: "SimpleCoders", package: "SimpleCoders")
+					.product(name: "SwiftToOpenAPI", package: "SwiftToOpenAPI")
 				]
 			),
 			.testTarget(
