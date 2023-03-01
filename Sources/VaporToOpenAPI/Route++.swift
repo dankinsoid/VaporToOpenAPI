@@ -1,128 +1,139 @@
 import Vapor
-import Swiftgger
+import SwiftOpenAPI
 
 extension Route {
     
     @discardableResult
     public func openAPI(
-        summary: String = "",
-        description: String = "",
-        response: (any OpenAPIObjectConvertable.Type)? = nil,
-        content: (any OpenAPIObjectConvertable.Type)? = nil,
-        query: any OpenAPIObjectConvertable.Type...,
-        headers: any HeadersType.Type...,
-        responses: [APIResponse] = [],
-        error: (any OpenAPIObjectConvertable.Type)? = nil
+        tags: [String]? = nil,
+        summary: String? = nil,
+        description: String,
+        externalDocs: ExternalDocumentationObject? = nil,
+        operationId: String? = nil,
+        query: WithExample.Type...,
+        headers: WithExample.Type...,
+        path: WithExample.Type...,
+        cookies: WithExample.Type...,
+        requestBody: WithExample.Type? = nil,
+        response: WithExample.Type? = nil,
+        errorResponses: [Int: WithExample.Type] = [:],
+        callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
+        deprecated: Bool? = nil,
+        security: [SecurityRequirementObject]? = nil,
+        servers: [ServerObject]? = nil
     ) -> Route {
-        set(\.contentType, to: content)
-            .set(\.queryType, to: query)
-            .set(\.headersType, to: headers)
-            .set(\.summary, to: summary)
-            .set(\.responses, to: responses)
-            .set(\.errorType, to: error)
-            .set(\.responseCustomType, to: response)
-            .description(description)
+        set(
+            \.operationObject,
+            to: OperationObject(
+                tags: tags,
+                summary: summary,
+                description: description,
+                externalDocs: externalDocs,
+                operationId: operationId,
+                parameters: [
+                    try? query.flatMap {
+                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .query, schemas: &schemas)
+                    },
+                    try? headers.flatMap {
+                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .header, schemas: &schemas)
+                    },
+                    try? path.flatMap {
+                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .path, schemas: &schemas)
+                    },
+                    try? cookies.flatMap {
+                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .cookie, schemas: &schemas)
+                    }
+                ].flatMap { $0 ?? [] },
+                requestBody: requestBody.flatMap {
+                    try? .value(
+                        RequestBodyObject(
+                            description: nil,
+                            content: [
+                                .application(.json): .encode($0.example, schemas: &schemas)
+                            ],
+                            required: nil
+                        )
+                    )
+                },
+                responses: ResponsesObject(
+                    (
+                        response.flatMap {
+                            try? [
+                                .default: .value(
+                                    ResponseObject(
+                                        description: String(describing: $0),
+                                        headers: nil,
+                                        content: [
+                                            .application(.json): .encode($0.example, schemas: &schemas)
+                                        ],
+                                        links: nil
+                                    )
+                                )
+                            ]
+                        } ?? [:]
+                    ).merging(
+                        Dictionary(
+                            errorResponses.compactMap {
+                                try? (
+                                    ResponsesObject.Key.code($0.key),
+                                    .value(
+                                        ResponseObject(
+                                            description: "",
+                                            headers: nil,
+                                            content: [
+                                                .application(.json): .encode($0.value.example, schemas: &schemas)
+                                            ],
+                                            links: nil
+                                        )
+                                    )
+                                )
+                            }
+                        ) { _, new in new }
+                    ) { _, new in new }
+                ),
+                callbacks: callbacks,
+                deprecated: deprecated,
+                security: security,
+                servers: servers
+             )
+        )
+        .description(description)
     }
     
     @discardableResult
     public func excludeFromOpenAPI() -> Route {
         set(\.excludeFromOpenApi, to: true)
     }
+    
+    @discardableResult
+    public func openAPI<T>(custom keyPath: WritableKeyPath<OperationObject, T>, _ value: T) -> Route {
+        var operation = operationObject
+        operation[keyPath: keyPath] = value
+        return set(\.operationObject, to: operation)
+    }
+    
+    @discardableResult
+    public func openAPI<T>(custom keyPath: WritableKeyPath<OperationObject, T>, _ value: (inout T) -> Void) -> Route {
+        var operation = operationObject
+        value(&operation[keyPath: keyPath])
+        return set(\.operationObject, to: operation)
+    }
 }
 
 extension Route {
     
-    public var summary: String {
-        values.summary ?? ""
+    var operationObject: OperationObject {
+        values.operationObject ?? OperationObject(
+        		description: description
+        )
     }
     
-    @discardableResult
-    public func summary(_ value: String) -> Route {
-        set(\.summary, to: value)
+    var schemas: [String: ReferenceOr<SchemaObject>] {
+        get { values.schemas ?? [:] }
+        set { set(\.schemas, to: newValue) }
     }
     
-    public var responses: [APIResponse] {
-        values.responses ?? []
-    }
-    
-    public var openAPIRequestType: Decodable.Type? {
-        contentType ?? (requestType == Request.self ? nil : requestType as? Decodable.Type)
-    }
-    
-    public var openAPIResponseType: Any.Type {
-        let type = responseCustomType ?? (responseType as? EventLoopType.Type)?.valueType ?? responseType
-        if type == View.self {
-            return HTML.self
-        } else if type == Response.self {
-            return Unknown.self
-        } else {
-            return type
-        }
-    }
-    
-    var openAPIObjectTypes: [any OpenAPIObject.Type] {
-        var result: [any OpenAPIObject.Type] = []
-        if let openAPIRequestType,
-           let objectType = openAPIRequestType as? any OpenAPIObjectConvertable.Type {
-            result.append(objectType.openAPIType)
-        }
-        if let objectType = openAPIResponseType as? any OpenAPIObjectConvertable.Type {
-            result.append(objectType.openAPIType)
-        }
-        if let objectType = errorType as? any OpenAPIObjectConvertable.Type {
-            result.append(objectType.openAPIType)
-        }
-        return result
-    }
-    
-    public var contentType: (any WithExample.Type)? {
-        values.contentType
-    }
-    
-    public var responseCustomType: (any WithExample.Type)? {
-        values.responseCustomType
-    }
-    
-    public var errorType: (any WithExample.Type)? {
-        values.errorType
-    }
-    
-    public var queryType: [any WithExample.Type] {
-        values.queryType ?? []
-    }
-    
-    public var headersType: [any HeadersType.Type] {
-        values.headersType ?? []
-    }
-    
-    public var excludeFromOpenApi: Bool {
+    var excludeFromOpenApi: Bool {
         values.excludeFromOpenApi ?? false
     }
 }
-
-private struct HTML: OpenAPIContent, CustomStringConvertible, APIPrimitiveType, WithExample {
-    
-    static var apiDataType: APIDataType { .string }
-    static var defaultContentType: HTTPMediaType { .html }
-    let description = "<html>HTML text</html>"
-    
-    static var example: HTML { HTML() }
-    
-    init() {}
-    
-    init(from decoder: Decoder) throws {
-        _ = try String(from: decoder)
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        try description.encode(to: encoder)
-    }
-}
-
-private struct Unknown: OpenAPIContent, WithExample, APIPrimitiveType {
-    
-    static var apiDataType: APIDataType { .string }
-    static var example: Unknown { Unknown() }
-    public static var defaultContentType: HTTPMediaType { .any }
-}
-
