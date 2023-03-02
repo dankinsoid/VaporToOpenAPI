@@ -1,5 +1,5 @@
 import Vapor
-import SwiftOpenAPI
+@_exported import SwiftOpenAPI
 
 extension Routes {
     
@@ -13,7 +13,7 @@ extension Routes {
         security: [SecurityRequirementObject]? = nil,
         tags: [TagObject]? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
-        errorResponses: [Int: WithExample.Type] = [:],
+        errorExamples: [Int: WithExample.Type] = [:],
         errorType: MediaType = .application(.json),
         errorHeaders: WithExample.Type...,
         map: (Route) -> Route = { $0 }

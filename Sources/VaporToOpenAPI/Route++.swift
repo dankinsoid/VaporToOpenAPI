@@ -30,7 +30,7 @@ extension Route {
         set(
             \.operationObject,
             to: OperationObject(
-                tags: tags,
+                tags: tags ?? self.path.prefix(1).map(\.description),
                 summary: summary,
                 description: description,
                 externalDocs: externalDocs,
