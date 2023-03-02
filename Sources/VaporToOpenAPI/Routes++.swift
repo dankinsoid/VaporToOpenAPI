@@ -40,7 +40,7 @@ extension Routes {
             default: nil,
             type: .application(.json),
             headers: [],
-            errors: errorResponses,
+            errors: errorExamples,
             errorType: errorType,
             errorHeaders: errorHeaders,
             schemas: &schemas
