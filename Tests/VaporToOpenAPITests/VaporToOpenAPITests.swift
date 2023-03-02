@@ -21,7 +21,7 @@ final class VDTests: XCTestCase {
                 errorResponses: [:],
                 callbacks: nil,
                 deprecated: nil,
-                security: nil,
+                security: [.init("auth", [])],
                 servers: nil
             )
         
@@ -30,6 +30,16 @@ final class VDTests: XCTestCase {
             info: InfoObject(
                 title: "Pets API",
                 version: Version(1, 0, 0)
+            ),
+            components: ComponentsObject(
+            		securitySchemes: [
+                    "auth": .value(
+                        SecuritySchemeObject(
+                            type: .oauth2,
+                            bearerFormat: <#T##String?#>
+                        )
+                    )
+                ]
             ),
             errorExamples: [401: ErrorResponse.example]
         )
