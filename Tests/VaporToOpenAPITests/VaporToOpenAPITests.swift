@@ -12,7 +12,6 @@ final class VDTests: XCTestCase {
                 []
             }
             .openAPI(
-                tags: nil,
                 summary: nil,
                 description: "Get all pets",
                 externalDocs: nil,
@@ -32,7 +31,7 @@ final class VDTests: XCTestCase {
                 title: "Pets API",
                 version: Version(1, 0, 0)
             ),
-            errorResponses: [401: ErrorResponse.self]
+            errorExamples: [401: ErrorResponse.self]
         )
         
         try prettyPrint(api)

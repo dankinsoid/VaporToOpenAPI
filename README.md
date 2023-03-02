@@ -23,10 +23,10 @@ routes.post("login") { req in
 .openAPI(
   summary: "Login",
   description: "Login request",
-  response: LoginResponse.self,
-  content: LoginRequestBody.self,
   query: LoginQuery.self,
-  headers: AuthHeaders.self
+  headers: AuthHeaders.self,
+  body: LoginRequestBody.self,
+  response: LoginResponse.self
 )
 
 routes.get("api") { req in
@@ -37,27 +37,12 @@ routes.get("api") { req in
 ### 2. OpenAPIDocument
 ```swift
 let api = app.routes.openAPI(
-  title: "Example API",
-  version: "0.1.0",
-  description: "Example API description",
-  objects: [
-    // Add an additional object
-    APIObject(object: ErrorResponse.example)
-  ],
-  map: {
-    // Add an error response example to each request
-    var array = $0.responses
-    let failure = APIResponse(
-      code: "400",
-      description: ErrorResponse.example.reason,
-      type: APIBodyType(
-        type: ErrorResponse.self,
-        example: ErrorResponse.example
-      )
-    )
-    array.append(failure)
-    return $0.set(\.responses, to: array)
-    }
+  info: InfoObject(
+    title: "Example API",
+    description: "Example API description",
+    version: "0.1.0",
+  ),
+  errorExamples: [400: ErrorResponse.self]
 )
 ```
 ### 3. Saving OpenAPI
