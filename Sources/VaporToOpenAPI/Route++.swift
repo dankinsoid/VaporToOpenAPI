@@ -15,8 +15,13 @@ extension Route {
         path: WithExample.Type...,
         cookies: WithExample.Type...,
         requestBody: WithExample.Type? = nil,
+        requestType: MediaType = .application(.json),
         response: WithExample.Type? = nil,
+        responseType: MediaType = .application(.json),
+        responseHeaders: WithExample.Type...,
         errorResponses: [Int: WithExample.Type] = [:],
+        errorType: MediaType = .application(.json),
+        errorHeaders: WithExample.Type...,
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
         security: [SecurityRequirementObject]? = nil,
@@ -43,53 +48,22 @@ extension Route {
                     try? cookies.flatMap {
                         try [ReferenceOr<ParameterObject>].encode($0.example, in: .cookie, schemas: &schemas)
                     }
-                ].flatMap { $0 ?? [] },
-                requestBody: requestBody.flatMap {
-                    try? .value(
-                        RequestBodyObject(
-                            description: nil,
-                            content: [
-                                .application(.json): .encode($0.example, schemas: &schemas)
-                            ],
-                            required: nil
-                        )
-                    )
-                },
-                responses: ResponsesObject(
-                    (
-                        response.flatMap {
-                            try? [
-                                .default: .value(
-                                    ResponseObject(
-                                        description: String(describing: $0),
-                                        headers: nil,
-                                        content: [
-                                            .application(.json): .encode($0.example, schemas: &schemas)
-                                        ],
-                                        links: nil
-                                    )
-                                )
-                            ]
-                        } ?? [:]
-                    ).merging(
-                        Dictionary(
-                            errorResponses.compactMap {
-                                try? (
-                                    ResponsesObject.Key.code($0.key),
-                                    .value(
-                                        ResponseObject(
-                                            description: "",
-                                            headers: nil,
-                                            content: [
-                                                .application(.json): .encode($0.value.example, schemas: &schemas)
-                                            ],
-                                            links: nil
-                                        )
-                                    )
-                                )
-                            }
-                        ) { _, new in new }
-                    ) { _, new in new }
+                ].flatMap { $0 ?? [] }.nilIfEmpty,
+                requestBody: request(
+                    body: requestBody,
+                    description: nil,
+                    required: nil,
+                    type: requestType,
+                    schemas: &schemas
+                ),
+                responses: responses(
+                    default: response,
+                    type: responseType,
+                    headers: responseHeaders,
+                    errors: errorResponses,
+                    errorType: errorType,
+                    errorHeaders: errorHeaders,
+                    schemas: &schemas
                 ),
                 callbacks: callbacks,
                 deprecated: deprecated,
@@ -123,9 +97,14 @@ extension Route {
 extension Route {
     
     var operationObject: OperationObject {
-        values.operationObject ?? OperationObject(
-        		description: description
-        )
+        get {
+            values.operationObject ?? OperationObject(
+                description: description
+            )
+        }
+        set {
+            set(\.operationObject, to: newValue)
+        }
     }
     
     var schemas: [String: ReferenceOr<SchemaObject>] {

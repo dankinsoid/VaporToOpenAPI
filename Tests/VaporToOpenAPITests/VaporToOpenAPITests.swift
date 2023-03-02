@@ -31,7 +31,8 @@ final class VDTests: XCTestCase {
             info: InfoObject(
                 title: "Pets API",
                 version: Version(1, 0, 0)
-            )
+            ),
+            errorResponses: [401: ErrorResponse.self]
         )
         
         try prettyPrint(api)
@@ -55,6 +56,14 @@ struct PetQuery: WithExample {
     var filter: String?
     
     static let example = PetQuery(filter: "age>5")
+}
+
+struct ErrorResponse: WithExample {
+    
+    var reason: String
+    var code: Int
+    
+    static var example = ErrorResponse(reason: "Not found", code: 401)
 }
 
 private func prettyPrint(_ codable: some Encodable) throws {
