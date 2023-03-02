@@ -77,3 +77,6 @@ extension Routes {
         "error-code-\(key.rawValue)"
     }
 }
+
+extension OpenAPIObject: Content {
+}
