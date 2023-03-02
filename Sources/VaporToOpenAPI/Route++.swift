@@ -15,7 +15,7 @@ extension Route {
         path: WithExample.Type...,
         cookies: WithExample.Type...,
         body: WithExample.Type? = nil,
-        requestType: MediaType = .application(.json),
+        bodyType: MediaType = .application(.json),
         response: WithExample.Type? = nil,
         responseType: MediaType = .application(.json),
         responseHeaders: WithExample.Type...,
@@ -53,7 +53,7 @@ extension Route {
                     body: body,
                     description: nil,
                     required: nil,
-                    type: requestType,
+                    type: bodyType,
                     schemas: &schemas
                 ),
                 responses: responses(
