@@ -7,7 +7,7 @@ extension Route {
     public func openAPI(
         tags: [String]? = nil,
         summary: String? = nil,
-        description: String,
+        description: String = "",
         externalDocs: ExternalDocumentationObject? = nil,
         operationId: String? = nil,
         query: WithExample.Type...,
@@ -19,7 +19,7 @@ extension Route {
         response: WithExample.Type? = nil,
         responseType: MediaType = .application(.json),
         responseHeaders: WithExample.Type...,
-        errorResponses: [Int: WithExample.Type] = [:],
+        errorResponses: [Int: Codable] = [:],
         errorType: MediaType = .application(.json),
         errorHeaders: WithExample.Type...,
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,

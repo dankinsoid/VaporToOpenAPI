@@ -3,7 +3,7 @@ import Vapor
 import SwiftOpenAPI
 
 func response(
-    _ type: WithExample.Type,
+    _ type: Codable,
     description: String,
     contentType: MediaType,
     headers: [WithExample.Type],
@@ -17,7 +17,7 @@ func response(
         		}
         ) { _, s in s }.nilIfEmpty,
         content: [
-            contentType: .encode(type.example, schemas: &schemas)
+            contentType: .encode(type, schemas: &schemas)
         ],
         links: nil
     )
@@ -27,7 +27,7 @@ func responses(
     default defaultResponse: WithExample.Type?,
     type: MediaType,
     headers: [WithExample.Type],
-    errors errorResponses: [Int: WithExample.Type],
+    errors errorResponses: [Int: Codable],
     errorType: MediaType,
     errorHeaders: [WithExample.Type],
     schemas: inout [String: ReferenceOr<SchemaObject>]
@@ -51,7 +51,7 @@ func responses(
     if let defaultResponse {
         responses[.default] = try? .value(
             response(
-                defaultResponse,
+                defaultResponse.example,
                 description: "Success",
                 contentType: errorType,
                 headers: errorHeaders,

@@ -31,7 +31,7 @@ final class VDTests: XCTestCase {
                 title: "Pets API",
                 version: Version(1, 0, 0)
             ),
-            errorExamples: [401: ErrorResponse.self]
+            errorExamples: [401: ErrorResponse.example]
         )
         
         try prettyPrint(api)

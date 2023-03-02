@@ -13,7 +13,7 @@ extension Routes {
         security: [SecurityRequirementObject]? = nil,
         tags: [TagObject]? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
-        errorExamples: [Int: WithExample.Type] = [:],
+        errorExamples: [Int: Codable] = [:],
         errorType: MediaType = .application(.json),
         errorHeaders: WithExample.Type...,
         map: (Route) -> Route = { $0 }
