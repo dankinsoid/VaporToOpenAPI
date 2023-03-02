@@ -14,7 +14,7 @@ extension Route {
         headers: WithExample.Type...,
         path: WithExample.Type...,
         cookies: WithExample.Type...,
-        requestBody: WithExample.Type? = nil,
+        body: WithExample.Type? = nil,
         requestType: MediaType = .application(.json),
         response: WithExample.Type? = nil,
         responseType: MediaType = .application(.json),
@@ -50,7 +50,7 @@ extension Route {
                     }
                 ].flatMap { $0 ?? [] }.nilIfEmpty,
                 requestBody: request(
-                    body: requestBody,
+                    body: body,
                     description: nil,
                     required: nil,
                     type: requestType,
