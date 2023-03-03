@@ -65,7 +65,7 @@ routes.get("Swagger", "swagger.json") { req in
       description: "Example API description",
       version: "0.1.0",
     ),
-    errorExamples: [400: ErrorResponse.self]
+    errorExamples: [400: ErrorResponse()]
   )
 }
 .excludeFromOpenAPI()
