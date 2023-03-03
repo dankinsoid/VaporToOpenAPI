@@ -3,16 +3,37 @@
 VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/).
 
 ## Usage
-1. Describe all routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing)
+1. Setup a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your vapor project, for example download `dist` folder and place its content at `Public/Swagger` directory.
+2. Describe all routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing)
    - Add OpenAPI details to each route via [`route.openAPI` method](#1-routes). (optional)
-2. Create an `OpenAPIDocument` instance via [`app.routes.openAPI`](#2-openapidocument) method.
-3. Convert the `OpenAPIDocument` to json or yml file.
-   - `OpenAPIDocument` conforms to the `Codable` protocol so `JSONEncoder` can be used for this purpose.
-4. Save the file into a SwuggerUI folder.
-5. Add a route to [SwaggerUI page](https://swagger.io/swagger-ui/).
+3. Add a route to return a `OpenAPIObject`instance via [`app.routes.openAPI`] so that its path matches the `swagger.json` url in your SwaggerUI page.(#2-openapiobject) method.
 
 ## Example
-### 1. Routes
+### 1. Swagger page
+[`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
+```js
+window.onload = function() {
+  //<editor-fold desc="Changeable Configuration Block">
+
+  // the following lines will be replaced by docker/configurator, when it runs in a docker-container
+  window.ui = SwaggerUIBundle({
+    url: "./Swagger/swagger.json",
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout"
+  });
+
+  //</editor-fold>
+};
+```
+### 2. Routes
 ```swift
 routes.post("login") { req in
   try await loginService.makeLoginRequest(
@@ -34,28 +55,20 @@ routes.get("api") { req in
 }
 .excludeFromOpenAPI()
 ```
-### 2. OpenAPIDocument
+### 3. OpenAPIObject route
 ```swift
-let api = app.routes.openAPI(
-  info: InfoObject(
-    title: "Example API",
-    description: "Example API description",
-    version: "0.1.0",
-  ),
-  errorExamples: [400: ErrorResponse.self]
-)
-```
-### 3. Saving OpenAPI
-```swift
-let json = try JSONEncoder().encode(api)
-  try? FileManager.default.createDirectory(
-    at: URL(fileURLWithPath: app.directory.publicDirectory + "Swagger"),
-		withIntermediateDirectories: true,
-		attributes: nil
+// generate OpenAPI documentation
+routes.get("Swagger", "swagger.json") { req in
+  app.routes.openAPI(
+    info: InfoObject(
+      title: "Example API",
+      description: "Example API description",
+      version: "0.1.0",
+    ),
+    errorExamples: [400: ErrorResponse.self]
   )
-  // save file to Swagger directory containing SwaggerUI resources
-  let url = URL(fileURLWithPath: app.directory.publicDirectory + "Swagger/swagger.json")
-  try json.write(to: url)
+}
+.excludeFromOpenAPI()
 ```
 
 ## Installation
@@ -63,13 +76,13 @@ let json = try JSONEncoder().encode(api)
 
 Create a `Package.swift` file.
 ```swift
-// swift-tools-version:5.0
+// swift-tools-version:5.7
 import PackageDescription
 
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.6.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.7.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
