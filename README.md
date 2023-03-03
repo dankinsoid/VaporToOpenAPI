@@ -59,7 +59,7 @@ routes.get("api") { req in
 ```swift
 // generate OpenAPI documentation
 routes.get("Swagger", "swagger.json") { req in
-  app.routes.openAPI(
+  req.application.routes.openAPI(
     info: InfoObject(
       title: "Example API",
       description: "Example API description",
