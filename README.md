@@ -3,10 +3,10 @@
 VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/).
 
 ## Usage
-1. Setup a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your vapor project, for example download `dist` folder and place its content at `Public/Swagger` directory.
-2. Describe all routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing)
-   - Add OpenAPI details to each route via [`route.openAPI` method](#1-routes). (optional)
-3. Add a route to return a `OpenAPIObject`instance via `app.routes.openAPI` so that its path matches the `swagger.json` url in your SwaggerUI page method.
+1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
+2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing)
+   Optionally, add OpenAPI details to each route using the `route.openAPI` method.
+3. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the "swagger.json" URL in your SwaggerUI page method.
 
 ## Example
 ### 1. Swagger page
