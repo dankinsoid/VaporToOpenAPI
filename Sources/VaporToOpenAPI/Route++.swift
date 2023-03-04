@@ -84,6 +84,7 @@ extension Route {
     @discardableResult
     public func openAPINoAuth() -> Route {
         set(\.auths, to: [])
+            .openAPI(custom: \.security, nil)
     }
     
     @discardableResult
