@@ -4,12 +4,12 @@ VaporToOpenAPI is a Swift library which can generate output compatible with [Ope
 
 ## Usage
 1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
-2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing)
-   Optionally, add OpenAPI details to each route using the `route.openAPI` method.
-3. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the "swagger.json" URL in your SwaggerUI page method.
+2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Optionally, add OpenAPI details to each route using the `route.openAPI` method.
+3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
+4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the "swagger.json" URL in your SwaggerUI page method.
 
 ## Example
-### 1. Swagger page
+### 1. SwaggerUI page
 Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
 ```js
 window.onload = function() {
@@ -49,13 +49,12 @@ routes.post("login") { req in
   body: LoginRequestBody.self,
   response: LoginResponse.self
 )
-
-routes.get("api") { req in
-  req.view.render("swagger")
-}
-.excludeFromOpenAPI()
 ```
-### 3. OpenAPIObject route
+### 3. SwaggerUI page routing
+```swift
+FileMiddleware(publicDirectory: app.directory.publicDirectory, defaultFile: "index.html")
+```
+### 4. OpenAPIObject route
 ```swift
 // generate OpenAPI documentation
 routes.get("Swagger", "swagger.json") { req in
