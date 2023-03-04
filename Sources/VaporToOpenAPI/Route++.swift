@@ -82,6 +82,11 @@ extension Route {
     }
     
     @discardableResult
+    public func openAPINoAuth() -> Route {
+        set(\.auths, to: [])
+    }
+    
+    @discardableResult
     public func openAPI<T>(custom keyPath: WritableKeyPath<OperationObject, T>, _ value: T) -> Route {
         var operation = operationObject
         operation[keyPath: keyPath] = value

@@ -8,6 +8,7 @@ VaporToOpenAPI is a Swift library which can generate output compatible with [Ope
 3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
 4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the "swagger.json" URL in your SwaggerUI page method.
 
+All models should implement `WithExample` protocol, all enums must implement `CaseIterable`.
 ## Example
 ### 1. SwaggerUI page
 Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
@@ -83,7 +84,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.11.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.12.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
