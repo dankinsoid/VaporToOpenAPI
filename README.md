@@ -10,7 +10,7 @@ VaporToOpenAPI is a Swift library which can generate output compatible with [Ope
 
 ## Example
 ### 1. Swagger page
-[`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
+Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
 ```js
 window.onload = function() {
   //<editor-fold desc="Changeable Configuration Block">
