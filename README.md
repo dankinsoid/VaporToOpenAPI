@@ -35,6 +35,8 @@ window.onload = function() {
 ```
 ### 2. Routes
 ```swift
+routes = routes.groupedOpenAPI(auth: .basic)
+
 routes.post("login") { req in
   try await loginService.makeLoginRequest(
     query: req.query.decode(LoginQuery.self),
@@ -45,9 +47,9 @@ routes.post("login") { req in
   summary: "Login",
   description: "Login request",
   query: LoginQuery.self,
-  headers: AuthHeaders.self,
   body: LoginRequestBody.self,
-  response: LoginResponse.self
+  response: LoginResponse.self,
+  auth: .apiKey()
 )
 
 routes.get("api") { req in
@@ -82,7 +84,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.7.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.8.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

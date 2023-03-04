@@ -3,6 +3,22 @@ import Vapor
 
 extension Routes {
     
+    /// Create ```OpenAPIObjwct```
+    /// - Parameters:
+    ///   - info: Provides metadata about the API. The metadata MAY be used by tooling as required.
+    ///   - jsonSchemaDialect: The default value for the $schema keyword within ```SchemaObjects``` contained within this OAS document.
+    ///   - servers: An array of ```ServerObject```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```ServerObject``` with a url value of /.
+    ///   - paths: The available paths and operations for the API.
+    ///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement. 
+    ///   - components: An element to hold additional schemas for the document.
+    ///   - commonAuth: A declaration of which security mechanisms can be used across the API.
+    ///   - tags: A list of tags used by the document with additional metadata. 
+    ///   - externalDocs: Additional external documentation.
+    ///   - errorExamples: Common error responses
+    ///   - errorType: Common error content type
+    ///   - errorHeaders: Common error headers
+    ///   - map: Closure to customise OpenAPI for each route
+    /// - Returns: ```OpenAPIObject``` instance
     public func openAPI(
         info: InfoObject,
         jsonSchemaDialect: URL? = nil,
@@ -10,7 +26,7 @@ extension Routes {
         paths: PathsObject? = nil,
         webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
         components: ComponentsObject = ComponentsObject(),
-        security: [SecurityRequirementObject]? = nil,
+        commonAuth: [SecuritySchemeObject]? = nil,
         tags: [TagObject]? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
         errorExamples: [Int: Codable] = [:],
@@ -26,7 +42,7 @@ extension Routes {
             paths: paths ?? PathsObject(),
             webhooks: webhooks,
             components: components,
-            security: security,
+            security: securities(auth: commonAuth ?? []),
             tags: tags,
             externalDocs: externalDocs
         )
@@ -70,6 +86,12 @@ extension Routes {
             )
         }
         openAPIObject.components?.schemas = schemas.nilIfEmpty
+        openAPIObject.components?.securitySchemes = Dictionary(
+            (routes.flatMap(\.auths) + (commonAuth ?? []))
+        				.removeEquals
+                .map { ($0.autoName, .value($0)) }
+        ) { _, n in n }
+            .nilIfEmpty
         return openAPIObject
     }
     
@@ -78,5 +100,42 @@ extension Routes {
     }
 }
 
+extension RoutesBuilder {
+    
+    public func groupedOpenAPI(
+        tags: [String] = [],
+        auth: [SecuritySchemeObject],
+        authScopes: [String]
+    ) -> RoutesBuilder {
+        HTTPRoutesGroup(root: self, tags: tags, auth: auth, authScopes: authScopes)
+    }
+    
+    public func groupedOpenAPI(
+        tags: String...,
+        auth: SecuritySchemeObject...,
+        authScopes: [String] = []
+    ) -> RoutesBuilder {
+        groupedOpenAPI(tags: tags, auth: auth, authScopes: authScopes)
+    }
+}
+
 extension OpenAPIObject: Content {
+}
+
+/// Groups routes
+private struct HTTPRoutesGroup: RoutesBuilder {
+    /// Router to cascade to.
+    let root: RoutesBuilder
+		let tags: [String]
+    let auth: [SecuritySchemeObject]
+    let authScopes: [String]
+    
+    /// See `HTTPRoutesBuilder`.
+    func add(_ route: Route) {
+        root.add(
+            route
+                .setNew(auth: auth, scopes: authScopes)
+                .openAPI(custom: \.tags, ((route.operationObject.tags ?? []) + tags).removeEquals)
+        )
+    }
 }

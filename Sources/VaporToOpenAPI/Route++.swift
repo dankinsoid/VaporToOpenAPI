@@ -24,13 +24,14 @@ extension Route {
         errorHeaders: WithExample.Type...,
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
-        security: [SecurityRequirementObject]? = nil,
+        auth: SecuritySchemeObject...,
+        authScopes: [String] = [],
         servers: [ServerObject]? = nil
     ) -> Route {
         set(
             \.operationObject,
             to: OperationObject(
-                tags: tags ?? self.path.prefix(1).map(\.description),
+                tags: ((operationObject.tags ?? []) + (tags ?? self.path.prefix(1).map(\.description.upFirst))).removeEquals,
                 summary: summary,
                 description: description,
                 externalDocs: externalDocs,
@@ -67,11 +68,12 @@ extension Route {
                 ),
                 callbacks: callbacks,
                 deprecated: deprecated,
-                security: security,
+                security: operationObject.security,
                 servers: servers
              )
         )
         .description(description)
+        .setNew(auth: auth, scopes: authScopes)
     }
     
     @discardableResult
@@ -110,6 +112,11 @@ extension Route {
     var schemas: [String: ReferenceOr<SchemaObject>] {
         get { values.schemas ?? [:] }
         set { set(\.schemas, to: newValue) }
+    }
+    
+    var auths: [SecuritySchemeObject] {
+        get { values.auths ?? [] }
+        set { set(\.auths, to: newValue) }
     }
     
     var excludeFromOpenApi: Bool {
