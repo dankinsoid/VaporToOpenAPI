@@ -43,16 +43,16 @@ extension Route {
                     try? headers.flatMap {
                         try [ReferenceOr<ParameterObject>].encode($0.example, in: .header, schemas: &schemas)
                     },
-                    try? path.flatMap {
-                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .path, schemas: &schemas)
-                    },
-                    pathParameters,
+                    (
+                        try? path.flatMap {
+                            try [ReferenceOr<ParameterObject>].encode($0.example, in: .path, schemas: &schemas)
+                        }
+                    )?.nilIfEmpty ?? pathParameters,
                     try? cookies.flatMap {
                         try [ReferenceOr<ParameterObject>].encode($0.example, in: .cookie, schemas: &schemas)
                     }
                 ]
                     .flatMap { $0 ?? [] }
-                    .removeEquals { $0.object?.name }
                     .nilIfEmpty,
                 requestBody: request(
                     body: body,
