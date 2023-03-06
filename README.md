@@ -84,7 +84,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.15.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "1.16.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

@@ -24,7 +24,13 @@ extension PathComponent {
         switch self {
         case .parameter(let name):
             return .value(
-                ParameterObject(name: name, in: .path, example: nil)
+                ParameterObject(
+                    name: name,
+                    in: .path,
+                    required: true,
+                    schema: .string,
+                    example: nil
+                )
             )
         default:
             return nil
