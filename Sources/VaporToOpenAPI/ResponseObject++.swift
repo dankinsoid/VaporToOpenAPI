@@ -49,7 +49,7 @@ func responses(
         }
     ) { _, new in new }
     if let defaultResponse {
-        responses[.default] = try? .value(
+        responses[200] = try? .value(
             response(
                 defaultResponse.example,
                 description: "Success",
