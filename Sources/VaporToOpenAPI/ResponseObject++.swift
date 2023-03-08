@@ -13,8 +13,8 @@ func response(
         description: description,
         headers: Dictionary(
             headers.flatMap {
-            		try [String: ReferenceOr<HeaderObject>].encode($0.example, schemas: &schemas)
-        		}
+                try [String: ReferenceOr<HeaderObject>].encode($0.example, schemas: &schemas)
+            }
         ) { _, s in s }.nilIfEmpty,
         content: [
             contentType: .encode(type, schemas: &schemas)
@@ -40,8 +40,8 @@ func responses(
                     response(
                         $0.value,
                         description: Abort(HTTPResponseStatus(statusCode: $0.key)).reason,
-                        contentType: type,
-                        headers: headers,
+                        contentType: errorType,
+                        headers: errorHeaders,
                         schemas: &schemas
                     )
                 )
@@ -53,8 +53,8 @@ func responses(
             response(
                 defaultResponse.example,
                 description: "Success",
-                contentType: errorType,
-                headers: errorHeaders,
+                contentType: type,
+                headers: headers,
                 schemas: &schemas
             )
         )
