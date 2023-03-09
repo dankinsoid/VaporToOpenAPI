@@ -75,16 +75,21 @@ extension Routes {
             }
         }
         
-        for route in routes {
-            openAPIObject.paths?[Path(route.path)] = .value(
-            		PathItemObject(
-                    description: nil,
-                    servers: nil,
-                    parameters: nil,
-                    [route.method.openAPI: route.operationObject]
+        openAPIObject.paths?.value.merge(
+            Dictionary(
+                routes.map {
+                    (
+                        Path($0.path),
+                        PathItemObject([$0.method.openAPI: $0.operationObject])
+                    )
+                }
+            ) { f, s in
+                PathItemObject(
+                    f.operations.merging(s.operations) { _, new in new }
                 )
-            )
-        }
+            }
+                .mapValues(ReferenceOr.value)
+        ) { new, _ in new }
         openAPIObject.components?.schemas = schemas.nilIfEmpty
         openAPIObject.components?.securitySchemes = Dictionary(
             (routes.flatMap(\.auths) + (commonAuth ?? []))
