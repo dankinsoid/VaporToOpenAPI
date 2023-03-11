@@ -90,6 +90,7 @@ extension Routes {
             }
                 .mapValues(ReferenceOr.value)
         ) { new, _ in new }
+        
         openAPIObject.components?.schemas = schemas.nilIfEmpty
         openAPIObject.components?.securitySchemes = Dictionary(
             (routes.flatMap(\.auths) + (commonAuth ?? []))

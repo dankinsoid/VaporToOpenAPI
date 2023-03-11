@@ -16,7 +16,6 @@ final class VDTests: XCTestCase {
                 summary: nil,
                 description: "Get all pets",
                 externalDocs: nil,
-                operationId: nil,
                 query: PetQuery.self,
                 response: [Pet].self,
                 errorResponses: [:],
@@ -146,6 +145,7 @@ struct GroupDTO: WithExample, Content {
 
 struct Pet: WithExample, Content {
     
+    var id = UUID()
     var name: String
     var age: UInt
     

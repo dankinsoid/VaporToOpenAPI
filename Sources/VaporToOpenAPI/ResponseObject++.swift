@@ -18,8 +18,7 @@ func response(
         ) { _, s in s }.nilIfEmpty,
         content: [
             contentType: .encode(type, schemas: &schemas)
-        ],
-        links: nil
+        ]
     )
 }
 

@@ -9,7 +9,6 @@ extension Route {
         summary: String? = nil,
         description: String = "",
         externalDocs: ExternalDocumentationObject? = nil,
-        operationId: String? = nil,
         query: WithExample.Type...,
         headers: WithExample.Type...,
         path: WithExample.Type...,
@@ -35,7 +34,7 @@ extension Route {
                 summary: summary,
                 description: description,
                 externalDocs: externalDocs,
-                operationId: operationId,
+                operationId: operationID,
                 parameters: [
                     try? query.flatMap {
                         try [ReferenceOr<ParameterObject>].encode($0.example, in: .query, schemas: &schemas)
@@ -57,7 +56,7 @@ extension Route {
                 requestBody: request(
                     body: body,
                     description: nil,
-                    required: nil,
+                    required: true,
                     type: bodyType,
                     schemas: &schemas
                 ),
@@ -107,6 +106,18 @@ extension Route {
 }
 
 extension Route {
+    
+    public var operationID: String {
+        "\(method.rawValue.lowercased())\(path.map(\.name.upFirst).joined())"
+    }
+    
+    public var operationRef: String {
+        "#paths/\(Path(path).stringValue.replacingOccurrences(of: "/", with: "~1"))/\(method.rawValue.lowercased())"
+    }
+   
+    var pathParameters: [ReferenceOr<ParameterObject>] {
+        path.compactMap(\.pathParameter)
+    }
     
     var operationObject: OperationObject {
         get {
