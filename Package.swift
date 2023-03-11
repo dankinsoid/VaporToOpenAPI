@@ -16,8 +16,8 @@ let package = Package(
 		],
 		dependencies: [
 			// 💧 A server-side Swift web framework.
-			.package(url: "https://github.com/vapor/vapor.git", from: "4.70.0"),
-			.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "1.17.0"),
+			.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
+			.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "1.19.0"),
 		],
     targets: [
 			.target(
