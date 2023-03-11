@@ -48,6 +48,7 @@ extension Route {
         errorResponses: [Int: Codable] = [:],
         errorType: MediaType = .application(.json),
         errorHeaders: WithExample.Type...,
+        links: [Link: LinkableParameterKey.Type] = [:],
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
         auth: SecuritySchemeObject...,
@@ -105,6 +106,7 @@ extension Route {
         .description(description)
         .setNew(auth: auth, scopes: authScopes)
         .set(\.specID, to: spec ?? specID)
+        .set(\.links, to: links)
     }
 
     /// Exclude route from OpenAPI specification
@@ -190,5 +192,9 @@ extension Route {
     
     var specID: String? {
         values.specID ?? nil
+    }
+    
+    var links: [Link: LinkableParameterKey.Type] {
+        values.links ?? [:]
     }
 }

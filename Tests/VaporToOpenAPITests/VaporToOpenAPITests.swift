@@ -52,7 +52,8 @@ final class VDTests: XCTestCase {
             .openAPI(
                 summary: "List \(Group.self)s",
                 description: "List all the \(Group.self)s of the current \(Account.self)",
-                response: [GroupDTO].self
+                response: [GroupDTO].self,
+                links: [Link("id", in: .request(.path)): GroupDTOID.self]
             )
         
         groups.get(":id") { _ in GroupDTO() }
@@ -62,7 +63,8 @@ final class VDTests: XCTestCase {
                 response: GroupDTO.self,
                 errorResponses: [
                     404: ErrorResponse(error: true, reason: "Not found")
-                ]
+                ],
+                links: [Link("id", in: .request(.path)): GroupDTOID.self]
             )
         
         groups.post { _ in GroupDTO() }
@@ -74,6 +76,9 @@ final class VDTests: XCTestCase {
                 errorResponses: [
                     422: ErrorResponse(error: true, reason: "Error details"),
                     409: ErrorResponse(error: true, reason: "Already exists")
+                ],
+                links: [
+                    Link(\GroupDTO.id): GroupDTOID.self
                 ]
             )
         
@@ -82,8 +87,11 @@ final class VDTests: XCTestCase {
                 summary: "Update a \(Group.self)",
                 description: "Update a \(Group.self) in the current \(Account.self)",
                 body: CreateGroup.self,
-                response: GroupDTO.self
-                //responses: []
+                response: GroupDTO.self,
+                links: [
+                    Link("id", in: .request(.path)): GroupDTOID.self,
+                    Link("id", in: .response(.body)): GroupDTOID.self
+                ]
             )
         
         let api = authenticated.openAPI(
@@ -167,4 +175,10 @@ private func prettyPrint(_ codable: some Encodable) {
     } catch {
         print(codable)
     }
+}
+
+enum PetID: LinkableParameterKey {
+}
+
+enum GroupDTOID: LinkableParameterKey {
 }
