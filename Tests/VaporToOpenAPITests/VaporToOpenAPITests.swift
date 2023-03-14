@@ -41,7 +41,6 @@ final class VDTests: XCTestCase {
         
         let groups = authenticated.grouped("groups")
         
-        // ❌ Does not appear in openAPI
         groups.get { _ in [GroupDTO]() }
             .openAPI(
                 summary: "List \(Group.self)s",
@@ -49,7 +48,6 @@ final class VDTests: XCTestCase {
                 response: [GroupDTO].self
             )
         
-        // ✅ Properly appears in openAPI
         groups.get("blublublu") { _ in [GroupDTO]() }
             .openAPI(
                 summary: "List \(Group.self)s",
@@ -57,7 +55,6 @@ final class VDTests: XCTestCase {
                 response: [GroupDTO].self
             )
         
-        // ❌ Does not appear in openAPI
         groups.get(":id") { _ in GroupDTO() }
             .openAPI(
                 summary: "Get a \(Group.self) details",
@@ -68,7 +65,6 @@ final class VDTests: XCTestCase {
                 ]
             )
         
-        // ✅ Properly appears in openAPI
         groups.post { _ in GroupDTO() }
             .openAPI(
                 summary: "Create a \(Group.self)",
@@ -81,7 +77,6 @@ final class VDTests: XCTestCase {
                 ]
             )
         
-        // ❌ Does not appear in openAPI
         groups.put(":id") { _ in GroupDTO() }
             .openAPI(
                 summary: "Update a \(Group.self)",

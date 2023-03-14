@@ -3,8 +3,9 @@ import Vapor
 
 extension Routes {
     
-    /// Create ```OpenAPIObjwct```
+    /// Create ```OpenAPIObject```
     /// - Parameters:
+    ///   - spec: Specification identifier, used to group specifications
     ///   - info: Provides metadata about the API. The metadata MAY be used by tooling as required.
     ///   - jsonSchemaDialect: The default value for the $schema keyword within ```SchemaObjects``` contained within this OAS document.
     ///   - servers: An array of ```ServerObject```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```ServerObject``` with a url value of /.
@@ -20,6 +21,7 @@ extension Routes {
     ///   - map: Closure to customise OpenAPI for each route
     /// - Returns: ```OpenAPIObject``` instance
     public func openAPI(
+        spec: String? = nil,
         info: InfoObject,
         jsonSchemaDialect: URL? = nil,
         servers: [ServerObject]? = nil,
@@ -46,7 +48,7 @@ extension Routes {
             tags: tags,
             externalDocs: externalDocs
         )
-        let routes = all.map(map).filter { !$0.excludeFromOpenApi }
+        let routes = all.map(map).filter { !$0.excludeFromOpenApi && $0.specID == spec }
         
         schemas = routes.reduce(into: schemas) { components, route in
             components.merge(route.schemas) { new, _ in new }
@@ -103,45 +105,5 @@ extension Routes {
     
     private func errorKey(_ key: ResponsesObject.Key) -> String {
         "error-code-\(key.rawValue)"
-    }
-}
-
-extension RoutesBuilder {
-    
-    public func groupedOpenAPI(
-        tags: [String] = [],
-        auth: [SecuritySchemeObject],
-        authScopes: [String]
-    ) -> RoutesBuilder {
-        HTTPRoutesGroup(root: self, tags: tags, auth: auth, authScopes: authScopes)
-    }
-    
-    public func groupedOpenAPI(
-        tags: String...,
-        auth: SecuritySchemeObject...,
-        authScopes: [String] = []
-    ) -> RoutesBuilder {
-        groupedOpenAPI(tags: tags, auth: auth, authScopes: authScopes)
-    }
-}
-
-extension OpenAPIObject: Content {
-}
-
-/// Groups routes
-private struct HTTPRoutesGroup: RoutesBuilder {
-    /// Router to cascade to.
-    let root: RoutesBuilder
-		let tags: [String]
-    let auth: [SecuritySchemeObject]
-    let authScopes: [String]
-    
-    /// See `HTTPRoutesBuilder`.
-    func add(_ route: Route) {
-        root.add(
-            route
-                .setNew(auth: auth, scopes: authScopes)
-                .openAPI(custom: \.tags, ((route.operationObject.tags ?? []) + tags).removeEquals)
-        )
     }
 }
