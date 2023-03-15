@@ -8,6 +8,7 @@ extension Route {
         tags: [String]? = nil,
         summary: String? = nil,
         description: String = "",
+        operationId: String? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
         query: WithExample.Type...,
         headers: WithExample.Type...,
@@ -34,7 +35,7 @@ extension Route {
                 summary: summary,
                 description: description,
                 externalDocs: externalDocs,
-                operationId: operationID,
+                operationId: operationId ?? operationID,
                 parameters: [
                     try? query.flatMap {
                         try [ReferenceOr<ParameterObject>].encode($0.example, in: .query, schemas: &schemas)
