@@ -37,8 +37,10 @@ extension PathComponent {
     
     var name: String {
         switch self {
-        case .constant(let string), .parameter(let string):
+        case .constant(let string):
             return string
+        case .parameter(let string):
+            return "by\(string.upFirst)"
         case .anything:
             return "_"
         case .catchall:

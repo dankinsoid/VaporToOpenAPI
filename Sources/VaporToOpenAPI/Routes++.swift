@@ -36,48 +36,35 @@ extension Routes {
         errorHeaders: WithExample.Type...,
         map: (Route) -> Route = { $0 }
     ) -> OpenAPIObject {
-        var schemas = components.schemas ?? [:]
+        let routes = all.map(map).filter { !$0.excludeFromOpenApi && $0.specID == spec }
+        
         var openAPIObject = OpenAPIObject(
             info: info,
             jsonSchemaDialect: jsonSchemaDialect,
             servers: servers,
-            paths: paths ?? PathsObject(),
+            paths: paths,
             webhooks: webhooks,
             components: components,
             security: securities(auth: commonAuth ?? []),
             tags: tags,
             externalDocs: externalDocs
         )
-        let routes = all.map(map).filter { !$0.excludeFromOpenApi && $0.specID == spec }
         
-        schemas = routes.reduce(into: schemas) { components, route in
-            components.merge(route.schemas) { new, _ in new }
+        openAPIObject.addPaths(routes: routes)
+        openAPIObject.addSchemas(routes: routes)
+        openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
+        openAPIObject.addErrors(errorExamples: errorExamples, errorType: errorType, errorHeaders: errorHeaders)
+        return openAPIObject
+    }
+}
+
+private extension OpenAPIObject {
+    
+    mutating func addPaths(routes: [Route]) {
+        if paths == nil {
+            paths = PathsObject()
         }
-        
-        if let errors = responses(
-            default: nil,
-            type: .application(.json),
-            headers: [],
-            errors: errorExamples,
-            errorType: errorType,
-            errorHeaders: errorHeaders,
-            schemas: &schemas
-        ) {
-            var responses = openAPIObject.components?.responses ?? [:]
-            for (key, value) in errors.value {
-                responses[errorKey(key)] = value
-            }
-            openAPIObject.components?.responses = responses
-            
-            for route in routes {
-                route.operationObject.responses = route.operationObject.responses ?? [:]
-                for key in errors.value.keys where route.operationObject.responses?[key] == nil {
-                    route.operationObject.responses?[key] = .ref(components: \.responses, errorKey(key))
-                }
-            }
-        }
-        
-        openAPIObject.paths?.value.merge(
+        paths?.value.merge(
             Dictionary(
                 routes.map {
                     (
@@ -93,17 +80,144 @@ extension Routes {
                 .mapValues(ReferenceOr.value)
         ) { new, _ in new }
         
-        openAPIObject.components?.schemas = schemas.nilIfEmpty
-        openAPIObject.components?.securitySchemes = Dictionary(
-            (routes.flatMap(\.auths) + (commonAuth ?? []))
-        				.removeEquals
-                .map { ($0.autoName, .value($0)) }
-        ) { _, n in n }
-            .nilIfEmpty
-        return openAPIObject
+        addLinks(routes: routes)
     }
     
-    private func errorKey(_ key: ResponsesObject.Key) -> String {
-        "error-code-\(key.rawValue)"
+    mutating func addSecuritySchemes(
+        routes: [Route],
+        commonAuth: [SecuritySchemeObject]
+    ) {
+        if components == nil {
+            components = ComponentsObject()
+        }
+        if components?.securitySchemes == nil {
+            components?.securitySchemes = [:]
+        }
+        components?.securitySchemes?.merge(
+            (routes.flatMap(\.auths) + commonAuth)
+                .removeEquals
+                .map { ($0.autoName, .value($0)) }
+        ) { n, _ in n }
+        
+        if components?.securitySchemes?.isEmpty == true {
+            components?.securitySchemes = nil
+        }
     }
+    
+    mutating func addSchemas(routes: [Route]) {
+        var schemas = components?.schemas ?? [:]
+        schemas = routes.reduce(into: schemas) { components, route in
+            components.merge(route.schemas) { new, _ in new }
+        }
+        if components == nil {
+            components = ComponentsObject()
+        }
+        components?.schemas = schemas.nilIfEmpty
+    }
+    
+    mutating func addLinks(routes: [Route]) {
+        var links: [LinkKeyObject: [(Link, Route)]] = [:]
+        for route in routes {
+            for (link, type) in route.links {
+                links[type.object, default: []].append((link, route))
+            }
+        }
+        var linkObjects: [String: ReferenceOr<LinkObject>] = [:]
+        for (id, pairs) in links {
+            let sourcePairs = pairs.filter { $0.0.location.isResponse }
+            let targetPairs = pairs.filter { !$0.0.location.isResponse }
+            
+            guard !sourcePairs.isEmpty, !targetPairs.isEmpty else { continue }
+            
+            for sourcePair in sourcePairs {
+                var refs: [String: ReferenceOr<LinkObject>] = [:]
+                for targetPair in targetPairs {
+                    let name = [sourcePair.0.identifier, targetPair.1.operationID, targetPair.0.identifier].map(\.upFirst).joined()
+                    linkObjects[name] = .value(
+                        LinkObject(
+                            operationRef: nil,
+                            operationId: targetPair.1.operationObject.operationId ?? targetPair.1.operationID,
+                            parameters: [targetPair.0.name: .expression(sourcePair.0.expression)],
+                            requestBody: nil,
+                            description: id.type.description,
+                            server: id.type.server
+                        )
+                    )
+                    refs[name] = .ref(components: \.links, name)
+                }
+                
+                let path = Path(sourcePair.1.path)
+                let method = sourcePair.1.method.openAPI
+                guard var response = paths?[path]?[method]?.responses?[200]?.object else { continue }
+                response.links = response.links ?? [:]
+                response.links?.merge(refs) { _, n in n }
+                paths?[path]?[method]?.responses?[200] = .value(response)
+            }
+        }
+        
+        guard !linkObjects.isEmpty else { return }
+        if components == nil {
+            components = ComponentsObject()
+        }
+        if components?.links == nil {
+            components?.links = [:]
+        }
+        components?.links?.merge(linkObjects) { n, _ in n }
+    }
+    
+    mutating func addErrors(
+        errorExamples: [Int: Codable],
+        errorType: MediaType,
+        errorHeaders: [WithExample.Type]
+    ) {
+        var schemas = components?.schemas ?? [:]
+        let errors = responses(
+            default: nil,
+            type: .application(.json),
+            headers: [],
+            errors: errorExamples,
+            errorType: errorType,
+            errorHeaders: errorHeaders,
+            schemas: &schemas
+        )
+        guard let errors else { return }
+        
+        var responses = components?.responses ?? [:]
+        for (key, value) in errors.value {
+            let keyName = errorKey(key)
+            if responses[keyName] == nil {
+                responses[keyName] = value
+            }
+        }
+        let newPaths = paths?.value.mapValues { operations in
+            guard var operations = operations.object else { return operations }
+            operations.operations = operations.operations.mapValues { $0.withErrors(errors) }
+            return .value(operations)
+        }
+        if let newPaths {
+            paths = PathsObject(newPaths)
+        }
+        
+        if components == nil {
+            components = ComponentsObject()
+        }
+        components?.schemas = schemas
+        components?.responses = responses
+    }
+}
+
+private extension OperationObject {
+    
+    func withErrors(_ errors: ResponsesObject) -> OperationObject {
+        var result = self
+        result.responses = result.responses ?? [:]
+        for key in errors.value.keys where result.responses?[key] == nil {
+            result.responses?[key] = .ref(components: \.responses, errorKey(key))
+        }
+        return result
+    }
+}
+
+private func errorKey(_ key: ResponsesObject.Key) -> String {
+    "error-code-\(key.rawValue)"
 }

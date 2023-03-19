@@ -48,7 +48,7 @@ extension Route {
         errorResponses: [Int: Codable] = [:],
         errorType: MediaType = .application(.json),
         errorHeaders: WithExample.Type...,
-        links: [Link: LinkableParameterKey.Type] = [:],
+        links: [Link: LinkKey.Type] = [:],
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
         auth: SecuritySchemeObject...,
@@ -194,7 +194,7 @@ extension Route {
         values.specID ?? nil
     }
     
-    var links: [Link: LinkableParameterKey.Type] {
+    var links: [Link: LinkKey.Type] {
         values.links ?? [:]
     }
 }

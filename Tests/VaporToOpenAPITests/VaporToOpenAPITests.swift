@@ -78,7 +78,7 @@ final class VDTests: XCTestCase {
                     409: ErrorResponse(error: true, reason: "Already exists")
                 ],
                 links: [
-                    Link(\GroupDTO.id): GroupDTOID.self
+                    Link(\GroupDTO.id, in: .response): GroupDTOID.self
                 ]
             )
         
@@ -90,7 +90,7 @@ final class VDTests: XCTestCase {
                 response: GroupDTO.self,
                 links: [
                     Link("id", in: .request(.path)): GroupDTOID.self,
-                    Link("id", in: .response(.body)): GroupDTOID.self
+                    Link("id", in: .response): GroupDTOID.self
                 ]
             )
         
@@ -177,8 +177,8 @@ private func prettyPrint(_ codable: some Encodable) {
     }
 }
 
-enum PetID: LinkableParameterKey {
+enum PetID: LinkKey {
 }
 
-enum GroupDTOID: LinkableParameterKey {
+enum GroupDTOID: LinkKey {
 }
