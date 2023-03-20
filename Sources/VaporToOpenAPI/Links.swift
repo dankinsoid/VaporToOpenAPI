@@ -36,7 +36,7 @@ public struct Link: Hashable {
     public var location: Location
     
     public var identifier: String {
-        "\(location.description.components(separatedBy: ["."]).map(\.upFirst).joined())\(name.upFirst)"
+        "\(location.description).\(name)".components(separatedBy: ["."]).map(\.upFirst).joined()
     }
     
     public var expression: RuntimeExpression {
@@ -58,6 +58,8 @@ public struct Link: Hashable {
         
         public static var response: Location { .response(.body) }
         public static var request: Location { .request(.body) }
+        public static var path: Location { .request(.path) }
+        public static var query: Location { .request(.query) }
         
         public var description: String {
             switch self {
