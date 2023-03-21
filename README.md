@@ -47,9 +47,9 @@ routes.post("login") { req in
 .openAPI(
   summary: "Login",
   description: "Login request",
-  query: LoginQuery.self,
-  body: LoginRequestBody.self,
-  response: LoginResponse.self,
+  query: LoginQuery.example,
+  body: LoginRequestBody.example,
+  response: LoginResponse.example,
   auth: .apiKey()
 )
 ```
@@ -108,7 +108,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "2.0.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "2.0.1")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
