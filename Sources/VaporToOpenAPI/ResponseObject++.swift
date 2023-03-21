@@ -6,14 +6,14 @@ func response(
     _ type: Codable,
     description: String,
     contentType: MediaType,
-    headers: [WithExample.Type],
+    headers: [Codable],
     schemas: inout [String: ReferenceOr<SchemaObject>]
 ) throws -> ResponseObject {
     try ResponseObject(
         description: description,
         headers: Dictionary(
             headers.flatMap {
-                try [String: ReferenceOr<HeaderObject>].encode($0.example, schemas: &schemas)
+                try [String: ReferenceOr<HeaderObject>].encode($0, schemas: &schemas)
             }
         ) { _, s in s }.nilIfEmpty,
         content: [
@@ -23,12 +23,12 @@ func response(
 }
 
 func responses(
-    default defaultResponse: WithExample.Type?,
+    default defaultResponse: Codable?,
     type: MediaType,
-    headers: [WithExample.Type],
+    headers: [Codable],
     errors errorResponses: [Int: Codable],
     errorType: MediaType,
-    errorHeaders: [WithExample.Type],
+    errorHeaders: [Codable],
     schemas: inout [String: ReferenceOr<SchemaObject>]
 ) -> ResponsesObject? {
     var responses: [ResponsesObject.Key: ResponsesObject.Value] = Dictionary(
@@ -50,7 +50,7 @@ func responses(
     if let defaultResponse {
         responses[200] = try? .value(
             response(
-                defaultResponse.example,
+                defaultResponse,
                 description: "Success",
                 contentType: type,
                 headers: headers,

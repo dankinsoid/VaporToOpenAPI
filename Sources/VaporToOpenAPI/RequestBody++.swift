@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 
 func request(
-    body: WithExample.Type?,
+    body: Codable?,
     description: String?,
     required: Bool?,
     type: MediaType,
@@ -13,7 +13,7 @@ func request(
             RequestBodyObject(
                 description: description,
                 content: [
-                    type: .encode($0.example, schemas: &schemas)
+                    type: .encode($0, schemas: &schemas)
                 ],
                 required: required
             )

@@ -177,7 +177,7 @@ private extension OpenAPIObject {
             headers: [],
             errors: errorExamples,
             errorType: errorType,
-            errorHeaders: errorHeaders,
+            errorHeaders: errorHeaders.map { $0.example as Codable },
             schemas: &schemas
         )
         guard let errors else { return }

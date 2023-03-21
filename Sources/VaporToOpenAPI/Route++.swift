@@ -36,18 +36,18 @@ extension Route {
         description: String = "",
         operationId: String? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
-        query: WithExample.Type...,
-        headers: WithExample.Type...,
-        path: WithExample.Type...,
-        cookies: WithExample.Type...,
-        body: WithExample.Type? = nil,
+        query: Codable...,
+        headers: Codable...,
+        path: Codable...,
+        cookies: Codable...,
+        body: Codable? = nil,
         bodyType: MediaType = .application(.json),
-        response: WithExample.Type? = nil,
+        response: Codable? = nil,
         responseType: MediaType = .application(.json),
-        responseHeaders: WithExample.Type...,
+        responseHeaders: Codable...,
         errorResponses: [Int: Codable] = [:],
         errorType: MediaType = .application(.json),
-        errorHeaders: WithExample.Type...,
+        errorHeaders: Codable...,
         links: [Link: LinkKey.Type] = [:],
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
@@ -55,9 +55,88 @@ extension Route {
         authScopes: [String] = [],
         servers: [ServerObject]? = nil
     ) -> Route {
+        _openAPI(
+            spec: spec,
+            tags: tags,
+            summary: summary,
+            description: description,
+            operationId: operationId,
+            externalDocs: externalDocs,
+            query: query,
+            headers: headers,
+            path: path,
+            cookies: cookies,
+            body: body,
+            bodyType: bodyType,
+            response: response,
+            responseType: responseType,
+            responseHeaders: responseHeaders,
+            errorResponses: errorResponses,
+            errorType: errorType,
+            errorHeaders: errorHeaders,
+            links: links,
+            callbacks: callbacks,
+            deprecated: deprecated,
+            auth: auth,
+            authScopes: authScopes,
+            servers: servers
+        )
+    }
+    
+    /// OpenAPI operation object
+    /// - Parameters:
+    ///   - spec: Specification identifier, used to group specifications
+    ///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
+    ///   - summary: A short summary of what the operation does.
+    ///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
+    ///   - externalDocs: Additional external documentation for this operation.
+    ///   - query: Query parameters
+    ///   - headers: Request headers
+    ///   - path: Path parameters
+    ///   - cookies: Cookie parameters
+    ///   - body: Request body
+    ///   - bodyType: Request body content type
+    ///   - response: Response body
+    ///   - responseType: Response body content type
+    ///   - responseHeaders: Response headers
+    ///   - errorResponses: Error responses example
+    ///   - errorType: Error response content type
+    ///   - errorHeaders: Error response headers
+    ///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
+    ///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
+    ///   - auth: Security requirements
+    ///   - authScopes: Security scopes
+    ///   - servers: An alternative ```ServerObject``` to service this operation.
+    /// - Returns: ```Route``` instance
+    private func _openAPI(
+        spec: String?,
+        tags: [String]?,
+        summary: String?,
+        description: String,
+        operationId: String?,
+        externalDocs: ExternalDocumentationObject?,
+        query: [Codable],
+        headers: [Codable],
+        path: [Codable],
+        cookies: [Codable],
+        body: Codable?,
+        bodyType: MediaType,
+        response: Codable?,
+        responseType: MediaType,
+        responseHeaders: [Codable],
+        errorResponses: [Int: Codable],
+        errorType: MediaType,
+        errorHeaders: [Codable],
+        links: [Link: LinkKey.Type],
+        callbacks: [String: ReferenceOr<CallbackObject>]?,
+        deprecated: Bool?,
+        auth: [SecuritySchemeObject],
+        authScopes: [String],
+        servers: [ServerObject]?
+    ) -> Route {
         set(
             \.operationObject,
-            to: OperationObject(
+             to: OperationObject(
                 tags: ((operationObject.tags ?? []) + (tags ?? self.path.prefix(1).map(\.description.upFirst))).removeEquals,
                 summary: summary,
                 description: description,
@@ -65,18 +144,18 @@ extension Route {
                 operationId: operationId ?? operationID,
                 parameters: [
                     try? query.flatMap {
-                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .query, schemas: &schemas)
+                        try [ReferenceOr<ParameterObject>].encode($0, in: .query, schemas: &schemas)
                     },
                     try? headers.flatMap {
-                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .header, schemas: &schemas)
+                        try [ReferenceOr<ParameterObject>].encode($0, in: .header, schemas: &schemas)
                     },
                     (
                         try? path.flatMap {
-                            try [ReferenceOr<ParameterObject>].encode($0.example, in: .path, schemas: &schemas)
+                            try [ReferenceOr<ParameterObject>].encode($0, in: .path, schemas: &schemas)
                         }
                     )?.nilIfEmpty ?? pathParameters,
                     try? cookies.flatMap {
-                        try [ReferenceOr<ParameterObject>].encode($0.example, in: .cookie, schemas: &schemas)
+                        try [ReferenceOr<ParameterObject>].encode($0, in: .cookie, schemas: &schemas)
                     }
                 ]
                     .flatMap { $0 ?? [] }
@@ -108,7 +187,7 @@ extension Route {
         .set(\.specID, to: spec ?? specID)
         .set(\.links, to: links)
     }
-
+    
     /// Exclude route from OpenAPI specification
     @discardableResult
     public func excludeFromOpenAPI() -> Route {

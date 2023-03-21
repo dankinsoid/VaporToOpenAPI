@@ -73,6 +73,30 @@ routes.get("Swagger", "swagger.json") { req in
 .excludeFromOpenAPI()
 ```
 
+## Links
+Links are one of the new features of OpenAPI 3.0. Using links, you can describe how various values returned by one operation can be used as input for other operations.
+To create a Link:
+1. create `LinkKey` type identifying some reusable parameter.
+2. specify the type in each route using the related parameter
+
+```swift
+enum PetID: LinkKey {
+}
+```
+```swift
+route.get("pet", use: getPet).openAPI(
+  links: [
+    Link(\Pet.id, in: .response): PetID.self
+  ]
+)
+
+route.post("pet", ":petID", use: renamePer).openAPI(
+  links: [
+    Link("petID", in: .path): PetID.self
+  ]
+)
+```
+
 ## Installation
 1. [Swift Package Manager](https://github.com/apple/swift-package-manager)
 
