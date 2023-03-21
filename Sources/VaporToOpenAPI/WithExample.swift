@@ -102,5 +102,5 @@ extension Decimal: WithExample {
 
 extension UUID: WithExample {
     
-    public static var example: Self { UUID() }
+    public static let example = UUID()
 }
