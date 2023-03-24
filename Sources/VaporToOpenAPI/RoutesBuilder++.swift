@@ -18,7 +18,7 @@ extension RoutesBuilder {
 
     /// Group routes with OpenAPI security requirements
     public func groupedOpenAPI(
-        auth: [SecuritySchemeObject],
+        auth: [AuthSchemeObject],
         authScopes: [String] = []
     ) -> RoutesBuilder {
         HTTPRoutesGroup(root: self) { route in
@@ -28,7 +28,7 @@ extension RoutesBuilder {
 
     /// Group routes with OpenAPI security requirements
     public func groupedOpenAPI(
-        auth: SecuritySchemeObject...,
+        auth: AuthSchemeObject...,
         authScopes: [String] = []
     ) -> RoutesBuilder {
         groupedOpenAPI(auth: auth, authScopes: authScopes)

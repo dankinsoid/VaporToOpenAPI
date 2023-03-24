@@ -51,7 +51,7 @@ extension Route {
         links: [Link: LinkKey.Type] = [:],
         callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
         deprecated: Bool? = nil,
-        auth: SecuritySchemeObject...,
+        auth: AuthSchemeObject...,
         authScopes: [String] = [],
         servers: [ServerObject]? = nil
     ) -> Route {
@@ -130,7 +130,7 @@ extension Route {
         links: [Link: LinkKey.Type],
         callbacks: [String: ReferenceOr<CallbackObject>]?,
         deprecated: Bool?,
-        auth: [SecuritySchemeObject],
+        auth: [AuthSchemeObject],
         authScopes: [String],
         servers: [ServerObject]?
     ) -> Route {
@@ -260,7 +260,7 @@ extension Route {
         set { set(\.schemas, to: newValue) }
     }
     
-    var auths: [SecuritySchemeObject] {
+    var auths: [AuthSchemeObject] {
         get { values.auths ?? [] }
         set { set(\.auths, to: newValue) }
     }

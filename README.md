@@ -47,8 +47,7 @@ routes.get("Swagger", "swagger.json") { req in
 3. `groupedOpenAPI`: These methods are used to group Vapor routes together based on OpenAPI metadata, such as tags or security requirements.\
 Here's an example of how you might use it to group routes with the same security requirements:
 ```swift
-let auth = SecuritySchemeObject.apiKey(name: "Authorization", location: .header)
-let routes = app.routes.groupedOpenAPI(auth: auth)
+let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 ```
 4. `excludeFromOpenAPI`: This method is used to exclude a Vapor route from the generated OpenAPI specification.
    
@@ -157,7 +156,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "2.0.3")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.0.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

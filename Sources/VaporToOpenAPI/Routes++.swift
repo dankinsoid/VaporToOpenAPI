@@ -28,7 +28,7 @@ extension Routes {
         paths: PathsObject? = nil,
         webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
         components: ComponentsObject = ComponentsObject(),
-        commonAuth: [SecuritySchemeObject]? = nil,
+        commonAuth: [AuthSchemeObject]? = nil,
         tags: [TagObject]? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
         errorExamples: [Int: Codable] = [:],
@@ -85,7 +85,7 @@ private extension OpenAPIObject {
     
     mutating func addSecuritySchemes(
         routes: [Route],
-        commonAuth: [SecuritySchemeObject]
+        commonAuth: [AuthSchemeObject]
     ) {
         if components == nil {
             components = ComponentsObject()
@@ -96,7 +96,7 @@ private extension OpenAPIObject {
         components?.securitySchemes?.merge(
             (routes.flatMap(\.auths) + commonAuth)
                 .removeEquals
-                .map { ($0.autoName, .value($0)) }
+                .map { ($0.id, .value($0.scheme)) }
         ) { n, _ in n }
         
         if components?.securitySchemes?.isEmpty == true {
