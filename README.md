@@ -25,8 +25,7 @@ routes.post("users") { req -> EventLoopFuture<User> in
     summary: "Create User",
     description: "Create a new user with the provided data",
     body: User.example,
-    response: User.example,
-    responseDescription: "The newly created user"
+    response: User.example
 )
 ```
 2. `openAPI` (on Routes): This method is used to generate an entire OpenAPI specification from your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
