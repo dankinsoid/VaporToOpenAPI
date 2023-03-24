@@ -5,9 +5,9 @@ VaporToOpenAPI is a Swift library which can generate output compatible with [Ope
 ## Usage
 ### Base usage
 1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
-2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Optionally, add OpenAPI details to each route using the `route.openAPI` method.
+2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
 3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
-4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the "swagger.json" URL in your SwaggerUI page method.
+4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the `swagger.json` URL in your SwaggerUI page method.
 
 All enums in your models must implement `CaseIterable`.
 
@@ -24,8 +24,8 @@ routes.post("users") { req -> EventLoopFuture<User> in
 .openAPI(
     summary: "Create User",
     description: "Create a new user with the provided data",
-    body: User.self,
-    response: User.self,
+    body: User.example,
+    response: User.example,
     responseDescription: "The newly created user"
 )
 ```
