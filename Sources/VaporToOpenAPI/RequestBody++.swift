@@ -2,11 +2,11 @@ import Foundation
 import SwiftOpenAPI
 
 func request(
-    body: Codable?,
-    description: String?,
-    required: Bool?,
-    types: [MediaType],
-    schemas: inout [String: ReferenceOr<SchemaObject>]
+	body: Codable?,
+	description: String?,
+	required: Bool?,
+	types: [MediaType],
+	schemas: inout [String: ReferenceOr<SchemaObject>]
 ) -> ReferenceOr<RequestBodyObject>? {
 	guard
 		let body,

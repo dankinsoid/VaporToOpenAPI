@@ -1,0 +1,15 @@
+--indent tab
+--swiftversion 5.7
+--exclude Pods,**/API,**/Templates
+--disable preferKeyPath
+--disable wrapConditionalBodies
+--disable sortDeclarations
+--disable blankLinesAtStartOfScope
+--redundanttype inferred
+--header ""
+--enable organizeDeclarations
+--organizetypes markcategories
+--extensionacl on-extension
+--stripunusedargs unnamed-only
+--enable genericExtensions
+--enable typeSugar

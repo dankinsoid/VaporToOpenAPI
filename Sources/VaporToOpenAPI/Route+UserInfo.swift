@@ -18,21 +18,21 @@ public enum UserInfoKey: RouteInfoKey {
 public struct RouteUserInfoValues {
 	private let key = "user_infos"
 	private var infos: [PartialKeyPath<Route>: Any] = [:]
-	
+
 	public subscript<T>(dynamicMember keyPath: KeyPath<Route, T>) -> T? {
 		get { infos[keyPath] as? T }
 		set { infos[keyPath] = newValue }
 	}
-	
+
 	public subscript<T>(dynamicMember keyPath: KeyPath<Route, T?>) -> T? {
 		get { (infos[keyPath] as? T?) ?? nil }
 		set { infos[keyPath] = newValue }
 	}
 }
 
-extension Route {
-	
-	public var values: RouteUserInfoValues {
+public extension Route {
+
+	var values: RouteUserInfoValues {
 		get {
 			userInfo(for: UserInfoKey.self) ?? RouteUserInfoValues()
 		}
@@ -40,26 +40,26 @@ extension Route {
 			userInfo(key: UserInfoKey.self, newValue)
 		}
 	}
-	
+
 	@discardableResult
-	public func set<T>(_ keyPath: KeyPath<Route, T>, to value: T?) -> Route {
+	func set<T>(_ keyPath: KeyPath<Route, T>, to value: T?) -> Route {
 		values[dynamicMember: keyPath] = value
 		return self
 	}
-	
+
 	@discardableResult
-	public func set<T>(_ keyPath: KeyPath<Route, T?>, to value: T?) -> Route {
+	func set<T>(_ keyPath: KeyPath<Route, T?>, to value: T?) -> Route {
 		values[dynamicMember: keyPath] = value
 		return self
 	}
-	
+
 	@discardableResult
-	public func userInfo<Key: RouteInfoKey>(key: Key.Type, _ value: Key.Value) -> Route {
+	func userInfo<Key: RouteInfoKey>(key: Key.Type, _ value: Key.Value) -> Route {
 		userInfo[Key.name] = value
 		return self
 	}
-	
-	public func userInfo<Key: RouteInfoKey>(for key: Key.Type) -> Key.Value? {
+
+	func userInfo<Key: RouteInfoKey>(for key: Key.Type) -> Key.Value? {
 		userInfo[Key.name] as? Key.Value
 	}
 }

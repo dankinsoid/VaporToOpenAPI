@@ -2,60 +2,60 @@ import Foundation
 import SwiftOpenAPI
 import Vapor
 
-extension PathElement {
-    
-    public init(_ pathComponent: PathComponent) {
-        switch pathComponent {
-        case let .constant(string):
-            self = .constant(string)
-        case let .parameter(string):
-            self = .variable(string)
-        case .anything:
-            self = .constant("*")
-        case .catchall:
-            self = .constant("**")
-        }
-    }
+public extension PathElement {
+
+	init(_ pathComponent: PathComponent) {
+		switch pathComponent {
+		case let .constant(string):
+			self = .constant(string)
+		case let .parameter(string):
+			self = .variable(string)
+		case .anything:
+			self = .constant("*")
+		case .catchall:
+			self = .constant("**")
+		}
+	}
 }
 
 extension PathComponent {
-    
-    var parameterObject: ParameterObject? {
-        switch self {
-        case .parameter(let name):
-            return ParameterObject(
-                    name: name,
-                    in: .path,
-                    required: true,
-                    schema: .string,
-                    example: nil
-                )
-        default:
-            return nil
-        }
-    }
-    
-    var name: String {
-        switch self {
-        case .constant(let string):
-            return string
-        case .parameter(let string):
-            return "by\(string.upFirst)"
-        case .anything:
-            return "_"
-        case .catchall:
-            return "__"
-        }
-    }
-    
-    var pathParameter: ReferenceOr<ParameterObject>? {
-        parameterObject.map { .value($0) }
-    }
+
+	var parameterObject: ParameterObject? {
+		switch self {
+		case let .parameter(name):
+			return ParameterObject(
+				name: name,
+				in: .path,
+				required: true,
+				schema: .string,
+				example: nil
+			)
+		default:
+			return nil
+		}
+	}
+
+	var name: String {
+		switch self {
+		case let .constant(string):
+			return string
+		case let .parameter(string):
+			return "by\(string.upFirst)"
+		case .anything:
+			return "_"
+		case .catchall:
+			return "__"
+		}
+	}
+
+	var pathParameter: ReferenceOr<ParameterObject>? {
+		parameterObject.map { .value($0) }
+	}
 }
 
-extension Path {
-    
-    public init(_ path: [PathComponent]) {
-        self.init(path.map { PathElement($0) })
-    }
+public extension Path {
+
+	init(_ path: [PathComponent]) {
+		self.init(path.map { PathElement($0) })
+	}
 }

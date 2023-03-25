@@ -1,9 +1,9 @@
-import Vapor
 import SwiftOpenAPI
+import Vapor
 
-extension HTTPMethod {
-    
-    public var openAPI: PathItemObject.Method {
-        PathItemObject.Method(rawValue)
-    }
+public extension HTTPMethod {
+
+	var openAPI: PathItemObject.Method {
+		PathItemObject.Method(rawValue)
+	}
 }

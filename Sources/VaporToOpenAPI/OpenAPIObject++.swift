@@ -1,5 +1,4 @@
 import SwiftOpenAPI
 import Vapor
 
-extension OpenAPIObject: Content {
-}
+extension OpenAPIObject: Content {}
