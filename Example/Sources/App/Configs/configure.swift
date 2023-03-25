@@ -26,6 +26,7 @@ public func configure(_ app: Application) async throws {
 	try app.register(collection: OpenAPIController())
 	try app.register(collection: PetController())
 	try app.register(collection: StoreController())
+	try app.register(collection: UserController())
 
 	let encoder = JSONEncoder()
 	encoder.outputFormatting = .sortedKeys

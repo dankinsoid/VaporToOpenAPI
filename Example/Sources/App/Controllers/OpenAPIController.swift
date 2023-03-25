@@ -41,9 +41,6 @@ struct OpenAPIController: RouteCollection {
 							description: "Find out more about our store",
 							url: URL(string: "http://swagger.io")!
 						)
-					),
-					TagObject(
-						name: "user"
 					)
 				],
 				externalDocs: ExternalDocumentationObject(
