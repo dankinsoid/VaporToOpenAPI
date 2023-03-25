@@ -18,20 +18,18 @@ public extension RoutesBuilder {
 
 	/// Group routes with OpenAPI security requirements
 	func groupedOpenAPI(
-		auth: [AuthSchemeObject],
-		authScopes: [String] = []
+		auth: [AuthSchemeObject]
 	) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
-			route.setNew(auth: auth, scopes: authScopes)
+			route.setNew(auth: auth)
 		}
 	}
 
 	/// Group routes with OpenAPI security requirements
 	func groupedOpenAPI(
-		auth: AuthSchemeObject...,
-		authScopes: [String] = []
+		auth: AuthSchemeObject...
 	) -> RoutesBuilder {
-		groupedOpenAPI(auth: auth, authScopes: authScopes)
+		groupedOpenAPI(auth: auth)
 	}
 
 	/// Group routes with OpenAPI specification identifier

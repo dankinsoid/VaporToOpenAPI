@@ -51,6 +51,7 @@ public extension Routes {
 			externalDocs: externalDocs
 		)
 
+		openAPIObject.addTags(routes: routes)
 		openAPIObject.addPaths(routes: routes)
 		openAPIObject.addSchemas(routes: routes)
 		openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
@@ -211,6 +212,17 @@ private extension OpenAPIObject {
 		}
 		components?.schemas = schemas
 		components?.responses = responses
+	}
+	
+	mutating func addTags(routes: [Route]) {
+		let newTags = routes.flatMap { route in
+			return (route.operationObject.tags ?? []).compactMap { tag -> TagObject? in
+				guard tags?.contains(where: { $0.name == tag }) != true else { return nil }
+				return TagObject(name: tag)
+			}
+		}
+		.removeEquals(\.name)
+		tags = ((tags ?? []) + newTags).nilIfEmpty
 	}
 }
 

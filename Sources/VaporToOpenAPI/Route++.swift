@@ -53,7 +53,6 @@ public extension Route {
 		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
 		deprecated: Bool? = nil,
 		auth: AuthSchemeObject...,
-		authScopes: [String] = [],
 		servers: [ServerObject]? = nil
 	) -> Route {
 		_openAPI(
@@ -80,7 +79,6 @@ public extension Route {
 			callbacks: callbacks,
 			deprecated: deprecated,
 			auth: auth,
-			authScopes: authScopes,
 			servers: servers
 		)
 	}
@@ -134,13 +132,12 @@ public extension Route {
 		callbacks: [String: ReferenceOr<CallbackObject>]?,
 		deprecated: Bool?,
 		auth: [AuthSchemeObject],
-		authScopes: [String],
 		servers: [ServerObject]?
 	) -> Route {
 		set(
 			\.operationObject,
 			to: OperationObject(
-				tags: ((operationObject.tags ?? []) + (tags ?? self.path.prefix(1).map(\.description.upFirst))).removeEquals,
+				tags: ((operationObject.tags ?? []) + (tags ?? self.path.prefix(1).map(\.description))).removeEquals,
 				summary: summary,
 				description: description,
 				externalDocs: externalDocs,
@@ -187,7 +184,7 @@ public extension Route {
 			)
 		)
 		.description(description)
-		.setNew(auth: auth, scopes: authScopes)
+		.setNew(auth: auth)
 		.set(\.specID, to: spec ?? specID)
 		.set(\.links, to: links)
 	}

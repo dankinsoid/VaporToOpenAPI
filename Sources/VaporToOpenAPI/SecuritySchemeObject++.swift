@@ -5,11 +5,23 @@ import Vapor
 public struct AuthSchemeObject: Equatable, Identifiable {
 
 	public let id: String
+	public var scopes: [String]
 	public let scheme: SecuritySchemeObject
 
-	public init(id: String? = nil, scheme: SecuritySchemeObject) {
+	public init(id: String? = nil, scopes: [String] = [], scheme: SecuritySchemeObject) {
 		self.id = id ?? scheme.autoName
+		self.scopes = scopes
 		self.scheme = scheme
+	}
+	
+	public func scopes(_ scopes: String...) -> AuthSchemeObject {
+		self.scopes(scopes)
+	}
+	
+	public func scopes(_ scopes: [String]) -> AuthSchemeObject {
+		var result = self
+		result.scopes = scopes
+		return result
 	}
 }
 
@@ -94,25 +106,23 @@ extension SecuritySchemeObject {
 extension Route {
 
 	func setNew(
-		auth: [AuthSchemeObject],
-		scopes: [String]
+		auth: [AuthSchemeObject]
 	) -> Route {
 		let newAuth = (auths + auth).removeEquals
 		return set(\.auths, to: newAuth)
-			.openAPI(custom: \.security, securities(auth: newAuth, scopes: scopes, old: operationObject.security))
+			.openAPI(custom: \.security, securities(auth: newAuth, old: operationObject.security))
 	}
 }
 
 func securities(
 	auth: [AuthSchemeObject],
-	scopes: [String] = [],
 	old: [SecurityRequirementObject]? = nil
 ) -> [SecurityRequirementObject]? {
 	auth.map { auth in
 		let name = auth.id
 		return SecurityRequirementObject(
 			name,
-			((old?.first(where: { $0.name == name })?.values ?? []) + scopes).nilIfEmpty ?? auth.scheme.allScopes
+			((old?.first(where: { $0.name == name })?.values ?? []) + auth.scopes).nilIfEmpty ?? auth.scheme.allScopes
 		)
 	}.nilIfEmpty
 }
