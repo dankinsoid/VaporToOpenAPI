@@ -155,7 +155,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.3.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.4.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

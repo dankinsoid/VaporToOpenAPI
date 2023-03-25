@@ -32,6 +32,7 @@ public extension Routes {
 		tags: [TagObject]? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
 		errorExamples: [Int: Codable] = [:],
+		errorDescriptions: [Int: String] = [:],
 		errorType: MediaType...,
 		errorHeaders: WithExample.Type...,
 		map: (Route) -> Route = { $0 }
@@ -53,7 +54,12 @@ public extension Routes {
 		openAPIObject.addPaths(routes: routes)
 		openAPIObject.addSchemas(routes: routes)
 		openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
-		openAPIObject.addErrors(errorExamples: errorExamples, errorTypes: errorType.nilIfEmpty ?? [.application(.json)], errorHeaders: errorHeaders)
+		openAPIObject.addErrors(
+			errorExamples: errorExamples,
+			errorDescriptions: errorDescriptions,
+			errorTypes: errorType.nilIfEmpty ?? [.application(.json)],
+			errorHeaders: errorHeaders
+		)
 		return openAPIObject
 	}
 }
@@ -167,6 +173,7 @@ private extension OpenAPIObject {
 
 	mutating func addErrors(
 		errorExamples: [Int: Codable],
+		errorDescriptions: [Int: String],
 		errorTypes: [MediaType],
 		errorHeaders: [WithExample.Type]
 	) {
@@ -176,7 +183,7 @@ private extension OpenAPIObject {
 			types: [.application(.json)],
 			headers: [],
 			errors: errorExamples,
-			descriptions: [:],
+			descriptions: errorDescriptions,
 			errorTypes: errorTypes,
 			errorHeaders: errorHeaders.map { $0.example as Codable },
 			schemas: &schemas
