@@ -3,3 +3,4 @@
 .swiftpm
 .build
 .idea
+.DS_Store
