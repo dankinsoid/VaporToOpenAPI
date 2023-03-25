@@ -5,18 +5,22 @@ func request(
     body: Codable?,
     description: String?,
     required: Bool?,
-    type: MediaType,
+    types: [MediaType],
     schemas: inout [String: ReferenceOr<SchemaObject>]
 ) -> ReferenceOr<RequestBodyObject>? {
-    body.flatMap {
-        try? .value(
-            RequestBodyObject(
-                description: description,
-                content: [
-                    type: .encode($0, schemas: &schemas)
-                ],
-                required: required
-            )
-        )
-    }
+	guard
+		let body,
+		let bodyObject = try? MediaTypeObject.encode(body, into: &schemas)
+	else {
+		return nil
+	}
+	return .value(
+		RequestBodyObject(
+			description: description,
+			content: ContentObject(
+				dictionaryElements: types.map { ($0, bodyObject) }
+			),
+			required: required
+		)
+	)
 }

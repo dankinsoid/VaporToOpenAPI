@@ -32,7 +32,7 @@ extension Routes {
         tags: [TagObject]? = nil,
         externalDocs: ExternalDocumentationObject? = nil,
         errorExamples: [Int: Codable] = [:],
-        errorType: MediaType = .application(.json),
+				errorType: MediaType...,
         errorHeaders: WithExample.Type...,
         map: (Route) -> Route = { $0 }
     ) -> OpenAPIObject {
@@ -53,7 +53,7 @@ extension Routes {
         openAPIObject.addPaths(routes: routes)
         openAPIObject.addSchemas(routes: routes)
         openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
-        openAPIObject.addErrors(errorExamples: errorExamples, errorType: errorType, errorHeaders: errorHeaders)
+			  openAPIObject.addErrors(errorExamples: errorExamples, errorTypes: errorType.nilIfEmpty ?? [.application(.json)], errorHeaders: errorHeaders)
         return openAPIObject
     }
 }
@@ -167,16 +167,17 @@ private extension OpenAPIObject {
     
     mutating func addErrors(
         errorExamples: [Int: Codable],
-        errorType: MediaType,
+        errorTypes: [MediaType],
         errorHeaders: [WithExample.Type]
     ) {
         var schemas = components?.schemas ?? [:]
         let errors = responses(
             default: nil,
-            type: .application(.json),
+            types: [.application(.json)],
             headers: [],
             errors: errorExamples,
-            errorType: errorType,
+						descriptions: [:],
+            errorTypes: errorTypes,
             errorHeaders: errorHeaders.map { $0.example as Codable },
             schemas: &schemas
         )

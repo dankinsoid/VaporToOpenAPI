@@ -5,29 +5,31 @@ import SwiftOpenAPI
 func response(
     _ type: Codable,
     description: String,
-    contentType: MediaType,
+    contentTypes: [MediaType],
     headers: [Codable],
     schemas: inout [String: ReferenceOr<SchemaObject>]
 ) throws -> ResponseObject {
-    try ResponseObject(
+	let object = try MediaTypeObject.encode(type, schemas: &schemas)
+	return try ResponseObject(
         description: description,
         headers: Dictionary(
             headers.flatMap {
                 try [String: ReferenceOr<HeaderObject>].encode($0, schemas: &schemas)
             }
         ) { _, s in s }.nilIfEmpty,
-        content: [
-            contentType: .encode(type, schemas: &schemas)
-        ]
+        content: ContentObject(
+					dictionaryElements: contentTypes.map { ($0, object) }
+				)
     )
 }
 
 func responses(
     default defaultResponse: Codable?,
-    type: MediaType,
+    types: [MediaType],
     headers: [Codable],
     errors errorResponses: [Int: Codable],
-    errorType: MediaType,
+		descriptions: [Int: String],
+    errorTypes: [MediaType],
     errorHeaders: [Codable],
     schemas: inout [String: ReferenceOr<SchemaObject>]
 ) -> ResponsesObject? {
@@ -38,21 +40,28 @@ func responses(
                 .value(
                     response(
                         $0.value,
-                        description: Abort(HTTPResponseStatus(statusCode: $0.key)).reason,
-                        contentType: errorType,
+												description: descriptions[$0.key] ?? Abort(HTTPResponseStatus(statusCode: $0.key)).reason,
+                        contentTypes: errorTypes,
                         headers: errorHeaders,
                         schemas: &schemas
                     )
                 )
             )
-        }
+				} + descriptions.filter({ errorResponses[$0.key] == nil }).compactMap {
+					(
+						ResponsesObject.Key.code($0.key),
+						.value(
+							ResponseObject(description: $0.value)
+						)
+					)
+				}
     ) { _, new in new }
     if let defaultResponse {
         responses[200] = try? .value(
             response(
                 defaultResponse,
                 description: "Success",
-                contentType: type,
+                contentTypes: types,
                 headers: headers,
                 schemas: &schemas
             )
