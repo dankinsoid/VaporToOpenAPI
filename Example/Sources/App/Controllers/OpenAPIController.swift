@@ -24,7 +24,6 @@ struct OpenAPIController: RouteCollection {
 					),
 					version: Version(1, 0, 17)
 				),
-				servers: ["/api/v3"],
 				tags: [
 					TagObject(
 						name: "pet",
