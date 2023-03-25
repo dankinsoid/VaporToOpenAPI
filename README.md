@@ -80,7 +80,8 @@ route.post("pet", ":petID", use: renamePer).openAPI(
 )
 ```
 
-## Example
+## [Example project](Example/)
+## Short example
 ### 1. SwaggerUI page
 Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
 ```js
