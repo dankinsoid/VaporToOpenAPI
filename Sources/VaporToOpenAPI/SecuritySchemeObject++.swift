@@ -13,11 +13,11 @@ public struct AuthSchemeObject: Equatable, Identifiable {
 		self.scopes = scopes
 		self.scheme = scheme
 	}
-	
+
 	public func scopes(_ scopes: String...) -> AuthSchemeObject {
 		self.scopes(scopes)
 	}
-	
+
 	public func scopes(_ scopes: [String]) -> AuthSchemeObject {
 		var result = self
 		result.scopes = scopes
