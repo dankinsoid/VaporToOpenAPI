@@ -31,7 +31,7 @@ public extension Route {
 	@discardableResult
 	func openAPI(
 		spec: String? = nil,
-		tags: [String]? = nil,
+		tags: TagObject...,
 		summary: String? = nil,
 		description: String = "",
 		operationId: String? = nil,
@@ -110,7 +110,7 @@ public extension Route {
 	/// - Returns: ```Route``` instance
 	private func _openAPI(
 		spec: String?,
-		tags: [String]?,
+		tags: [TagObject],
 		summary: String?,
 		description: String,
 		operationId: String?,
@@ -134,10 +134,11 @@ public extension Route {
 		auth: [AuthSchemeObject],
 		servers: [ServerObject]?
 	) -> Route {
-		set(
+		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { TagObject(name: $0.description) }
+		return set(
 			\.operationObject,
 			to: OperationObject(
-				tags: ((operationObject.tags ?? []) + (tags ?? self.path.prefix(1).map(\.description))).removeEquals,
+				tags: newTags.map(\.name),
 				summary: summary,
 				description: description,
 				externalDocs: externalDocs,
@@ -187,6 +188,7 @@ public extension Route {
 		.setNew(auth: auth)
 		.set(\.specID, to: spec ?? specID)
 		.set(\.links, to: links)
+		.set(\.tags, to: newTags)
 	}
 
 	/// Exclude route from OpenAPI specification
@@ -264,6 +266,10 @@ extension Route {
 	var auths: [AuthSchemeObject] {
 		get { values.auths ?? [] }
 		set { set(\.auths, to: newValue) }
+	}
+	
+	var tags: [TagObject] {
+		values.tags ?? []
 	}
 
 	var excludeFromOpenApi: Bool {

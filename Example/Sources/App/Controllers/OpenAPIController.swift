@@ -24,24 +24,6 @@ struct OpenAPIController: RouteCollection {
 					),
 					version: Version(1, 0, 17)
 				),
-				tags: [
-					TagObject(
-						name: "pet",
-						description: "Everything about your Pets",
-						externalDocs: ExternalDocumentationObject(
-							description: "Find out more",
-							url: URL(string: "http://swagger.io")!
-						)
-					),
-					TagObject(
-						name: "store",
-						description: "Access to Petstore orders",
-						externalDocs: ExternalDocumentationObject(
-							description: "Find out more about our store",
-							url: URL(string: "http://swagger.io")!
-						)
-					)
-				],
 				externalDocs: ExternalDocumentationObject(
 					description: "Find out more about Swagger",
 					url: URL(string: "http://swagger.io")!

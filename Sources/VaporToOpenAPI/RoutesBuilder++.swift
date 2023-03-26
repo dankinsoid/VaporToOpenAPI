@@ -5,14 +5,14 @@ import Vapor
 public extension RoutesBuilder {
 
 	/// Group routes with OpenAPI tags
-	func groupedOpenAPI(tags: [String]) -> RoutesBuilder {
+	func groupedOpenAPI(tags: [TagObject]) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
-			route.openAPI(custom: \.tags, ((route.operationObject.tags ?? []) + tags).removeEquals)
+			route.set(\.tags, to: (route.tags + tags).removeEquals(\.name))
 		}
 	}
 
 	/// Group routes with OpenAPI tags
-	func groupedOpenAPI(tags: String...) -> RoutesBuilder {
+	func groupedOpenAPI(tags: TagObject...) -> RoutesBuilder {
 		groupedOpenAPI(tags: tags)
 	}
 

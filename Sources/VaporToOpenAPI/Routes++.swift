@@ -13,7 +13,6 @@ public extension Routes {
 	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
 	///   - components: An element to hold additional schemas for the document.
 	///   - commonAuth: A declaration of which security mechanisms can be used across the API.
-	///   - tags: A list of tags used by the document with additional metadata.
 	///   - externalDocs: Additional external documentation.
 	///   - errorExamples: Common error responses
 	///   - errorType: Common error content type
@@ -29,7 +28,6 @@ public extension Routes {
 		webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
 		components: ComponentsObject = ComponentsObject(),
 		commonAuth: [AuthSchemeObject]? = nil,
-		tags: [TagObject]? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
 		errorExamples: [Int: Codable] = [:],
 		errorDescriptions: [Int: String] = [:],
@@ -47,7 +45,7 @@ public extension Routes {
 			webhooks: webhooks,
 			components: components,
 			security: securities(auth: commonAuth ?? []),
-			tags: tags,
+			tags: [],
 			externalDocs: externalDocs
 		)
 
@@ -215,14 +213,7 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addTags(routes: [Route]) {
-		let newTags = routes.flatMap { route in
-			(route.operationObject.tags ?? []).compactMap { tag -> TagObject? in
-				guard tags?.contains(where: { $0.name == tag }) != true else { return nil }
-				return TagObject(name: tag)
-			}
-		}
-		.removeEquals(\.name)
-		tags = ((tags ?? []) + newTags).nilIfEmpty
+		tags = routes.flatMap(\.tags).removeEquals(\.name).nilIfEmpty
 	}
 }
 

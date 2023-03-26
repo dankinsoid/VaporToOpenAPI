@@ -9,6 +9,16 @@ struct PetController: RouteCollection {
 	func boot(routes: RoutesBuilder) throws {
 		routes
 			.groupedOpenAPI(auth: .petstoreAuth.scopes("write:pets", "read:pets"))
+			.groupedOpenAPI(
+				tags: TagObject(
+					name: "pet",
+					description: "Everything about your Pets",
+					externalDocs: ExternalDocumentationObject(
+						description: "Find out more",
+						url: URL(string: "http://swagger.io")!
+					)
+				)
+			)
 			.group("pet") { routes in
 				routes.put { _ in
 					Pet.example

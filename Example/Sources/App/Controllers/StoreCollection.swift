@@ -6,6 +6,16 @@ public struct StoreController: RouteCollection {
 
 	public func boot(routes: RoutesBuilder) throws {
 		routes
+			.groupedOpenAPI(
+				tags: TagObject(
+					name: "store",
+					description: "Access to Petstore orders",
+					externalDocs: ExternalDocumentationObject(
+						description: "Find out more about our store",
+						url: URL(string: "http://swagger.io")!
+					)
+				)
+			)
 			.group("store") { routes in
 				routes.get("inventory") { _ in
 					["Key": 100]
