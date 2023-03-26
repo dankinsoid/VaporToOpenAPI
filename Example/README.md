@@ -1,8 +1,8 @@
-# Pets
+# Petstore
 
 ## About 💬
 
-Hi and welcome! It's a Pets example project.
+Hi and welcome! It's a Petstore example project.
 
 run project
 ```sh
