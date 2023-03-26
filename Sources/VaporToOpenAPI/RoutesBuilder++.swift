@@ -15,7 +15,18 @@ public extension RoutesBuilder {
 	func groupedOpenAPI(tags: TagObject...) -> RoutesBuilder {
 		groupedOpenAPI(tags: tags)
 	}
-
+	
+	/// Creates a new Router that will automatically prepend the supplied tags as path components.
+	func group(tags: [TagObject], configure: (RoutesBuilder) throws -> ()) rethrows {
+		try groupedOpenAPI(tags: tags)
+			.group(tags.map { .constant($0.name) }, configure: configure)
+	}
+	
+	/// Creates a new Router that will automatically prepend the supplied tags as path components.
+	func group(tags firsTag: TagObject, _ otherTags: TagObject..., configure: (RoutesBuilder) throws -> ()) rethrows {
+		try group(tags: [firsTag] + otherTags, configure: configure)
+	}
+	
 	/// Group routes with OpenAPI security requirements
 	func groupedOpenAPI(
 		auth: [AuthSchemeObject]
