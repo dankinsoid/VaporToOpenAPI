@@ -3,13 +3,14 @@ import SwiftOpenAPI
 import Vapor
 
 func response(
-	_ type: Codable,
+	_ body: Codable,
 	description: String,
 	contentTypes: [MediaType],
 	headers: [Codable],
-	schemas: inout [String: ReferenceOr<SchemaObject>]
+	schemas: inout [String: ReferenceOr<SchemaObject>],
+	examples: inout [String: ReferenceOr<ExampleObject>]
 ) throws -> ResponseObject {
-	let object = try MediaTypeObject.encode(type, schemas: &schemas)
+	let object = try MediaTypeObject.encode(body, schemas: &schemas, examples: &examples)
 	return try ResponseObject(
 		description: description,
 		headers: Dictionary(
@@ -31,7 +32,8 @@ func responses(
 	descriptions: [Int: String],
 	errorTypes: [MediaType],
 	errorHeaders: [Codable],
-	schemas: inout [String: ReferenceOr<SchemaObject>]
+	schemas: inout [String: ReferenceOr<SchemaObject>],
+	examples: inout [String: ReferenceOr<ExampleObject>]
 ) -> ResponsesObject? {
 	var responses: [ResponsesObject.Key: ResponsesObject.Value] = Dictionary(
 		errorResponses.compactMap {
@@ -43,7 +45,8 @@ func responses(
 						description: descriptions[$0.key] ?? Abort(HTTPResponseStatus(statusCode: $0.key)).reason,
 						contentTypes: errorTypes,
 						headers: errorHeaders,
-						schemas: &schemas
+						schemas: &schemas,
+						examples: &examples
 					)
 				)
 			)
@@ -60,10 +63,11 @@ func responses(
 		responses[200] = try? .value(
 			response(
 				defaultResponse,
-				description: "Success",
+				description: descriptions[200] ?? "Success",
 				contentTypes: types,
 				headers: headers,
-				schemas: &schemas
+				schemas: &schemas,
+				examples: &examples
 			)
 		)
 	}

@@ -52,6 +52,7 @@ public extension Routes {
 		openAPIObject.addTags(routes: routes)
 		openAPIObject.addPaths(routes: routes)
 		openAPIObject.addSchemas(routes: routes)
+		openAPIObject.addExamples(routes: routes)
 		openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
 		openAPIObject.addErrors(
 			errorExamples: errorExamples,
@@ -110,14 +111,22 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addSchemas(routes: [Route]) {
-		var schemas = components?.schemas ?? [:]
-		schemas = routes.reduce(into: schemas) { components, route in
-			components.merge(route.schemas) { new, _ in new }
+		addComponent(\.schemas, routes: routes, at: \.schemas)
+	}
+	
+	mutating func addExamples(routes: [Route]) {
+		addComponent(\.examples, routes: routes, at: \.examples)
+	}
+	
+	mutating func addComponent<T>(_ componentKeyPath: WritableKeyPath<ComponentsObject, [String: T]?>, routes: [Route], at routeKeyPath: KeyPath<Route, [String: T]>) {
+		var values = components?[keyPath: componentKeyPath] ?? [:]
+		values = routes.reduce(into: values) { components, route in
+			components.merge(route[keyPath: routeKeyPath]) { new, _ in new }
 		}
 		if components == nil {
 			components = ComponentsObject()
 		}
-		components?.schemas = schemas.nilIfEmpty
+		components?[keyPath: componentKeyPath] = values.nilIfEmpty
 	}
 
 	mutating func addLinks(routes: [Route]) {
@@ -177,6 +186,7 @@ private extension OpenAPIObject {
 		errorHeaders: [WithExample.Type]
 	) {
 		var schemas = components?.schemas ?? [:]
+		var examples = components?.examples ?? [:]
 		let errors = responses(
 			default: nil,
 			types: [.application(.json)],
@@ -185,7 +195,8 @@ private extension OpenAPIObject {
 			descriptions: errorDescriptions,
 			errorTypes: errorTypes,
 			errorHeaders: errorHeaders.map { $0.example as Codable },
-			schemas: &schemas
+			schemas: &schemas,
+			examples: &examples
 		)
 		guard let errors else { return }
 
@@ -209,6 +220,7 @@ private extension OpenAPIObject {
 			components = ComponentsObject()
 		}
 		components?.schemas = schemas
+		components?.examples = examples
 		components?.responses = responses
 	}
 

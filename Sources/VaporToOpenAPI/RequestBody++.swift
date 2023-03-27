@@ -6,11 +6,12 @@ func request(
 	description: String?,
 	required: Bool?,
 	types: [MediaType],
-	schemas: inout [String: ReferenceOr<SchemaObject>]
+	schemas: inout [String: ReferenceOr<SchemaObject>],
+	examples: inout [String: ReferenceOr<ExampleObject>]
 ) -> ReferenceOr<RequestBodyObject>? {
 	guard
 		let body,
-		let bodyObject = try? MediaTypeObject.encode(body, into: &schemas)
+		let bodyObject = try? MediaTypeObject.encode(body, schemas: &schemas, examples: &examples)
 	else {
 		return nil
 	}

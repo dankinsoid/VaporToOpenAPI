@@ -166,7 +166,8 @@ public extension Route {
 					description: nil,
 					required: true,
 					types: bodyTypes,
-					schemas: &schemas
+					schemas: &schemas,
+					examples: &examples
 				),
 				responses: responses(
 					default: response,
@@ -176,7 +177,8 @@ public extension Route {
 					descriptions: errorDescriptions,
 					errorTypes: errorTypes,
 					errorHeaders: errorHeaders,
-					schemas: &schemas
+					schemas: &schemas,
+					examples: &examples
 				),
 				callbacks: callbacks,
 				deprecated: deprecated,
@@ -261,6 +263,11 @@ extension Route {
 	var schemas: [String: ReferenceOr<SchemaObject>] {
 		get { values.schemas ?? [:] }
 		set { set(\.schemas, to: newValue) }
+	}
+	
+	var examples: [String: ReferenceOr<ExampleObject>] {
+		get { values.examples ?? [:] }
+		set { set(\.examples, to: newValue) }
 	}
 
 	var auths: [AuthSchemeObject] {
