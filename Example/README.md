@@ -9,7 +9,7 @@ run project
 swift run
 ```
 
-and open `http://127.0.0.1:8080/swagger/`
+and open `http://127.0.0.1:8080/swagger/` (don't miss the last `/`)
 
 ## Requirements 📝
 
