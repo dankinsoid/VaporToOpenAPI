@@ -75,7 +75,7 @@ private extension OpenAPIObject {
 				routes.map {
 					(
 						Path($0.path),
-						PathItemObject([$0.method.openAPI: $0.operationObject])
+						PathItemObject([$0.openAPIMethod: $0.operationObject])
 					)
 				}
 			) { f, s in
@@ -161,7 +161,7 @@ private extension OpenAPIObject {
 				}
 
 				let path = Path(sourcePair.1.path)
-				let method = sourcePair.1.method.openAPI
+				let method = sourcePair.1.openAPIMethod
 				guard var response = paths?[path]?[method]?.responses?[200]?.object else { continue }
 				response.links = response.links ?? [:]
 				response.links?.merge(refs) { _, n in n }

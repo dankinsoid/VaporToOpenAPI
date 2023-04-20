@@ -5,6 +5,7 @@ public extension Route {
 
 	/// OpenAPI operation object
 	/// - Parameters:
+    ///   - customMethod: Custom route method
 	///   - spec: Specification identifier, used to group specifications
 	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
 	///   - summary: A short summary of what the operation does.
@@ -30,6 +31,7 @@ public extension Route {
 	/// - Returns: ```Route``` instance
 	@discardableResult
 	func openAPI(
+        customMethod: PathItemObject.Method? = nil,
 		spec: String? = nil,
 		tags: TagObject...,
 		summary: String? = nil,
@@ -56,6 +58,7 @@ public extension Route {
 		servers: [ServerObject]? = nil
 	) -> Route {
 		_openAPI(
+            method: customMethod,
 			spec: spec,
 			tags: tags,
 			summary: summary,
@@ -109,6 +112,7 @@ public extension Route {
 	///   - servers: An alternative ```ServerObject``` to service this operation.
 	/// - Returns: ```Route``` instance
 	private func _openAPI(
+        method: PathItemObject.Method?,
 		spec: String?,
 		tags: [TagObject],
 		summary: String?,
@@ -191,6 +195,7 @@ public extension Route {
 		.set(\.specID, to: spec ?? specID)
 		.set(\.links, to: links)
 		.set(\.tags, to: newTags)
+        .set(\.openAPIMethod, to: method)
 	}
 
 	/// Exclude route from OpenAPI specification
@@ -248,7 +253,7 @@ extension Route {
 	var pathParameters: [ReferenceOr<ParameterObject>] {
 		path.compactMap(\.pathParameter)
 	}
-
+    
 	var operationObject: OperationObject {
 		get {
 			values.operationObject ?? OperationObject(
@@ -278,6 +283,10 @@ extension Route {
 	var tags: [TagObject] {
 		values.tags ?? []
 	}
+    
+    var openAPIMethod: PathItemObject.Method {
+        values.openAPIMethod ?? method.openAPI
+    }
 
 	var excludeFromOpenApi: Bool {
 		values.excludeFromOpenApi ?? false
