@@ -58,7 +58,7 @@ public extension Route {
 		servers: [ServerObject]? = nil
 	) -> Route {
 		_openAPI(
-            method: customMethod,
+			method: customMethod,
 			spec: spec,
 			tags: tags,
 			summary: summary,
@@ -196,7 +196,7 @@ public extension Route {
 		.set(\.specID, to: spec ?? specID)
 		.set(\.links, to: links)
 		.set(\.tags, to: newTags)
-        .set(\.openAPIMethod, to: method)
+		.set(\.openAPIMethod, to: method)
 	}
 
 	/// Exclude route from OpenAPI specification
@@ -285,9 +285,9 @@ extension Route {
 		values.tags ?? []
 	}
     
-    var openAPIMethod: PathItemObject.Method {
-        values.openAPIMethod ?? method.openAPI
-    }
+	var openAPIMethod: PathItemObject.Method {
+		values.openAPIMethod ?? method.openAPI
+   	}
 
 	var excludeFromOpenApi: Bool {
 		values.excludeFromOpenApi ?? false
