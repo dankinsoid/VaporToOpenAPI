@@ -5,7 +5,7 @@ public extension Route {
 
 	/// OpenAPI operation object
 	/// - Parameters:
-    ///   - customMethod: Custom route method
+	///   - customMethod: Custom route method
 	///   - spec: Specification identifier, used to group specifications
 	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
 	///   - summary: A short summary of what the operation does.
@@ -31,7 +31,7 @@ public extension Route {
 	/// - Returns: ```Route``` instance
 	@discardableResult
 	func openAPI(
-        customMethod: PathItemObject.Method? = nil,
+		customMethod: PathItemObject.Method? = nil,
 		spec: String? = nil,
 		tags: TagObject...,
 		summary: String? = nil,
@@ -88,6 +88,7 @@ public extension Route {
 
 	/// OpenAPI operation object
 	/// - Parameters:
+	///   - method: Custom route method
 	///   - spec: Specification identifier, used to group specifications
 	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
 	///   - summary: A short summary of what the operation does.
@@ -112,7 +113,7 @@ public extension Route {
 	///   - servers: An alternative ```ServerObject``` to service this operation.
 	/// - Returns: ```Route``` instance
 	private func _openAPI(
-        method: PathItemObject.Method?,
+		method: PathItemObject.Method?,
 		spec: String?,
 		tags: [TagObject],
 		summary: String?,
