@@ -188,7 +188,8 @@ private extension OpenAPIObject {
 		var schemas = components?.schemas ?? [:]
 		var examples = components?.examples ?? [:]
 		let errors = responses(
-			default: nil,
+            default: nil,
+            successCode: 200,
 			types: [.application(.json)],
 			headers: [],
 			errors: errorExamples,

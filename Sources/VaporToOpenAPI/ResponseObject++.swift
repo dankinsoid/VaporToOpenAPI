@@ -26,6 +26,7 @@ func response(
 
 func responses(
 	default defaultResponse: Codable?,
+    successCode: ResponsesObject.Key,
 	types: [MediaType],
 	headers: [Codable],
 	errors errorResponses: [Int: Codable],
@@ -60,7 +61,7 @@ func responses(
 		}
 	) { _, new in new }
 	if let defaultResponse {
-		responses[200] = try? .value(
+		responses[successCode] = try? .value(
 			response(
 				defaultResponse,
 				description: descriptions[200] ?? "Success",
