@@ -48,8 +48,8 @@ public struct Link: Hashable {
 		self.location = location
 	}
 
-	public init(_ name: WritableKeyPath<some WithExample, some DetectableType>, in location: Location) {
-		self.init(Link.name(name), in: location)
+    public init<T: WithExample>(_ name: WritableKeyPath<T, some DetectableType>, in location: Location) {
+        self.init(T.codingKey(for: name), in: location)
 	}
 
 	public enum Location: Hashable, CustomStringConvertible {
@@ -83,17 +83,4 @@ public struct Link: Hashable {
 
 		case header, cookie, body
 	}
-
-	private static func name<Root: WithExample, Value: DetectableType>(_ name: WritableKeyPath<Root, Value>) -> String {
-		if let result = cache[name] { return result }
-		var example = Root.example
-		let value1 = (try? AnyValue.encode(example)) ?? [:]
-		example[keyPath: name] = Value.another(for: example[keyPath: name])
-		let value2 = (try? AnyValue.encode(example)) ?? [:]
-		let key = value1.firstDifferentKey(with: value2)
-		cache[name] = key
-		return key
-	}
-
-	private static var cache: [AnyKeyPath: String] = [:]
 }
