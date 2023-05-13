@@ -62,6 +62,9 @@ You can customize OpenAPI schemas and parameters result by implementing `OpenAPI
 ```swift
 struct LoginBody: Codable, OpenAPIDescriptable {
     
+    var username: String
+    var password: String
+    
     static var openAPIDescription: OpenAPIDescriptionType? {
         OpenAPIDescription<CodingKeys>("Login body")
             .add(for: .username, "Username")
