@@ -16,6 +16,7 @@ public enum UserInfoKey: RouteInfoKey {
 
 @dynamicMemberLookup
 public struct RouteUserInfoValues {
+    
 	private let key = "user_infos"
 	private var infos: [PartialKeyPath<Route>: Any] = [:]
 

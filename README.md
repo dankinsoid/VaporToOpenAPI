@@ -56,6 +56,29 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
    
 7. `operationID` and `operationRef`: These properties are used to generate unique identifiers for OpenAPI operations and to create references to them in other parts of the specification.
 
+#### Customizing OpenAPI schemas and parameters
+You can customize OpenAPI schemas and parameters result by implementing `OpenAPIDescriptable` and `OpenAPIType` protocols.
+1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties.
+```swift
+struct LoginBody: Codable, OpenAPIDescriptable {
+    
+    static var openAPIDescription: OpenAPIDescriptionType? {
+        OpenAPIDescription<CodingKeys>("Login body")
+            .add(for: .username, "Username")
+            .add(for: .password, "Password")
+    }
+}
+```
+2. `OpenAPIType` protocol allows you to provide a custom schema for the type.
+```swift
+struct Color: Codable, OpenAPIType {
+    
+    static var openAPISchema: SchemaObject {
+        .string(format: "hex", description: "Color in hex format")
+    }
+}
+```
+
 #### Links
 Links are one of the new features of OpenAPI 3.0. Using links, you can describe how various values returned by one operation can be used as input for other operations.
 To create a Link:
@@ -156,7 +179,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.13.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
