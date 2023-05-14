@@ -24,8 +24,8 @@ routes.post("users") { req -> EventLoopFuture<User> in
 .openAPI(
     summary: "Create User",
     description: "Create a new user with the provided data",
-    body: User.example,
-    response: User.example
+    body: User.self,
+    response: User.self
 )
 ```
 2. `openAPI` (on Routes): This method is used to generate an entire OpenAPI specification from your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
@@ -186,7 +186,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.4")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.15.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

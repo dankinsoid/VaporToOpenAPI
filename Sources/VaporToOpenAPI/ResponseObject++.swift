@@ -3,19 +3,19 @@ import SwiftOpenAPI
 import Vapor
 
 func response(
-	_ body: Codable,
+	_ body: Any,
 	description: String,
 	contentTypes: [MediaType],
-	headers: [Codable],
+	headers: [Any],
 	schemas: inout [String: ReferenceOr<SchemaObject>],
 	examples: inout [String: ReferenceOr<ExampleObject>]
 ) throws -> ResponseObject {
-	let object = try MediaTypeObject.encode(body, schemas: &schemas, examples: &examples)
+	let object = try OpenAPIValue(body).mediaTypeObject(schemas: &schemas, examples: &examples)
 	return try ResponseObject(
 		description: description,
 		headers: Dictionary(
 			headers.flatMap {
-				try [String: ReferenceOr<HeaderObject>].encode($0, schemas: &schemas)
+                try OpenAPIValue($0).headers(schemas: &schemas)
 			}
 		) { _, s in s }.nilIfEmpty,
 		content: ContentObject(
@@ -25,14 +25,14 @@ func response(
 }
 
 func responses(
-	default defaultResponse: Codable?,
+	default defaultResponse: Any?,
     successCode: ResponsesObject.Key,
 	types: [MediaType],
-	headers: [Codable],
-	errors errorResponses: [Int: Codable],
+	headers: [Any],
+	errors errorResponses: [Int: Any],
 	descriptions: [Int: String],
 	errorTypes: [MediaType],
-	errorHeaders: [Codable],
+	errorHeaders: [Any],
 	schemas: inout [String: ReferenceOr<SchemaObject>],
 	examples: inout [String: ReferenceOr<ExampleObject>]
 ) -> ResponsesObject? {

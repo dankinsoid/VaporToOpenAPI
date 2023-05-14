@@ -22,7 +22,7 @@ public struct StoreController: RouteCollection {
 				.openAPI(
 					summary: "Returns pet inventories by status",
 					description: "Returns a map of status codes to quantities",
-					response: ["Cat": Int32.example],
+                    response: ["Cat": Int32].self,
 					auth: .petstoreApiKey
 				)
 
@@ -33,9 +33,9 @@ public struct StoreController: RouteCollection {
 					.openAPI(
 						summary: "Place an order for a pet",
 						description: "Place a new order in the store",
-						body: Order.example,
+						body: Order.self,
 						bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-						response: Order.example,
+						response: Order.self,
 						errorDescriptions: [
 							405: "Invalid input",
 						]
@@ -48,7 +48,7 @@ public struct StoreController: RouteCollection {
 						.openAPI(
 							summary: "Find purchase order by ID",
 							description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-							response: Order.example,
+							response: Order.self,
 							responseType: .application(.xml), .application(.json),
 							errorDescriptions: [
 								400: "Invalid ID supplied",

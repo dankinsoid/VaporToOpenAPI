@@ -1,6 +1,7 @@
 import Foundation
+import VaporToOpenAPI
 
-public struct Tag: Codable, Identifiable {
+public struct Tag: Codable, Identifiable, WithExample {
 	
 	public var id: Int
 	public var name: String?

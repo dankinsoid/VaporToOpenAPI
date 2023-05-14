@@ -11,18 +11,18 @@ public extension Route {
 	///   - summary: A short summary of what the operation does.
 	///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
 	///   - externalDocs: Additional external documentation for this operation.
-	///   - query: Query parameters
-	///   - headers: Request headers
-	///   - path: Path parameters
-	///   - cookies: Cookie parameters
-	///   - body: Request body
+	///   - query: Query parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - headers: Request headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - path: Path parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - cookies: Cookie parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - body: Request body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
 	///   - bodyType: Request body content type
-	///   - response: Response body
+	///   - response: Response body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
 	///   - responseType: Response body content type
 	///   - responseHeaders: Response headers
-	///   - errorResponses: Error responses example
+	///   - errorResponses: Error responses example. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
 	///   - errorType: Error response content type
-	///   - errorHeaders: Error response headers
+	///   - errorHeaders: Error response headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
 	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
 	///   - auth: Security requirements
@@ -38,20 +38,20 @@ public extension Route {
 		description: String = "",
 		operationId: String? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
-		query: Codable...,
-		headers: Codable...,
-		path: Codable...,
-		cookies: Codable...,
-		body: Codable? = nil,
+		query: Any...,
+		headers: Any...,
+		path: Any...,
+		cookies: Any...,
+		body: Any? = nil,
 		bodyType: MediaType...,
-		response: Codable? = nil,
+		response: Any? = nil,
 		responseType: MediaType...,
-		responseHeaders: Codable...,
+		responseHeaders: Any...,
         successStatusCode: ResponsesObject.Key = 200,
-		errorResponses: [Int: Codable] = [:],
+		errorResponses: [Int: Any] = [:],
 		errorDescriptions: [Int: String] = [:],
 		errorType: MediaType...,
-		errorHeaders: Codable...,
+		errorHeaders: Any...,
 		links: [Link: LinkKey.Type] = [:],
 		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
 		deprecated: Bool? = nil,
@@ -88,32 +88,6 @@ public extension Route {
 		)
 	}
 
-	/// OpenAPI operation object
-	/// - Parameters:
-	///   - method: Custom route method
-	///   - spec: Specification identifier, used to group specifications
-	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
-	///   - summary: A short summary of what the operation does.
-	///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
-	///   - externalDocs: Additional external documentation for this operation.
-	///   - query: Query parameters
-	///   - headers: Request headers
-	///   - path: Path parameters
-	///   - cookies: Cookie parameters
-	///   - body: Request body
-	///   - bodyType: Request body content type
-	///   - response: Response body
-	///   - responseType: Response body content type
-	///   - responseHeaders: Response headers
-	///   - errorResponses: Error responses example
-	///   - errorType: Error response content type
-	///   - errorHeaders: Error response headers
-	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
-	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
-	///   - auth: Security requirements
-	///   - authScopes: Security scopes
-	///   - servers: An alternative ```ServerObject``` to service this operation.
-	/// - Returns: ```Route``` instance
 	private func _openAPI(
 		method: PathItemObject.Method?,
 		spec: String?,
@@ -122,20 +96,20 @@ public extension Route {
 		description: String,
 		operationId: String?,
 		externalDocs: ExternalDocumentationObject?,
-		query: [Codable],
-		headers: [Codable],
-		path: [Codable],
-		cookies: [Codable],
-		body: Codable?,
+		query: [Any],
+		headers: [Any],
+		path: [Any],
+		cookies: [Any],
+		body: Any?,
 		bodyTypes: [MediaType],
-		response: Codable?,
+		response: Any?,
 		responseTypes: [MediaType],
-		responseHeaders: [Codable],
+		responseHeaders: [Any],
         successStatusCode: ResponsesObject.Key,
-		errorResponses: [Int: Codable],
+		errorResponses: [Int: Any],
 		errorDescriptions: [Int: String],
 		errorTypes: [MediaType],
-		errorHeaders: [Codable],
+		errorHeaders: [Any],
 		links: [Link: LinkKey.Type],
 		callbacks: [String: ReferenceOr<CallbackObject>]?,
 		deprecated: Bool?,
@@ -153,18 +127,18 @@ public extension Route {
 				operationId: operationId ?? operationID,
 				parameters: [
 					try? query.flatMap {
-						try [ReferenceOr<ParameterObject>].encode($0, in: .query, schemas: &schemas)
+                        try OpenAPIValue($0).parameters(in: .query, schemas: &schemas)
 					},
 					try? headers.flatMap {
-						try [ReferenceOr<ParameterObject>].encode($0, in: .header, schemas: &schemas)
+						try OpenAPIValue($0).parameters(in: .header, schemas: &schemas)
 					},
 					(
 						try? path.flatMap {
-							try [ReferenceOr<ParameterObject>].encode($0, in: .path, schemas: &schemas)
+							try OpenAPIValue($0).parameters(in: .path, schemas: &schemas)
 						}
 					)?.nilIfEmpty ?? pathParameters,
 					try? cookies.flatMap {
-						try [ReferenceOr<ParameterObject>].encode($0, in: .cookie, schemas: &schemas)
+						try OpenAPIValue($0).parameters(in: .cookie, schemas: &schemas)
 					},
 				]
 				.flatMap { $0 ?? [] }

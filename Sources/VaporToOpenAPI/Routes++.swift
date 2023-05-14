@@ -14,10 +14,10 @@ public extension Routes {
 	///   - components: An element to hold additional schemas for the document.
 	///   - commonAuth: A declaration of which security mechanisms can be used across the API.
 	///   - externalDocs: Additional external documentation.
-	///   - errorExamples: Common error responses
-	///   - errorType: Common error content type
-	///   - errorHeaders: Common error headers
-	///   - map: Closure to customise OpenAPI for each route
+	///   - errorExamples: Common error responses. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed.
+	///   - errorType: Common error content type.
+	///   - errorHeaders: Common error headers.
+	///   - map: Closure to customise OpenAPI for each route.
 	/// - Returns: ```OpenAPIObject``` instance
 	func openAPI(
 		spec: String? = nil,
@@ -29,7 +29,7 @@ public extension Routes {
 		components: ComponentsObject = ComponentsObject(),
 		commonAuth: [AuthSchemeObject]? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
-		errorExamples: [Int: Codable] = [:],
+		errorExamples: [Int: Any] = [:],
 		errorDescriptions: [Int: String] = [:],
 		errorType: MediaType...,
 		errorHeaders: WithExample.Type...,
@@ -180,7 +180,7 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addErrors(
-		errorExamples: [Int: Codable],
+		errorExamples: [Int: Any],
 		errorDescriptions: [Int: String],
 		errorTypes: [MediaType],
 		errorHeaders: [WithExample.Type]

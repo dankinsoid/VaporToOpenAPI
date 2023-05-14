@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 
 func request(
-	body: Codable?,
+	body: Any?,
 	description: String?,
 	required: Bool?,
 	types: [MediaType],
@@ -11,7 +11,7 @@ func request(
 ) -> ReferenceOr<RequestBodyObject>? {
 	guard
 		let body,
-		let bodyObject = try? MediaTypeObject.encode(body, schemas: &schemas, examples: &examples)
+        let bodyObject = try? OpenAPIValue(body).mediaTypeObject(schemas: &schemas, examples: &examples)
 	else {
 		return nil
 	}

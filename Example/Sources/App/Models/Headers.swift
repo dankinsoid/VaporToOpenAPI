@@ -1,8 +1,9 @@
 import Foundation
+import VaporToOpenAPI
 
 public enum Headers {
 
-	public struct XRateLimit: Codable {
+	public struct XRateLimit: Codable, WithExample {
 
 		public var xRateLimit: Int32
 
@@ -14,7 +15,7 @@ public enum Headers {
 		public static let example = XRateLimit(xRateLimit: 10)
 	}
 
-	public struct XExpiresAfter: Codable {
+	public struct XExpiresAfter: Codable, WithExample {
 
 		public var xExpiresAfter: Date
 

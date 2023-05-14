@@ -15,9 +15,9 @@ struct UserController: RouteCollection {
 				.openAPI(
 					summary: "Create user",
 					description: "This can only be done by the logged in user.",
-					body: User.example,
+					body: User.self,
 					bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-					response: User.example,
+					response: User.self,
 					responseType: .application(.json), .application(.xml)
 				)
 
@@ -27,8 +27,8 @@ struct UserController: RouteCollection {
 				.openAPI(
 					summary: "Creates list of users with given input array",
 					description: "Creates list of users with given input array",
-					body: User.example,
-					response: User.example,
+					body: User.self,
+					response: User.self,
 					responseType: .application(.json), .application(.xml)
 				)
 
@@ -37,10 +37,10 @@ struct UserController: RouteCollection {
 				}
 				.openAPI(
 					summary: "Logs user into the system",
-					query: LoginQuery.example,
-					response: String.example,
+					query: LoginQuery.self,
+					response: String.self,
 					responseType: .application(.json), .application(.xml),
-					responseHeaders: Headers.XRateLimit.example, Headers.XExpiresAfter.example,
+					responseHeaders: Headers.XRateLimit.self, Headers.XExpiresAfter.self,
 					errorDescriptions: [
 						400: "Invalid username/password supplied",
 					]
@@ -60,7 +60,7 @@ struct UserController: RouteCollection {
 					}
 					.openAPI(
 						summary: "Get user by user name",
-						response: User.example,
+						response: User.self,
 						responseType: .application(.json), .application(.xml),
 						errorDescriptions: [
 							400: "Invalid username supplied",
@@ -74,7 +74,7 @@ struct UserController: RouteCollection {
 					.openAPI(
 						summary: "Update user",
 						description: "This can only be done by the logged in user.",
-						body: User.example,
+						body: User.self,
 						bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
 						response: "successful operation"
 					)
