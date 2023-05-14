@@ -62,14 +62,30 @@ You can customize OpenAPI schemas and parameters result by implementing `OpenAPI
 ```swift
 struct LoginBody: Codable, OpenAPIDescriptable {
     
-    var username: String
-    var password: String
+    let username: String
+    let password: String
     
     static var openAPIDescription: OpenAPIDescriptionType? {
         OpenAPIDescription<CodingKeys>("Login body")
             .add(for: .username, "Username")
             .add(for: .password, "Password")
     }
+}
+```
+Or a bit clearer if a type implements `WithExample` protocol and all its properties are mutable:
+```swift
+struct LoginBody: Codable, WithExample, OpenAPIDescriptable {
+    
+    var username: String
+    var password: String
+    
+    static var openAPIDescription: OpenAPIDescriptionType? {
+        Description("Login body")
+            .username("Username")
+            .password("Password")
+    }
+
+    static let example = LoginBody(username: "user", password: "123456")
 }
 ```
 2. `OpenAPIType` protocol allows you to provide a custom schema for the type.
@@ -182,7 +198,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.1")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.2")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
