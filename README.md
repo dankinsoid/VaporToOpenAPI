@@ -60,6 +60,8 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 You can customize OpenAPI schemas and parameters result by implementing `OpenAPIDescriptable` and `OpenAPIType` protocols.
 1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties.
 ```swift
+import SwiftOpenAPI
+
 struct LoginBody: Codable, OpenAPIDescriptable {
     
     let username: String
@@ -74,6 +76,8 @@ struct LoginBody: Codable, OpenAPIDescriptable {
 ```
 2. `OpenAPIType` protocol allows you to provide a custom schema for the type.
 ```swift
+import SwiftOpenAPI
+
 struct Color: Codable, OpenAPIType {
     
     static var openAPISchema: SchemaObject {
