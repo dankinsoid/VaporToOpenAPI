@@ -1,7 +1,9 @@
 import Foundation
 import Vapor
+import VaporToOpenAPI
+import SwiftOpenAPI
 
-public struct Order: Codable, Equatable, Content {
+public struct Order: Codable, Equatable, Content, WithExample, OpenAPIDescriptable {
 
 	public var id: Int
 	public var petId: Int
@@ -18,4 +20,14 @@ public struct Order: Codable, Equatable, Content {
 		status: .approved,
 		complete: false
 	)
+
+		public static var openAPIDescription: OpenAPIDescriptionType? {
+			OpenAPIDescription<CodingKeys>("Order")
+				.add(for: .id, "Unique identifier for the order")
+				.add(for: .petId, "Pet sold to")
+				.add(for: .quantity, "Quantity sold")
+				.add(for: .shipDate, "Estimated ship date")
+				.add(for: .status, "Order Status")
+				.add(for: .complete, "Is the order complete?")
+	}
 }
