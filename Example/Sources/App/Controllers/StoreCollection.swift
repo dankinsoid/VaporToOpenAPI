@@ -22,7 +22,7 @@ public struct StoreController: RouteCollection {
 				.openAPI(
 					summary: "Returns pet inventories by status",
 					description: "Returns a map of status codes to quantities",
-                    response: ["Cat": Int32].self,
+                    response: [String: Int32].self,
 					auth: .petstoreApiKey
 				)
 
