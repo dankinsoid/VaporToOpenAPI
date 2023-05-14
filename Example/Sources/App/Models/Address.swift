@@ -1,4 +1,5 @@
 import Foundation
+import VaporToOpenAPI
 import SwiftOpenAPI
 
 public struct Address: Codable, WithExample, OpenAPIDescriptable {

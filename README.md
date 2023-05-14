@@ -72,22 +72,6 @@ struct LoginBody: Codable, OpenAPIDescriptable {
     }
 }
 ```
-Or a bit clearer if a type implements `WithExample` protocol and all its properties are mutable:
-```swift
-struct LoginBody: Codable, WithExample, OpenAPIDescriptable {
-    
-    var username: String
-    var password: String
-    
-    static var openAPIDescription: OpenAPIDescriptionType? {
-        Description("Login body")
-            .username("Username")
-            .password("Password")
-    }
-
-    static let example = LoginBody(username: "user", password: "123456")
-}
-```
 2. `OpenAPIType` protocol allows you to provide a custom schema for the type.
 ```swift
 struct Color: Codable, OpenAPIType {
@@ -198,7 +182,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.2")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.14.3")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
