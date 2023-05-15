@@ -149,9 +149,9 @@ routes.post("login") { req in
 .openAPI(
   summary: "Login",
   description: "Login request",
-  query: LoginQuery.example,
-  body: LoginRequestBody.example,
-  response: LoginResponse.example,
+  query: LoginQuery.self,
+  body: LoginRequestBody.self,
+  response: LoginResponse.self,
   auth: .apiKey()
 )
 ```
