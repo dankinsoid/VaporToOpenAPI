@@ -3,75 +3,63 @@ import SwiftOpenAPI
 import Vapor
 
 func response(
-	_ body: Any,
+	_ body: OpenAPIValue?,
 	description: String,
 	contentTypes: [MediaType],
-	headers: [Any],
+	headers: OpenAPIValue?,
 	schemas: inout [String: ReferenceOr<SchemaObject>],
 	examples: inout [String: ReferenceOr<ExampleObject>]
 ) throws -> ResponseObject {
-	let object = try OpenAPIValue(body).mediaTypeObject(schemas: &schemas, examples: &examples)
+	let object = try body?.mediaTypeObject(schemas: &schemas, examples: &examples)
 	return try ResponseObject(
 		description: description,
-		headers: Dictionary(
-			headers.flatMap {
-                try OpenAPIValue($0).headers(schemas: &schemas)
-			}
-		) { _, s in s }.nilIfEmpty,
-		content: ContentObject(
-			dictionaryElements: contentTypes.map { ($0, object) }
-		)
+		headers: headers?.headers(schemas: &schemas).nilIfEmpty,
+		content: object.map { object in
+			ContentObject(
+				dictionaryElements: (contentTypes.nilIfEmpty ?? [.application(.json)]).map { ($0, object) }
+			)
+		}
 	)
 }
 
 func responses(
-	default defaultResponse: Any?,
-    successCode: ResponsesObject.Key,
-	types: [MediaType],
-	headers: [Any],
-	errors errorResponses: [Int: Any],
-	descriptions: [Int: String],
-	errorTypes: [MediaType],
-	errorHeaders: [Any],
+	current: ResponsesObject?,
+	responses: [ResponsesObject.Key: OpenAPIValue],
+	descriptions: [ResponsesObject.Key: String],
+	types: [ResponsesObject.Key: [MediaType]],
+	headers: [ResponsesObject.Key: OpenAPIValue],
 	schemas: inout [String: ReferenceOr<SchemaObject>],
 	examples: inout [String: ReferenceOr<ExampleObject>]
 ) -> ResponsesObject? {
-	var responses: [ResponsesObject.Key: ResponsesObject.Value] = Dictionary(
-		errorResponses.compactMap {
+	var result: [ResponsesObject.Key: ResponsesObject.Value] = Dictionary(
+		Set(responses.keys).union(descriptions.keys).compactMap { key in
 			try? (
-				ResponsesObject.Key.code($0.key),
+				key,
 				.value(
 					response(
-						$0.value,
-						description: descriptions[$0.key] ?? Abort(HTTPResponseStatus(statusCode: $0.key)).reason,
-						contentTypes: errorTypes,
-						headers: errorHeaders,
+						responses[key],
+						description: descriptions[key] ?? description(for: key),
+						contentTypes: types[key] ?? [.application(.json)],
+						headers: headers[key],
 						schemas: &schemas,
 						examples: &examples
 					)
 				)
 			)
-		} + descriptions.filter { errorResponses[$0.key] == nil }.compactMap {
-			(
-				ResponsesObject.Key.code($0.key),
-				.value(
-					ResponseObject(description: $0.value)
-				)
-			)
 		}
 	) { _, new in new }
-	if let defaultResponse {
-		responses[successCode] = try? .value(
-			response(
-				defaultResponse,
-				description: descriptions[200] ?? "Success",
-				contentTypes: types,
-				headers: headers,
-				schemas: &schemas,
-				examples: &examples
-			)
-		)
+	result = result.merging(current?.value ?? [:]) { new, _ in
+		new
 	}
-	guard !responses.isEmpty else { return nil }
-	return ResponsesObject(responses)
+	guard !result.isEmpty else { return nil }
+	return ResponsesObject(result)
+}
+
+private func description(for code: ResponsesObject.Key) -> String {
+	switch code.intValue {
+	case nil:
+		return "Default response"
+	case let .some(otherCode):
+		return Abort(HTTPResponseStatus(statusCode: otherCode)).reason
+	}
 }

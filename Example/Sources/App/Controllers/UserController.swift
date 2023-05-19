@@ -15,10 +15,10 @@ struct UserController: RouteCollection {
 				.openAPI(
 					summary: "Create user",
 					description: "This can only be done by the logged in user.",
-					body: User.self,
-					bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-					response: User.self,
-					responseType: .application(.json), .application(.xml)
+					body: .type(User.self),
+					contentType: .application(.json), .application(.xml), .application(.urlEncoded),
+					response: .type(User.self),
+					responseContentType: .application(.json), .application(.xml)
 				)
 
 				routes.post("createWithList") { _ in
@@ -27,9 +27,9 @@ struct UserController: RouteCollection {
 				.openAPI(
 					summary: "Creates list of users with given input array",
 					description: "Creates list of users with given input array",
-					body: User.self,
-					response: User.self,
-					responseType: .application(.json), .application(.xml)
+					body: .type(User.self),
+					response: .type(User.self),
+					responseContentType: .application(.json), .application(.xml)
 				)
 
 				routes.get("login") { _ in
@@ -37,14 +37,12 @@ struct UserController: RouteCollection {
 				}
 				.openAPI(
 					summary: "Logs user into the system",
-					query: LoginQuery.self,
-					response: String.self,
-					responseType: .application(.json), .application(.xml),
-					responseHeaders: Headers.XRateLimit.self, Headers.XExpiresAfter.self,
-					errorDescriptions: [
-						400: "Invalid username/password supplied",
-					]
+					query: .type(LoginQuery.self),
+					response: .type(String.self),
+					responseContentType: .application(.json), .application(.xml),
+					responseHeaders: .all(of: .type(Headers.XRateLimit.self), .type(Headers.XExpiresAfter.self))
 				)
+				.response(statusCode: 400, description: "Invalid username/password supplied")
 
 				routes.get("logout") { _ in
 					"Success"
@@ -60,13 +58,11 @@ struct UserController: RouteCollection {
 					}
 					.openAPI(
 						summary: "Get user by user name",
-						response: User.self,
-						responseType: .application(.json), .application(.xml),
-						errorDescriptions: [
-							400: "Invalid username supplied",
-							404: "User not found",
-						]
+						response: .type(User.self),
+						responseContentType: .application(.json), .application(.xml)
 					)
+					.response(statusCode: 400, description: "Invalid username supplied")
+					.response(statusCode: 404, description: "User not found")
 
 					routes.put { _ in
 						"successful operation"
@@ -74,9 +70,9 @@ struct UserController: RouteCollection {
 					.openAPI(
 						summary: "Update user",
 						description: "This can only be done by the logged in user.",
-						body: User.self,
-						bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-						response: "successful operation"
+						body: .type(User.self),
+						contentType: .application(.json), .application(.xml), .application(.urlEncoded),
+						response: .type(of: "successful operation")
 					)
 
 					routes.delete { _ in
@@ -85,12 +81,10 @@ struct UserController: RouteCollection {
 					.openAPI(
 						summary: "Delete user",
 						description: "This can only be done by the logged in user.",
-						response: "successful operation",
-						errorDescriptions: [
-							400: "Invalid username supplied",
-							404: "User not found"
-						]
+						response: .type(of: "successful operation")
 					)
+					.response(statusCode: 400, description: "Invalid username supplied")
+					.response(statusCode: 404, description: "User not found")
 				}
 			}
 	}

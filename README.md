@@ -14,7 +14,7 @@ All enums in your models must implement `CaseIterable`.
 ### Advanced Usage
 VaporToOpenAPI includes several advanced features that allow you to customize the generated OpenAPI documentation in various ways. Some of these features include:
 
-1. `openAPI`: This method is used to add OpenAPI metadata to a single Vapor route. It takes a variety of parameters, such as a summary and description of the operation, request and response bodies, query parameters, and more.\
+- `openAPI`: This method is used to add OpenAPI metadata to a single Vapor route. It takes a variety of parameters, such as a summary and description of the operation, request and response bodies, query parameters, and more.\
 Here's an example of how you might use it to document a POST request:
 ```swift
 routes.post("users") { req -> EventLoopFuture<User> in
@@ -24,11 +24,11 @@ routes.post("users") { req -> EventLoopFuture<User> in
 .openAPI(
     summary: "Create User",
     description: "Create a new user with the provided data",
-    body: User.self,
-    response: User.self
+    body: .type(User.self),
+    response: .type(User.self)
 )
 ```
-2. `openAPI` (on Routes): This method is used to generate an entire OpenAPI specification from your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
+- `openAPI` (on Routes): This method is used to generate an entire OpenAPI specification from your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
 ```swift
 // generate OpenAPI documentation
 routes.get("Swagger", "swagger.json") { req in
@@ -37,24 +37,28 @@ routes.get("Swagger", "swagger.json") { req in
       title: "Example API",
       description: "Example API description",
       version: "0.1.0",
-    ),
-    errorExamples: [400: ErrorResponse()]
+    )
   )
 }
 .excludeFromOpenAPI()
 ```
-3. `groupedOpenAPI`: These methods are used to group Vapor routes together based on OpenAPI metadata, such as tags or security requirements.\
+- `response`: This method is used to specify an additional response body for a Vapor route. It takes a variety of parameters, such as the status code, description, and response body type.
+- `groupedOpenAPI`: These methods are used to group Vapor routes together based on OpenAPI metadata, such as tags or security requirements.\
 Here's an example of how you might use it to group routes with the same security requirements:
 ```swift
 let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 ```
-4. `excludeFromOpenAPI`: This method is used to exclude a Vapor route from the generated OpenAPI specification.
+- `groupedOpenAPIResponse`: These methods are used to group Vapor routes together based on common response.
+
+- `groupedOpenAPI(server:)`: These methods are used to group Vapor routes together based on common servers.
+
+- `excludeFromOpenAPI`: This method is used to exclude a Vapor route from the generated OpenAPI specification.
    
-5. `openAPINoAuth`: This method is used to specify that an operation does not require any authentication.
+- `openAPINoAuth`: This method is used to specify that an operation does not require any authentication.
    
-6. `openAPI(custom:)`: These methods are used to customize a specific aspect of the OpenAPI metadata for a Vapor route, such as a specific security scheme or callback.
+- `openAPI(custom:)`: These methods are used to customize a specific aspect of the OpenAPI metadata for a Vapor route, such as a specific security scheme or callback.
    
-7. `operationID` and `operationRef`: These properties are used to generate unique identifiers for OpenAPI operations and to create references to them in other parts of the specification.
+- `operationID` and `operationRef`: These properties are used to generate unique identifiers for OpenAPI operations and to create references to them in other parts of the specification.
 
 #### Customizing OpenAPI schemas and parameters
 You can customize OpenAPI schemas and parameters result by implementing `OpenAPIDescriptable` and `OpenAPIType` protocols.
@@ -138,7 +142,12 @@ window.onload = function() {
 ```
 ### 2. Routes
 ```swift
-routes = routes.groupedOpenAPI(auth: .basic)
+routes = routes
+  .groupedOpenAPI(auth: .basic)
+  .groupedOpenAPIResponse(
+    statusCode: 400,
+    body: .type(of: ErrorResponse())
+  )
 
 routes.post("login") { req in
   try await loginService.makeLoginRequest(
@@ -149,9 +158,10 @@ routes.post("login") { req in
 .openAPI(
   summary: "Login",
   description: "Login request",
-  query: LoginQuery.self,
-  body: LoginRequestBody.self,
-  response: LoginResponse.self,
+  query: .type(LoginQuery.self),
+  headers: ["X-SOME_VALUE": .string],
+  body: .type(LoginRequestBody.self),
+  response: .type(LoginResponse.self),
   auth: .apiKey()
 )
 ```
@@ -168,8 +178,7 @@ routes.get("Swagger", "swagger.json") { req in
       title: "Example API",
       description: "Example API description",
       version: "0.1.0",
-    ),
-    errorExamples: [400: ErrorResponse()]
+    )
   )
 }
 .excludeFromOpenAPI()
@@ -186,7 +195,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "3.15.1")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.0.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])

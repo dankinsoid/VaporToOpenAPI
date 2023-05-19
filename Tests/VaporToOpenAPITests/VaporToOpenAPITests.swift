@@ -9,27 +9,24 @@ final class VDTests: XCTestCase {
 		let routes = Routes()
 		routes
 			.groupedOpenAPI(auth: .basic, .apiKey())
+			.groupedOpenAPIResponse(
+				statusCode: 401,
+				body: .type(of: ErrorResponse.example)
+			)
 			.get("pets") { _ -> [Pet] in
 				[]
 			}
 			.openAPI(
-				summary: nil,
 				description: "Get all pets",
-				externalDocs: nil,
-				query: PetQuery.example,
-				response: [Pet].example,
-				errorResponses: [:],
-				callbacks: nil,
-				deprecated: nil,
-				servers: nil
+				query: .type(PetQuery.self),
+				response: .type([Pet].self)
 			)
 
 		let api = routes.openAPI(
 			info: InfoObject(
 				title: "Pets API",
 				version: Version(1, 0, 0)
-			),
-			errorExamples: [401: ErrorResponse.example]
+			)
 		)
 
 		prettyPrint(api)
@@ -44,14 +41,14 @@ final class VDTests: XCTestCase {
 			.openAPI(
 				summary: "List \(Group.self)s",
 				description: "List all the \(Group.self)s of the current \(Account.self)",
-				response: [GroupDTO].example
+				response: .type([GroupDTO].self)
 			)
 
 		groups.get("blublublu") { _ in [GroupDTO]() }
 			.openAPI(
 				summary: "List \(Group.self)s",
 				description: "List all the \(Group.self)s of the current \(Account.self)",
-				response: [GroupDTO].example,
+				response: .type([GroupDTO].self),
 				links: [Link("id", in: .request(.path)): GroupDTOID.self]
 			)
 
@@ -59,34 +56,39 @@ final class VDTests: XCTestCase {
 			.openAPI(
 				summary: "Get a \(Group.self) details",
 				description: "Get details for a specific \(Group.self)s in the current \(Account.self)",
-				response: GroupDTO.example,
-				errorResponses: [
-					404: ErrorResponse(error: true, reason: "Not found"),
-				],
+				response: .type(GroupDTO.self),
 				links: [Link("id", in: .request(.path)): GroupDTOID.self]
+			)
+			.response(
+				statusCode: 404,
+				body: .type(of: ErrorResponse(error: true, reason: "Not found"))
 			)
 
 		groups.post { _ in GroupDTO() }
 			.openAPI(
 				summary: "Create a \(Group.self)",
 				description: "Create a new users \(Group.self) in the current \(Account.self)",
-				body: CreateGroup.example,
-				response: GroupDTO.example,
-				errorResponses: [
-					422: ErrorResponse(error: true, reason: "Error details"),
-					409: ErrorResponse(error: true, reason: "Already exists"),
-				],
+				body: .type(CreateGroup.self),
+				response: .type(GroupDTO.self),
 				links: [
 					Link(\GroupDTO.id, in: .response): GroupDTOID.self,
 				]
+			)
+			.response(
+				statusCode: 422,
+				body: .type(of: ErrorResponse(error: true, reason: "Error details"))
+			)
+			.response(
+				statusCode: 409,
+				body: .type(of: ErrorResponse(error: true, reason: "Already exists"))
 			)
 
 		groups.put(":id") { _ in GroupDTO() }
 			.openAPI(
 				summary: "Update a \(Group.self)",
 				description: "Update a \(Group.self) in the current \(Account.self)",
-				body: CreateGroup.example,
-				response: GroupDTO.example,
+				body: .type(CreateGroup.self),
+				response: .type(GroupDTO.self),
 				links: [
 					Link("id", in: .request(.path)): GroupDTOID.self,
 					Link("id", in: .response): GroupDTOID.self,
@@ -96,6 +98,7 @@ final class VDTests: XCTestCase {
 		let api = authenticated.openAPI(
 			info: InfoObject(title: "Some API", version: "1.0.0")
 		)
+		prettyPrint(api)
 		XCTAssertEqual(authenticated.all.count, api.paths?.value.values.flatMap { $0.object?.operations ?? [:] }.count ?? 0)
 	}
 

@@ -3,6 +3,109 @@ import Vapor
 
 public extension Route {
 
+	/// OpenAPI documentation for route
+	/// - Parameters:
+	///   - customMethod: Custom route method
+	///   - spec: Specification identifier, used to group specifications
+	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
+	///   - summary: A short summary of what the operation does.
+	///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
+	///   - externalDocs: Additional external documentation for this operation.
+	///   - query: Query parameters.
+	///   - headers: Request headers.
+	///   - path: Path parameters.
+	///   - cookies: Cookie parameters.
+	///   - body: Request body.
+	///   - bodyType: Request body content type
+	///   - response: Response body.
+	///   - responseType: Response body content type
+	///   - responseHeaders: Response headers
+	///   - responseDescription: Response description
+	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
+	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
+	///   - auth: Security requirements
+	///   - authScopes: Security scopes
+	///   - servers: An alternative ```ServerObject``` to service this operation.
+	/// - Returns: ```Route``` instance
+	@discardableResult
+	func openAPI(
+		customMethod: PathItemObject.Method? = nil,
+		spec: String? = nil,
+		tags: TagObject...,
+		summary: String? = nil,
+		description: String = "",
+		operationId: String? = nil,
+		externalDocs: ExternalDocumentationObject? = nil,
+		query: OpenAPIParameters? = nil,
+		headers: OpenAPIParameters? = nil,
+		path: OpenAPIParameters? = nil,
+		cookies: OpenAPIParameters? = nil,
+		body: OpenAPIBody? = nil,
+		contentType: MediaType...,
+		response: OpenAPIBody? = nil,
+		responseContentType: MediaType...,
+		responseHeaders: OpenAPIParameters? = nil,
+		responseDescription: String? = nil,
+		statusCode: ResponsesObject.Key = 200,
+		links: [Link: LinkKey.Type] = [:],
+		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
+		deprecated: Bool? = nil,
+		auth: AuthSchemeObject...,
+		servers: [ServerObject]? = nil
+	) -> Route {
+		_openAPI(
+			method: customMethod,
+			spec: spec,
+			tags: tags,
+			summary: summary,
+			description: description,
+			operationId: operationId,
+			externalDocs: externalDocs,
+			query: query?.value,
+			headers: headers?.value,
+			path: path?.value,
+			cookies: cookies?.value,
+			body: body?.value,
+			bodyTypes: contentType,
+			links: links,
+			callbacks: callbacks,
+			deprecated: deprecated,
+			auth: auth,
+			servers: servers
+		)
+		._response(
+			statusCode: statusCode,
+			body: response?.value,
+			contentTypes: responseContentType,
+			headers: responseHeaders?.value,
+			description: responseDescription
+		)
+	}
+
+	/// Additional response for OpenAPI operation
+	/// - Parameters:
+	///  - statusCode: Response status code
+	///  - body: Response body.
+	///  - contentType: Response body content type
+	///  - headers: Response headers
+	///  - description: Response description
+	@discardableResult
+	func response(
+		statusCode: ResponsesObject.Key = 200,
+		body: OpenAPIBody? = nil,
+		contentType: MediaType...,
+		headers: OpenAPIParameters? = nil,
+		description: String? = nil
+	) -> Route {
+		_response(
+			statusCode: statusCode,
+			body: body?.value,
+			contentTypes: contentType,
+			headers: headers?.value,
+			description: description
+		)
+	}
+
 	/// OpenAPI operation object
 	/// - Parameters:
 	///   - customMethod: Custom route method
@@ -29,6 +132,7 @@ public extension Route {
 	///   - authScopes: Security scopes
 	///   - servers: An alternative ```ServerObject``` to service this operation.
 	/// - Returns: ```Route``` instance
+	@available(*, deprecated, message: "Use new `openAPI` and `response` methods")
 	@discardableResult
 	func openAPI(
 		customMethod: PathItemObject.Method? = nil,
@@ -47,7 +151,7 @@ public extension Route {
 		response: Any? = nil,
 		responseType: MediaType...,
 		responseHeaders: Any...,
-        successStatusCode: ResponsesObject.Key = 200,
+		successStatusCode: ResponsesObject.Key = 200,
 		errorResponses: [Int: Any] = [:],
 		errorDescriptions: [Int: String] = [:],
 		errorType: MediaType...,
@@ -66,115 +170,38 @@ public extension Route {
 			description: description,
 			operationId: operationId,
 			externalDocs: externalDocs,
-			query: query,
-			headers: headers,
-			path: path,
-			cookies: cookies,
-			body: body,
-			bodyTypes: bodyType.nilIfEmpty ?? [.application(.json)],
-			response: response,
-			responseTypes: responseType.nilIfEmpty ?? [.application(.json)],
-			responseHeaders: responseHeaders,
-            successStatusCode: successStatusCode,
-			errorResponses: errorResponses,
-			errorDescriptions: errorDescriptions,
-			errorTypes: errorType.nilIfEmpty ?? [.application(.json)],
-			errorHeaders: errorHeaders,
+			query: OpenAPIValue.params(query),
+			headers: OpenAPIValue.params(headers),
+			path: OpenAPIValue.params(path),
+			cookies: OpenAPIValue.params(cookies),
+			body: body.map { OpenAPIValue($0) },
+			bodyTypes: bodyType,
 			links: links,
 			callbacks: callbacks,
 			deprecated: deprecated,
 			auth: auth,
 			servers: servers
 		)
-	}
-
-	private func _openAPI(
-		method: PathItemObject.Method?,
-		spec: String?,
-		tags: [TagObject],
-		summary: String?,
-		description: String,
-		operationId: String?,
-		externalDocs: ExternalDocumentationObject?,
-		query: [Any],
-		headers: [Any],
-		path: [Any],
-		cookies: [Any],
-		body: Any?,
-		bodyTypes: [MediaType],
-		response: Any?,
-		responseTypes: [MediaType],
-		responseHeaders: [Any],
-        successStatusCode: ResponsesObject.Key,
-		errorResponses: [Int: Any],
-		errorDescriptions: [Int: String],
-		errorTypes: [MediaType],
-		errorHeaders: [Any],
-		links: [Link: LinkKey.Type],
-		callbacks: [String: ReferenceOr<CallbackObject>]?,
-		deprecated: Bool?,
-		auth: [AuthSchemeObject],
-		servers: [ServerObject]?
-	) -> Route {
-		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { TagObject(name: $0.description) }
-		return set(
-			\.operationObject,
-			to: OperationObject(
-				tags: newTags.map(\.name),
-				summary: summary,
-				description: description,
-				externalDocs: externalDocs,
-				operationId: operationId ?? operationID,
-				parameters: [
-					try? query.flatMap {
-                        try OpenAPIValue($0).parameters(in: .query, schemas: &schemas)
-					},
-					try? headers.flatMap {
-						try OpenAPIValue($0).parameters(in: .header, schemas: &schemas)
-					},
-					(
-						try? path.flatMap {
-							try OpenAPIValue($0).parameters(in: .path, schemas: &schemas)
-						}
-					)?.nilIfEmpty ?? pathParameters,
-					try? cookies.flatMap {
-						try OpenAPIValue($0).parameters(in: .cookie, schemas: &schemas)
-					},
-				]
-				.flatMap { $0 ?? [] }
-				.nilIfEmpty,
-				requestBody: request(
-					body: body,
-					description: nil,
-					required: true,
-					types: bodyTypes,
-					schemas: &schemas,
-					examples: &examples
-				),
-				responses: responses(
-					default: response,
-                    successCode: successStatusCode,
-					types: responseTypes,
-					headers: responseHeaders,
-					errors: errorResponses,
-					descriptions: errorDescriptions,
-					errorTypes: errorTypes,
-					errorHeaders: errorHeaders,
-					schemas: &schemas,
-					examples: &examples
-				),
-				callbacks: callbacks,
-				deprecated: deprecated,
-				security: operationObject.security,
-				servers: servers
-			)
+		._response(
+			statusCode: successStatusCode,
+			body: response.map { OpenAPIValue($0) },
+			contentTypes: responseType,
+			headers: responseHeaders.nilIfEmpty.map { OpenAPIParameters.all(of: $0.map { OpenAPIParameters(value: OpenAPIValue($0)) }).value },
+			description: successStatusCode.intValue.flatMap { errorDescriptions[$0] }
 		)
-		.description(description)
-		.setNew(auth: auth)
-		.set(\.specID, to: spec ?? specID)
-		.set(\.links, to: links)
-		.set(\.tags, to: newTags)
-		.set(\.openAPIMethod, to: method)
+		.openAPI(custom: \.responses) { value in
+			value = responses(
+				current: value,
+				responses: errorResponses.mapKeys(ResponsesObject.Key.code) { OpenAPIValue($0) },
+				descriptions: errorDescriptions.mapKeys(ResponsesObject.Key.code),
+				types: errorResponses.mapKeys(ResponsesObject.Key.code) { _ in errorType },
+				headers: OpenAPIValue.params(errorHeaders).map { headers in
+					errorResponses.mapKeys(ResponsesObject.Key.code) { _ in headers }
+				} ?? [:],
+				schemas: &schemas,
+				examples: &examples
+			)
+		}
 	}
 
 	/// Exclude route from OpenAPI specification
@@ -219,6 +246,89 @@ public extension Route {
 
 extension Route {
 
+	func _openAPI(
+		method: PathItemObject.Method?,
+		spec: String?,
+		tags: [TagObject],
+		summary: String?,
+		description: String,
+		operationId: String?,
+		externalDocs: ExternalDocumentationObject?,
+		query: OpenAPIValue?,
+		headers: OpenAPIValue?,
+		path: OpenAPIValue?,
+		cookies: OpenAPIValue?,
+		body: OpenAPIValue?,
+		bodyTypes: [MediaType],
+		links: [Link: LinkKey.Type],
+		callbacks: [String: ReferenceOr<CallbackObject>]?,
+		deprecated: Bool?,
+		auth: [AuthSchemeObject],
+		servers: [ServerObject]?
+	) -> Route {
+		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { TagObject(name: $0.description) }
+		return set(
+			\.operationObject,
+			to: OperationObject(
+				tags: newTags.map(\.name),
+				summary: summary,
+				description: description,
+				externalDocs: externalDocs,
+				operationId: operationId ?? operationID,
+				parameters: [
+					try? query?.parameters(in: .query, schemas: &schemas),
+					try? headers?.parameters(in: .header, schemas: &schemas),
+					(try? path?.parameters(in: .path, schemas: &schemas))?.nilIfEmpty ?? pathParameters,
+					try? cookies?.parameters(in: .cookie, schemas: &schemas),
+				]
+				.flatMap { $0 ?? [] }
+				.nilIfEmpty,
+				requestBody: request(
+					body: body,
+					description: nil,
+					required: true,
+					types: bodyTypes,
+					schemas: &schemas,
+					examples: &examples
+				),
+				responses: operationObject.responses,
+				callbacks: callbacks,
+				deprecated: deprecated,
+				security: operationObject.security,
+				servers: servers
+			)
+		)
+		.description(description)
+		.setNew(auth: auth)
+		.set(\.specID, to: spec ?? specID)
+		.set(\.links, to: links)
+		.set(\.tags, to: newTags)
+		.set(\.openAPIMethod, to: method)
+	}
+
+	func _response(
+		statusCode: ResponsesObject.Key = 200,
+		body: OpenAPIValue? = nil,
+		contentTypes: [MediaType],
+		headers: OpenAPIValue? = nil,
+		description: String? = nil
+	) -> Route {
+		openAPI(custom: \.responses) { value in
+			value = responses(
+				current: value,
+				responses: body.map { [statusCode: $0] } ?? [:],
+				descriptions: description.map { [statusCode: $0] } ?? [:],
+				types: [statusCode: contentTypes],
+				headers: headers.map { [statusCode: $0] } ?? [:],
+				schemas: &schemas,
+				examples: &examples
+			)
+		}
+	}
+}
+
+extension Route {
+
 	/// OpenAPI operation ID
 	public var operationID: String {
 		"\(method.rawValue.lowercased())\(path.map(\.name.upFirst).joined())"
@@ -232,7 +342,7 @@ extension Route {
 	var pathParameters: [ReferenceOr<ParameterObject>] {
 		path.compactMap(\.pathParameter)
 	}
-    
+
 	var operationObject: OperationObject {
 		get {
 			values.operationObject ?? OperationObject(
@@ -248,7 +358,7 @@ extension Route {
 		get { values.schemas ?? [:] }
 		set { set(\.schemas, to: newValue) }
 	}
-	
+
 	var examples: [String: ReferenceOr<ExampleObject>] {
 		get { values.examples ?? [:] }
 		set { set(\.examples, to: newValue) }
@@ -258,14 +368,14 @@ extension Route {
 		get { values.auths ?? [] }
 		set { set(\.auths, to: newValue) }
 	}
-	
+
 	var tags: [TagObject] {
 		values.tags ?? []
 	}
-    
+
 	var openAPIMethod: PathItemObject.Method {
 		values.openAPIMethod ?? method.openAPI
-   	}
+	}
 
 	var excludeFromOpenApi: Bool {
 		values.excludeFromOpenApi ?? false

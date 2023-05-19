@@ -13,10 +13,6 @@ public extension Routes {
 	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
 	///   - components: An element to hold additional schemas for the document.
 	///   - commonAuth: A declaration of which security mechanisms can be used across the API.
-	///   - externalDocs: Additional external documentation.
-	///   - errorExamples: Common error responses. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed.
-	///   - errorType: Common error content type.
-	///   - errorHeaders: Common error headers.
 	///   - map: Closure to customise OpenAPI for each route.
 	/// - Returns: ```OpenAPIObject``` instance
 	func openAPI(
@@ -29,10 +25,6 @@ public extension Routes {
 		components: ComponentsObject = ComponentsObject(),
 		commonAuth: [AuthSchemeObject]? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
-		errorExamples: [Int: Any] = [:],
-		errorDescriptions: [Int: String] = [:],
-		errorType: MediaType...,
-		errorHeaders: WithExample.Type...,
 		map: (Route) -> Route = { $0 }
 	) -> OpenAPIObject {
 		let routes = all.map(map).filter { !$0.excludeFromOpenApi && $0.specID == spec }
@@ -54,12 +46,6 @@ public extension Routes {
 		openAPIObject.addSchemas(routes: routes)
 		openAPIObject.addExamples(routes: routes)
 		openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
-		openAPIObject.addErrors(
-			errorExamples: errorExamples,
-			errorDescriptions: errorDescriptions,
-			errorTypes: errorType.nilIfEmpty ?? [.application(.json)],
-			errorHeaders: errorHeaders
-		)
 		return openAPIObject
 	}
 }
@@ -177,52 +163,6 @@ private extension OpenAPIObject {
 			components?.links = [:]
 		}
 		components?.links?.merge(linkObjects) { n, _ in n }
-	}
-
-	mutating func addErrors(
-		errorExamples: [Int: Any],
-		errorDescriptions: [Int: String],
-		errorTypes: [MediaType],
-		errorHeaders: [WithExample.Type]
-	) {
-		var schemas = components?.schemas ?? [:]
-		var examples = components?.examples ?? [:]
-		let errors = responses(
-            default: nil,
-            successCode: 200,
-			types: [.application(.json)],
-			headers: [],
-			errors: errorExamples,
-			descriptions: errorDescriptions,
-			errorTypes: errorTypes,
-			errorHeaders: errorHeaders.map { $0.example as Codable },
-			schemas: &schemas,
-			examples: &examples
-		)
-		guard let errors else { return }
-
-		var responses = components?.responses ?? [:]
-		for (key, value) in errors.value {
-			let keyName = errorKey(key)
-			if responses[keyName] == nil {
-				responses[keyName] = value
-			}
-		}
-		let newPaths = paths?.value.mapValues { operations in
-			guard var operations = operations.object else { return operations }
-			operations.operations = operations.operations.mapValues { $0.withErrors(errors) }
-			return .value(operations)
-		}
-		if let newPaths {
-			paths = PathsObject(newPaths)
-		}
-
-		if components == nil {
-			components = ComponentsObject()
-		}
-		components?.schemas = schemas
-		components?.examples = examples
-		components?.responses = responses
 	}
 
 	mutating func addTags(routes: [Route]) {

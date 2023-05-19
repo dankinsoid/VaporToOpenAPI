@@ -25,20 +25,18 @@ struct PetController: RouteCollection {
 				.openAPI(
 					summary: "Update an existing pet",
 					description: "Update an existing pet by Id",
-					body: Pet.self,
-					bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-					response: Pet.self,
-					responseType: .application(.json), .application(.xml),
-					errorDescriptions: [
-						400: "Invalid ID supplied",
-						404: "Pet not found",
-						405: "Validation exception",
-					],
+					body: .type(Pet.self),
+					contentType: .application(.json), .application(.xml), .application(.urlEncoded),
+					response: .type(Pet.self),
+					responseContentType: .application(.json), .application(.xml),
 					links: [
 						Link(\Pet.id, in: .response): Link.PetID.self,
-						Link(\Pet.id, in: .request): Link.PetID.self
+						Link(\Pet.id, in: .request): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 400, description: "Invalid ID supplied")
+				.response(statusCode: 404, description: "Pet not found")
+				.response(statusCode: 405, description: "Validation exception")
 
 				routes.post { _ in
 					Pet.example
@@ -46,18 +44,16 @@ struct PetController: RouteCollection {
 				.openAPI(
 					summary: "Add a new pet to the store",
 					description: "Add a new pet to the store",
-					body: Pet.self,
-					bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-					response: Pet.self,
-					responseType: .application(.json), .application(.xml),
-					errorDescriptions: [
-						405: "Invalid input",
-					],
+					body: .type(Pet.self),
+					contentType: .application(.json), .application(.xml), .application(.urlEncoded),
+					response: .type(Pet.self),
+					responseContentType: .application(.json), .application(.xml),
 					links: [
 						Link(\Pet.id, in: .response): Link.PetID.self,
-						Link(\Pet.id, in: .request): Link.PetID.self
+						Link(\Pet.id, in: .request): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 405, description: "Invalid input")
 
 				routes.get("findByStatus") { _ in
 					[Pet.example]
@@ -65,16 +61,14 @@ struct PetController: RouteCollection {
 				.openAPI(
 					summary: "Finds Pets by status",
 					description: "Multiple status values can be provided with comma separated strings",
-					query: FindPetByStatusQuery.self,
-                    response: [Pet].self,
-					responseType: .application(.json), .application(.xml),
-					errorDescriptions: [
-						400: "Invalid status value",
-					],
+					query: .type(FindPetByStatusQuery.self),
+					response: .type([Pet].self),
+					responseContentType: .application(.json), .application(.xml),
 					links: [
-						Link(\Pet.id, in: .response): Link.PetID.self
+						Link(\Pet.id, in: .response): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 400, description: "Invalid status value")
 
 				routes.get("findByTags") { _ in
 					[Pet.example]
@@ -82,16 +76,17 @@ struct PetController: RouteCollection {
 				.openAPI(
 					summary: "Finds Pets by tags",
 					description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-					query: FindPetByTagsQuery.self,
-					response: [Pet].self,
-					responseType: .application(.json), .application(.xml),
+					query: ["tags": .array(of: .string)],
+					response: .type([Pet].self),
+					responseContentType: .application(.json), .application(.xml),
 					errorDescriptions: [
 						400: "Invalid tag value",
 					],
 					links: [
-						Link(\Pet.id, in: .response): Link.PetID.self
+						Link(\Pet.id, in: .response): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 400, description: "Invalid tag value")
 
 				routes.get(":petId") { _ in
 					Pet.example
@@ -99,59 +94,51 @@ struct PetController: RouteCollection {
 				.openAPI(
 					summary: "Find pet by ID",
 					description: "Returns a single pet",
-					response: Pet.self,
-					responseType: .application(.json), .application(.xml),
-					errorDescriptions: [
-						400: "Invalid ID supplied",
-						404: "Pet not found",
-					],
+					response: .type(Pet.self),
+					responseContentType: .application(.json), .application(.xml),
 					links: [
 						Link(\Pet.id, in: .path): Link.PetID.self,
-						Link(\Pet.id, in: .response): Link.PetID.self
+						Link(\Pet.id, in: .response): Link.PetID.self,
 					],
 					auth: .petstoreApiKey
 				)
+				.response(statusCode: 400, description: "Invalid ID supplied")
+				.response(statusCode: 404, description: "Pet not found")
 
 				routes.post(":petId") { _ in
 					"Success update"
 				}
 				.openAPI(
 					summary: "Updates a pet in the store with form data",
-					query: UpdatePetQuery.self,
-					errorDescriptions: [
-						405: "Invalid input",
-					],
+					query: .type(UpdatePetQuery.self),
 					links: [
-						Link(\Pet.id, in: .path): Link.PetID.self
+						Link(\Pet.id, in: .path): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 405, description: "Invalid input")
 
 				routes.delete(":petId") { _ in
 					"Success delete"
 				}
 				.openAPI(
 					summary: "Deletes a pet",
-					errorDescriptions: [
-						400: "Invalid pet value",
-					],
 					links: [
-						Link(\Pet.id, in: .path): Link.PetID.self
+						Link(\Pet.id, in: .path): Link.PetID.self,
 					]
 				)
+				.response(statusCode: 400, description: "Invalid pet value")
 
 				routes.post("uploadImage") { _ in
 					ApiResponse.example
 				}
 				.openAPI(
 					summary: "uploads an image",
-					query: UploadImageQuery.self,
-					body: Data.self,
-					bodyType: .application(.octetStream),
-					response: ApiResponse.self,
-					errorDescriptions: [
-						400: "Invalid pet value",
-					]
+					query: .type(UploadImageQuery.self),
+					body: .type(Data.self),
+					contentType: .application(.octetStream),
+					response: .type(ApiResponse.self)
 				)
+				.response(statusCode: 400, description: "Invalid pet value")
 			}
 	}
 }

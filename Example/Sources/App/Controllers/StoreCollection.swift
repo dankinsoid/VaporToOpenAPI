@@ -22,7 +22,7 @@ public struct StoreController: RouteCollection {
 				.openAPI(
 					summary: "Returns pet inventories by status",
 					description: "Returns a map of status codes to quantities",
-                    response: [String: Int32].self,
+					response: .type([String: Int32]).self,
 					auth: .petstoreApiKey
 				)
 
@@ -33,42 +33,35 @@ public struct StoreController: RouteCollection {
 					.openAPI(
 						summary: "Place an order for a pet",
 						description: "Place a new order in the store",
-						body: Order.self,
-						bodyType: .application(.json), .application(.xml), .application(.urlEncoded),
-						response: Order.self,
-						errorDescriptions: [
-							405: "Invalid input",
-						]
+						body: .type(Order.self),
+						contentType: .application(.json), .application(.xml), .application(.urlEncoded),
+						response: .type(Order.self)
 					)
+					.response(statusCode: 405, description: "Invalid input")
 
-					routes.group(":orderId") { routes in
-						routes.get { _ in
-							Order.example
-						}
-						.openAPI(
-							summary: "Find purchase order by ID",
-							description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-							response: Order.self,
-							responseType: .application(.xml), .application(.json),
-							errorDescriptions: [
-								400: "Invalid ID supplied",
-								404: "Order not found",
-							]
-						)
+					routes
+						.groupedOpenAPIResponse(statusCode: 400, description: "Invalid ID supplied")
+						.groupedOpenAPIResponse(statusCode: 404, description: "Order not found")
+						.group(":orderId") { routes in
+							routes.get { _ in
+								Order.example
+							}
+							.openAPI(
+								summary: "Find purchase order by ID",
+								description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
+								response: .type(Order.self),
+								responseContentType: .application(.xml), .application(.json)
+							)
 
-						routes.delete { _ in
-							"Success delete"
+							routes.delete { _ in
+								"Success delete"
+							}
+							.openAPI(
+								summary: "Delete purchase order by ID",
+								description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors"
+							)
 						}
-						.openAPI(
-							summary: "Delete purchase order by ID",
-							description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-							errorDescriptions: [
-								400: "Invalid ID supplied",
-								404: "Order not found",
-							]
-						)
-					}
-				}
+				}§
 			}
 	}
 }

@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 
 func request(
-	body: Any?,
+	body: OpenAPIValue?,
 	description: String?,
 	required: Bool?,
 	types: [MediaType],
@@ -10,8 +10,7 @@ func request(
 	examples: inout [String: ReferenceOr<ExampleObject>]
 ) -> ReferenceOr<RequestBodyObject>? {
 	guard
-		let body,
-        let bodyObject = try? OpenAPIValue(body).mediaTypeObject(schemas: &schemas, examples: &examples)
+		let bodyObject = try? body?.mediaTypeObject(schemas: &schemas, examples: &examples)
 	else {
 		return nil
 	}
@@ -19,7 +18,7 @@ func request(
 		RequestBodyObject(
 			description: description,
 			content: ContentObject(
-				dictionaryElements: types.map { ($0, bodyObject) }
+				dictionaryElements: (types.nilIfEmpty ?? [.application(.json)]).map { ($0, bodyObject) }
 			),
 			required: required
 		)

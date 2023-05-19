@@ -3,17 +3,45 @@ import SwiftOpenAPI
 import Vapor
 
 public extension RoutesBuilder {
-
+	
 	/// Group routes with OpenAPI tags
 	func groupedOpenAPI(tags: [TagObject]) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
 			route.set(\.tags, to: (route.tags + tags).removeEquals(\.name))
 		}
 	}
-
+	
 	/// Group routes with OpenAPI tags
 	func groupedOpenAPI(tags: TagObject...) -> RoutesBuilder {
 		groupedOpenAPI(tags: tags)
+	}
+	
+	/// Group routes with OpenAPI response
+	func groupedOpenAPIResponse(
+		statusCode: ResponsesObject.Key = 200,
+		body: OpenAPIBody? = nil,
+		contentType: MediaType...,
+		headers: OpenAPIParameters? = nil,
+		description: String? = nil
+	) -> RoutesBuilder {
+		HTTPRoutesGroup(root: self) { route in
+			route._response(
+				statusCode: statusCode,
+				body: body?.value,
+				contentTypes: contentType,
+				headers: headers?.value,
+				description: description
+			)
+		}
+	}
+	
+	/// Group routes with OpenAPI server
+	func groupedOpenAPI(server: ServerObject) -> RoutesBuilder {
+		HTTPRoutesGroup(root: self) { route in
+			route.openAPI(custom: \.servers) { servers in
+				servers = (servers ?? []) + [server]
+			}
+		}
 	}
 	
 	/// Creates a new Router that will automatically prepend the supplied tags as path components.
