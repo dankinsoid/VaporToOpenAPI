@@ -6,9 +6,10 @@ public struct OpenAPIBody {
 	let value: OpenAPIValue
 
 	/// Body schema based on the type.
+	///
 	/// The method works fine for most types, however if the type contains non `CaseIterable` enams or the `init(from: Decoder)` contains custom validation
 	/// then the schema may be generated invalid, in which case use `type(of:)` instead or implement `WithExample` protocol.
-	/// Warning: Example is not generated from the type, to get the example use `type(of:)` instead or implement `WithExample` protocol.
+	/// - Warning: Example is not generated from the type, to get the example use `type(of:)` instead or implement `WithExample` protocol.
 	public static func type(_ type: Decodable.Type) -> OpenAPIBody {
 		OpenAPIBody(value: .type(type))
 	}
@@ -54,9 +55,10 @@ public struct OpenAPIParameters {
 	let value: OpenAPIValue
 
 	/// Parameters based on the type.
+	///
 	/// The method works fine for most types, however if the type contains non `CaseIterable` enams or the `init(from: Decoder)` contains custom validation
 	/// then parameters may be generated invalid, in which case use `type(of:)` instead or implement `WithExample` protocol.
-	/// Warning: Example is not generated from the type, to get the example use `type(of:)` instead or implement `WithExample` protocol.
+	/// - Warning: Example is not generated from the type, to get the example use `type(of:)` instead or implement `WithExample` protocol.
 	public static func type(_ type: Decodable.Type) -> OpenAPIParameters {
 		OpenAPIParameters(value: .type(type))
 	}
