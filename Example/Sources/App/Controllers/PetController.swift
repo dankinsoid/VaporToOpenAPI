@@ -79,9 +79,6 @@ struct PetController: RouteCollection {
 					query: ["tags": .array(of: .string)],
 					response: .type([Pet].self),
 					responseContentType: .application(.json), .application(.xml),
-					errorDescriptions: [
-						400: "Invalid tag value",
-					],
 					links: [
 						Link(\Pet.id, in: .response): Link.PetID.self,
 					]

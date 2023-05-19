@@ -22,7 +22,7 @@ public struct StoreController: RouteCollection {
 				.openAPI(
 					summary: "Returns pet inventories by status",
 					description: "Returns a map of status codes to quantities",
-					response: .type([String: Int32]).self,
+					response: .type([String: Int32].self),
 					auth: .petstoreApiKey
 				)
 
@@ -61,7 +61,7 @@ public struct StoreController: RouteCollection {
 								description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors"
 							)
 						}
-				}§
+				}
 			}
 	}
 }

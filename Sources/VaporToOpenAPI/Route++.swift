@@ -132,6 +132,7 @@ public extension Route {
 	///   - authScopes: Security scopes
 	///   - servers: An alternative ```ServerObject``` to service this operation.
 	/// - Returns: ```Route``` instance
+	@_disfavoredOverload
 	@available(*, deprecated, message: "Use new `openAPI` and `response` methods")
 	@discardableResult
 	func openAPI(
