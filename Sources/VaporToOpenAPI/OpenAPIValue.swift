@@ -122,7 +122,7 @@ indirect enum OpenAPIValue {
 	case schema(SchemaObject)
 	case composite([OpenAPIValue], CompositeType, discriminator: DiscriminatorObject?)
 
-	init(_ value: Any) {
+	init?(_ value: Any) {
 		switch value {
 		case let codable as Encodable:
 			self = .example(codable)
@@ -133,13 +133,17 @@ indirect enum OpenAPIValue {
 		case let schema as SchemaObject:
 			self = .schema(schema)
 		default:
-			self = .schema(.any)
+			return nil
 		}
 	}
 
 	static func params(_ array: [Any]) -> OpenAPIValue? {
-		array.nilIfEmpty.map {
-			OpenAPIParameters.all(of: $0.map { OpenAPIParameters(value: OpenAPIValue($0)) }).value
+		array.nilIfEmpty.map { array in
+            OpenAPIParameters.all(
+                of: array.compactMap { item in
+                    OpenAPIValue(item).map { OpenAPIParameters(value: $0) }
+                }
+            ).value
 		}
 	}
 
