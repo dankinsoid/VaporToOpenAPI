@@ -68,7 +68,7 @@ struct PetController: RouteCollection {
 						Link(\Pet.id, in: .response): Link.PetID.self,
 					]
 				)
-				.response(statusCode: 400, description: "Invalid status value")
+				.response(statusCode: .badRequest, description: "Invalid status value")
 
 				routes.get("findByTags") { _ in
 					[Pet.example]
@@ -83,7 +83,7 @@ struct PetController: RouteCollection {
 						Link(\Pet.id, in: .response): Link.PetID.self,
 					]
 				)
-				.response(statusCode: 400, description: "Invalid tag value")
+				.response(statusCode: .badRequest, description: "Invalid tag value")
 
 				routes.get(":petId") { _ in
 					Pet.example
@@ -99,8 +99,8 @@ struct PetController: RouteCollection {
 					],
 					auth: .petstoreApiKey
 				)
-				.response(statusCode: 400, description: "Invalid ID supplied")
-				.response(statusCode: 404, description: "Pet not found")
+				.response(statusCode: .badRequest, description: "Invalid ID supplied")
+				.response(statusCode: .notFound, description: "Pet not found")
 
 				routes.post(":petId") { _ in
 					"Success update"

@@ -60,6 +60,6 @@ private func description(for code: ResponsesObject.Key) -> String {
 	case nil:
 		return "Default response"
 	case let .some(otherCode):
-		return Abort(HTTPResponseStatus(statusCode: otherCode)).reason
+		return HTTPResponseStatus(statusCode: otherCode).reasonPhrase
 	}
 }

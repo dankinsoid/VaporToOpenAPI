@@ -61,8 +61,8 @@ struct UserController: RouteCollection {
 						response: .type(User.self),
 						responseContentType: .application(.json), .application(.xml)
 					)
-					.response(statusCode: 400, description: "Invalid username supplied")
-					.response(statusCode: 404, description: "User not found")
+					.response(statusCode: .badRequest, description: "Invalid username supplied")
+					.response(statusCode: .notFound, description: "User not found")
 
 					routes.put { _ in
 						"successful operation"
@@ -83,8 +83,8 @@ struct UserController: RouteCollection {
 						description: "This can only be done by the logged in user.",
 						response: .type(of: "successful operation")
 					)
-					.response(statusCode: 400, description: "Invalid username supplied")
-					.response(statusCode: 404, description: "User not found")
+					.response(statusCode: .badRequest, description: "Invalid username supplied")
+					.response(statusCode: .notFound, description: "User not found")
 				}
 			}
 	}
