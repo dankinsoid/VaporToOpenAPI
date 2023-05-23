@@ -13,6 +13,7 @@ public extension Routes {
 	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
 	///   - components: An element to hold additional schemas for the document.
 	///   - commonAuth: A declaration of which security mechanisms can be used across the API.
+	///   - extensions: Specification extensions
 	///   - map: Closure to customise OpenAPI for each route.
 	/// - Returns: ```OpenAPIObject``` instance
 	func openAPI(
@@ -25,8 +26,9 @@ public extension Routes {
 		components: ComponentsObject = ComponentsObject(),
 		commonAuth: [AuthSchemeObject]? = nil,
 		externalDocs: ExternalDocumentationObject? = nil,
+		extensions: SpecificationExtensions,
 		map: (Route) -> Route = { $0 }
-	) -> OpenAPIObject {
+	) -> WithSpecExtensions<OpenAPIObject> {
 		let routes = all.map(map).filter { !$0.excludeFromOpenApi && $0.specID == spec }
 
 		var openAPIObject = OpenAPIObject(
@@ -46,7 +48,48 @@ public extension Routes {
 		openAPIObject.addSchemas(routes: routes)
 		openAPIObject.addExamples(routes: routes)
 		openAPIObject.addSecuritySchemes(routes: routes, commonAuth: commonAuth ?? [])
-		return openAPIObject
+		openAPIObject.specificationExtensions = extensions
+		return WithSpecExtensions(wrappedValue: openAPIObject)
+	}
+	
+	/// Create ```OpenAPIObject```
+	/// - Parameters:
+	///   - spec: Specification identifier, used to group specifications
+	///   - info: Provides metadata about the API. The metadata MAY be used by tooling as required.
+	///   - jsonSchemaDialect: The default value for the $schema keyword within ```SchemaObjects``` contained within this OAS document.
+	///   - servers: An array of ```ServerObject```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```ServerObject``` with a url value of /.
+	///   - paths: The available paths and operations for the API.
+	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
+	///   - components: An element to hold additional schemas for the document.
+	///   - commonAuth: A declaration of which security mechanisms can be used across the API.
+	///   - map: Closure to customise OpenAPI for each route.
+	/// - Returns: ```OpenAPIObject``` instance
+	@_disfavoredOverload
+	func openAPI(
+		spec: String? = nil,
+		info: InfoObject,
+		jsonSchemaDialect: URL? = nil,
+		servers: [ServerObject]? = nil,
+		paths: PathsObject? = nil,
+		webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
+		components: ComponentsObject = ComponentsObject(),
+		commonAuth: [AuthSchemeObject]? = nil,
+		externalDocs: ExternalDocumentationObject? = nil,
+		map: (Route) -> Route = { $0 }
+	) -> OpenAPIObject {
+		openAPI(
+			spec: spec,
+			info: info,
+			jsonSchemaDialect: jsonSchemaDialect,
+			servers: servers,
+			paths: paths,
+			webhooks: webhooks,
+			components: components,
+			commonAuth: commonAuth,
+			externalDocs: externalDocs,
+			extensions: [:],
+			map: map
+		).wrappedValue
 	}
 }
 

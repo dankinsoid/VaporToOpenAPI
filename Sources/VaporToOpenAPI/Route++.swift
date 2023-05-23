@@ -51,7 +51,8 @@ public extension Route {
 		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
 		deprecated: Bool? = nil,
 		auth: AuthSchemeObject...,
-		servers: [ServerObject]? = nil
+		servers: [ServerObject]? = nil,
+		extensions: SpecificationExtensions = [:]
 	) -> Route {
 		_openAPI(
 			method: customMethod,
@@ -71,7 +72,8 @@ public extension Route {
 			callbacks: callbacks,
 			deprecated: deprecated,
 			auth: auth,
-			servers: servers
+			servers: servers,
+			extensions: extensions
 		)
 		._response(
 			statusCode: statusCode,
@@ -181,7 +183,8 @@ public extension Route {
 			callbacks: callbacks,
 			deprecated: deprecated,
 			auth: auth,
-			servers: servers
+			servers: servers,
+			extensions: [:]
 		)
 		._response(
 			statusCode: successStatusCode,
@@ -265,7 +268,8 @@ extension Route {
 		callbacks: [String: ReferenceOr<CallbackObject>]?,
 		deprecated: Bool?,
 		auth: [AuthSchemeObject],
-		servers: [ServerObject]?
+		servers: [ServerObject]?,
+		extensions: SpecificationExtensions
 	) -> Route {
 		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { TagObject(name: $0.description) }
 		return set(
@@ -305,6 +309,7 @@ extension Route {
 		.set(\.links, to: links)
 		.set(\.tags, to: newTags)
 		.set(\.openAPIMethod, to: method)
+		.openAPI(custom: \.specificationExtensions, extensions)
 	}
 
 	func _response(
