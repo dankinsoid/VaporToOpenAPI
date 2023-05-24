@@ -1,6 +1,7 @@
 # VaporToOpenAPI
 
-VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/).
+VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/).\
+The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAPI).
 
 ## Usage
 ### Base usage
@@ -195,7 +196,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.2.1")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.2.2")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
