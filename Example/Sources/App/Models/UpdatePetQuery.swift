@@ -1,6 +1,6 @@
 import Foundation
-import VaporToOpenAPI
 import SwiftOpenAPI
+import VaporToOpenAPI
 
 public struct UpdatePetQuery: Codable, Equatable, WithExample, OpenAPIDescriptable {
 
@@ -9,9 +9,9 @@ public struct UpdatePetQuery: Codable, Equatable, WithExample, OpenAPIDescriptab
 
 	public static var example = UpdatePetQuery(name: "Persey", status: .available)
 
-		public static var openAPIDescription: OpenAPIDescriptionType? {
-			OpenAPIDescription<CodingKeys>()
-				.add(for: .name, "Updated name of the pet")
-				.add(for: .status, "Updated status of the pet")
+	public static var openAPIDescription: OpenAPIDescriptionType? {
+		OpenAPIDescription<CodingKeys>()
+			.add(for: .name, "Updated name of the pet")
+			.add(for: .status, "Updated status of the pet")
 	}
 }

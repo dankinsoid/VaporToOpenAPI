@@ -86,24 +86,24 @@ extension UUID: DetectableType {
 }
 
 extension Array: DetectableType where Element: WithExample & Equatable {
- 
-    public static func another(for value: Array<Element>) -> Array<Element> {
-        value.isEmpty ? [.example] : []
-    }
+
+	public static func another(for value: [Element]) -> [Element] {
+		value.isEmpty ? [.example] : []
+	}
 }
 
 extension Set: DetectableType where Element: WithExample {
-    
-    public static func another(for value: Set<Element>) -> Set<Element> {
-        value.isEmpty ? [.example] : []
-    }
+
+	public static func another(for value: Set<Element>) -> Set<Element> {
+		value.isEmpty ? [.example] : []
+	}
 }
 
 extension Dictionary: DetectableType where Key: WithExample & Equatable, Value: WithExample & Equatable {
-    
-    public static func another(for value: Dictionary<Key, Value>) -> Dictionary<Key, Value> {
-        value.isEmpty ? [.example: .example] : [:]
-    }
+
+	public static func another(for value: [Key: Value]) -> [Key: Value] {
+		value.isEmpty ? [.example: .example] : [:]
+	}
 }
 
 extension Optional: DetectableType where Wrapped: WithExample & Equatable {

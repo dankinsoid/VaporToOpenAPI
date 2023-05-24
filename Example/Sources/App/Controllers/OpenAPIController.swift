@@ -7,7 +7,7 @@ struct OpenAPIController: RouteCollection {
 	// MARK: Internal
 
 	func boot(routes: RoutesBuilder) throws {
-	
+
 		// generate OpenAPI documentation
 		routes.get("swagger", "swagger.json") { req in
 			req.application.routes.openAPI(

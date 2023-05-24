@@ -48,8 +48,8 @@ public struct Link: Hashable {
 		self.location = location
 	}
 
-    public init<T: WithExample>(_ name: WritableKeyPath<T, some DetectableType>, in location: Location) {
-        self.init(T.codingKey(for: name), in: location)
+	public init<T: WithExample>(_ name: WritableKeyPath<T, some DetectableType>, in location: Location) {
+		self.init(T.codingKey(for: name), in: location)
 	}
 
 	public enum Location: Hashable, CustomStringConvertible {

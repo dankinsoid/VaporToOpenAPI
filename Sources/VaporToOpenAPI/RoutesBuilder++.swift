@@ -3,19 +3,19 @@ import SwiftOpenAPI
 import Vapor
 
 public extension RoutesBuilder {
-	
+
 	/// Group routes with OpenAPI tags
 	func groupedOpenAPI(tags: [TagObject]) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
 			route.set(\.tags, to: (route.tags + tags).removeEquals(\.name))
 		}
 	}
-	
+
 	/// Group routes with OpenAPI tags
 	func groupedOpenAPI(tags: TagObject...) -> RoutesBuilder {
 		groupedOpenAPI(tags: tags)
 	}
-	
+
 	/// Group routes with OpenAPI response
 	func groupedOpenAPIResponse(
 		statusCode: ResponsesObject.Key = 200,
@@ -34,7 +34,7 @@ public extension RoutesBuilder {
 			)
 		}
 	}
-	
+
 	/// Group routes with OpenAPI server
 	func groupedOpenAPI(server: ServerObject) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
@@ -43,18 +43,18 @@ public extension RoutesBuilder {
 			}
 		}
 	}
-	
+
 	/// Creates a new Router that will automatically prepend the supplied tags as path components.
-	func group(tags: [TagObject], configure: (RoutesBuilder) throws -> ()) rethrows {
+	func group(tags: [TagObject], configure: (RoutesBuilder) throws -> Void) rethrows {
 		try groupedOpenAPI(tags: tags)
 			.group(tags.map { .constant($0.name) }, configure: configure)
 	}
-	
+
 	/// Creates a new Router that will automatically prepend the supplied tags as path components.
-	func group(tags firsTag: TagObject, _ otherTags: TagObject..., configure: (RoutesBuilder) throws -> ()) rethrows {
+	func group(tags firsTag: TagObject, _ otherTags: TagObject..., configure: (RoutesBuilder) throws -> Void) rethrows {
 		try group(tags: [firsTag] + otherTags, configure: configure)
 	}
-	
+
 	/// Group routes with OpenAPI security requirements
 	func groupedOpenAPI(
 		auth: [AuthSchemeObject]

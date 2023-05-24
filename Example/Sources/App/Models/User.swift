@@ -1,7 +1,7 @@
 import Foundation
+import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
-import SwiftOpenAPI
 
 public struct User: Codable, Content, Identifiable, WithExample, OpenAPIDescriptable {
 

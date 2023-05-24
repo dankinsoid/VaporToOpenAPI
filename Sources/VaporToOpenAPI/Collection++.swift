@@ -23,15 +23,15 @@ extension Collection where Element: Equatable {
 }
 
 extension Dictionary {
-	
+
 	func mapKeys<T>(_ map: (Key) -> T) -> [T: Value] {
-		Dictionary<T, Value>(self.map { (map($0.key), $0.value) }) { _, new in
+		[T: Value](self.map { (map($0.key), $0.value) }) { _, new in
 			new
 		}
 	}
-	
+
 	func mapKeys<T, V>(_ map: (Key) -> T, values: (Value) -> V) -> [T: V] {
-		Dictionary<T, V>(self.map { (map($0.key), values($0.value)) }) { _, new in
+		[T: V](self.map { (map($0.key), values($0.value)) }) { _, new in
 			new
 		}
 	}

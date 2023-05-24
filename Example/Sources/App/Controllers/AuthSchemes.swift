@@ -9,7 +9,7 @@ public extension AuthSchemeObject {
 			id: "petstore_auth"
 		)
 	}
-	
+
 	static var petstoreApiKey: AuthSchemeObject {
 		.apiKey(
 			id: "api_key",

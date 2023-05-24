@@ -68,19 +68,17 @@ public extension Route {
 			cookies: cookies?.value,
 			body: body?.value,
 			bodyTypes: contentType,
+			response: response?.value,
+			responseContentType: responseContentType,
+			responseHeaders: responseHeaders?.value,
+			responseDescription: responseDescription,
+			statusCode: statusCode,
 			links: links,
 			callbacks: callbacks,
 			deprecated: deprecated,
 			auth: auth,
 			servers: servers,
 			extensions: extensions
-		)
-		._response(
-			statusCode: statusCode,
-			body: response?.value ?? openAPIResponseType,
-            contentTypes: responseContentType.nilIfEmpty ?? [defaultResponseContentType],
-			headers: responseHeaders?.value,
-			description: responseDescription
 		)
 	}
 
@@ -179,6 +177,11 @@ public extension Route {
 			cookies: OpenAPIValue.params(cookies),
 			body: body.flatMap { OpenAPIValue($0) },
 			bodyTypes: bodyType,
+			response: response.flatMap { OpenAPIValue($0) },
+			responseContentType: responseType,
+			responseHeaders: OpenAPIValue.params(responseHeaders),
+			responseDescription: successStatusCode.intValue.flatMap { errorDescriptions[$0] },
+			statusCode: successStatusCode,
 			links: links,
 			callbacks: callbacks,
 			deprecated: deprecated,
@@ -186,17 +189,10 @@ public extension Route {
 			servers: servers,
 			extensions: [:]
 		)
-		._response(
-			statusCode: successStatusCode,
-			body: response.flatMap { OpenAPIValue($0) } ?? openAPIResponseType,
-            contentTypes: responseType.nilIfEmpty ?? [defaultResponseContentType],
-            headers: OpenAPIValue.params(responseHeaders),
-			description: successStatusCode.intValue.flatMap { errorDescriptions[$0] }
-		)
 		.openAPI(custom: \.responses) { value in
 			value = responses(
 				current: value,
-                responses: errorResponses.mapKeys(ResponsesObject.Key.code) { OpenAPIValue($0) }.compactMapValues { $0 },
+				responses: errorResponses.mapKeys(ResponsesObject.Key.code) { OpenAPIValue($0) }.compactMapValues { $0 },
 				descriptions: errorDescriptions.mapKeys(ResponsesObject.Key.code),
 				types: errorResponses.mapKeys(ResponsesObject.Key.code) { _ in errorType },
 				headers: OpenAPIValue.params(errorHeaders).map { headers in
@@ -264,6 +260,11 @@ extension Route {
 		cookies: OpenAPIValue?,
 		body: OpenAPIValue?,
 		bodyTypes: [MediaType],
+		response: OpenAPIValue?,
+		responseContentType: [MediaType],
+		responseHeaders: OpenAPIValue?,
+		responseDescription: String?,
+		statusCode: ResponsesObject.Key,
 		links: [Link: LinkKey.Type],
 		callbacks: [String: ReferenceOr<CallbackObject>]?,
 		deprecated: Bool?,
@@ -310,6 +311,13 @@ extension Route {
 		.set(\.tags, to: newTags)
 		.set(\.openAPIMethod, to: method)
 		.openAPI(custom: \.specificationExtensions, extensions)
+		._response(
+			statusCode: statusCode,
+			body: response,
+			contentTypes: responseContentType.nilIfEmpty ?? response.map { [self.responseContentType(for: $0)] } ?? [],
+			headers: responseHeaders,
+			description: responseDescription
+		)
 	}
 
 	func _response(
@@ -394,34 +402,79 @@ extension Route {
 	var links: [Link: LinkKey.Type] {
 		values.links ?? [:]
 	}
-    
-    var bodyResponseType: Any.Type {
-        (responseType as? EventLoopType.Type)?.valueType ?? responseType
-    }
-    
-    var openAPIResponseType: OpenAPIValue? {
-        switch bodyResponseType {
-        case let withExample as WithExample.Type:
-            return .example(withExample.example)
-        case let openAPIType as OpenAPIType.Type:
-            return .schema(openAPIType.openAPISchema)
-        case _ as Response.Type:
-            return nil
-        case _ as Request.Type:
-            return nil
-        case let decodable as Decodable.Type:
-            return .type(decodable)
-        default:
-            return nil
-        }
-    }
-    
-    var defaultResponseContentType: MediaType {
-        switch bodyResponseType {
-        case let custom as CustomContentType.Type:
-            return custom.contentType
-        default:
-            return .application(.json)
-        }
-    }
+
+	var bodyResponseType: Any.Type {
+		(responseType as? EventLoopType.Type)?.valueType ?? responseType
+	}
+
+	var openAPIResponseType: OpenAPIValue? {
+		switch bodyResponseType {
+		case let withExample as WithExample.Type:
+			return .example(withExample.example)
+		case let openAPIType as OpenAPIType.Type:
+			return .schema(openAPIType.openAPISchema)
+		case _ as Response.Type:
+			return nil
+		case _ as Request.Type:
+			return nil
+		case let decodable as Decodable.Type:
+			return .type(decodable)
+		default:
+			return nil
+		}
+	}
+
+	var defaultResponseContentType: MediaType {
+		responseContentType(for: bodyResponseType)
+	}
+
+	func responseContentType(for value: OpenAPIValue) -> MediaType {
+		switch value {
+		case let .type(type):
+			return responseContentType(for: type)
+		case let .example(value):
+			return responseContentType(for: Swift.type(of: value))
+		case let .schema(object):
+			switch object.type {
+			case .array, .object:
+				return .application(.json)
+			case .enum:
+				return .text(.plain)
+			case .any:
+				return .any
+			case let .composite(_, schemas, _):
+				return responseContentType(for: schemas.compactMap(\.object).map { .schema($0) })
+			case let .primitive(_, format, _):
+				switch format {
+				case "html":
+					return .text(.html)
+				default:
+					return .text(.plain)
+				}
+			}
+		case let .composite(values, _, _):
+			return responseContentType(for: values)
+		}
+	}
+
+	func responseContentType(for values: [OpenAPIValue]) -> MediaType {
+		guard !values.isEmpty else {
+			return .text(.plain)
+		}
+		var type = responseContentType(for: values[0])
+		var i = 1
+		while i < values.count, responseContentType(for: values[i]) == type {
+			i += 1
+		}
+		return i == values.count ? type : .any
+	}
+
+	func responseContentType(for type: Any.Type) -> MediaType {
+		switch type {
+		case let custom as CustomContentType.Type:
+			return custom.contentType
+		default:
+			return .application(.json)
+		}
+	}
 }

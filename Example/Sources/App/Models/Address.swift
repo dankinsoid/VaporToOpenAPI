@@ -1,14 +1,14 @@
 import Foundation
-import VaporToOpenAPI
 import SwiftOpenAPI
+import VaporToOpenAPI
 
 public struct Address: Codable, WithExample, OpenAPIDescriptable {
-	
+
 	public var street: String?
 	public var city: String?
 	public var state: String?
 	public var zip: String?
-	
+
 	public static let example = Address(
 		street: "437 Lytton",
 		city: "Palo Alto",

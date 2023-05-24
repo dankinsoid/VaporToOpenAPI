@@ -51,7 +51,7 @@ public extension Routes {
 		openAPIObject.specificationExtensions = extensions
 		return WithSpecExtensions(wrappedValue: openAPIObject)
 	}
-	
+
 	/// Create ```OpenAPIObject```
 	/// - Parameters:
 	///   - spec: Specification identifier, used to group specifications
@@ -142,11 +142,11 @@ private extension OpenAPIObject {
 	mutating func addSchemas(routes: [Route]) {
 		addComponent(\.schemas, routes: routes, at: \.schemas)
 	}
-	
+
 	mutating func addExamples(routes: [Route]) {
 		addComponent(\.examples, routes: routes, at: \.examples)
 	}
-	
+
 	mutating func addComponent<T>(_ componentKeyPath: WritableKeyPath<ComponentsObject, [String: T]?>, routes: [Route], at routeKeyPath: KeyPath<Route, [String: T]>) {
 		var values = components?[keyPath: componentKeyPath] ?? [:]
 		values = routes.reduce(into: values) { components, route in

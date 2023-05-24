@@ -1,6 +1,6 @@
 import Foundation
-import VaporToOpenAPI
 import SwiftOpenAPI
+import VaporToOpenAPI
 
 public struct UploadImageQuery: Codable, Equatable, WithExample, OpenAPIDescriptable {
 

@@ -109,7 +109,7 @@ extension OpenAPIParameters: ExpressibleByArrayLiteral {
 }
 
 extension OpenAPIParameters: ExpressibleByDictionaryLiteral {
-	
+
 	public init(dictionaryLiteral elements: (String, ReferenceOr<SchemaObject>)...) {
 		self = .schema(.object(properties: Dictionary(elements) { _, new in new }))
 	}
@@ -139,11 +139,11 @@ indirect enum OpenAPIValue {
 
 	static func params(_ array: [Any]) -> OpenAPIValue? {
 		array.nilIfEmpty.map { array in
-            OpenAPIParameters.all(
-                of: array.compactMap { item in
-                    OpenAPIValue(item).map { OpenAPIParameters(value: $0) }
-                }
-            ).value
+			OpenAPIParameters.all(
+				of: array.compactMap { item in
+					OpenAPIValue(item).map { OpenAPIParameters(value: $0) }
+				}
+			).value
 		}
 	}
 

@@ -10,7 +10,7 @@ public struct Pet: Codable, Content, Identifiable, WithExample {
 	public var photoUrls: [URL]
 	public var tags: [Tag]?
 	public var status: PetStatus?
-	
+
 	public static let example = Pet(
 		id: 10,
 		name: "doggie",

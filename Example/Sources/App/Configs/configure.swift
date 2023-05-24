@@ -3,7 +3,7 @@ import Logging
 import SwiftOpenAPI
 import Vapor
 
-// configures your application
+/// configures your application
 public func configure(_ app: Application) async throws {
 
 	app.logger.info("Environment: \(app.environment.name)")

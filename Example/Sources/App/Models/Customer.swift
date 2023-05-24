@@ -1,15 +1,15 @@
 import Foundation
-import VaporToOpenAPI
 import SwiftOpenAPI
+import VaporToOpenAPI
 
 public struct Customer: Codable, Identifiable, WithExample, OpenAPIDescriptable {
-	
+
 	public var id: Int
 	public var username: String
 	public var address: [Address]
-	
+
 	public static let example = Customer(
-		id: 100000,
+		id: 100_000,
 		username: "fehguy",
 		address: [.example]
 	)

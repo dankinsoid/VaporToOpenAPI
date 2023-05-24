@@ -1,10 +1,12 @@
 --indent tab
+--ifdef no-indent
 --swiftversion 5.7
---exclude Pods,**/API,**/Templates
+--exclude Pods,**/Templates
 --disable preferKeyPath
 --disable wrapConditionalBodies
 --disable sortDeclarations
 --disable blankLinesAtStartOfScope
+--disable opaqueGenericParameters
 --redundanttype inferred
 --header ""
 --enable organizeDeclarations
@@ -13,3 +15,4 @@
 --stripunusedargs unnamed-only
 --enable genericExtensions
 --enable typeSugar
+--enable docComments

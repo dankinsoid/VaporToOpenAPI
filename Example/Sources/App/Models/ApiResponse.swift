@@ -1,10 +1,10 @@
 import Foundation
+import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
-import SwiftOpenAPI
 
 public struct ApiResponse: Codable, Content, WithExample, OpenAPIDescriptable {
-	
+
 	public var code: Int32?
 	public var type: String?
 	public var message: String?
