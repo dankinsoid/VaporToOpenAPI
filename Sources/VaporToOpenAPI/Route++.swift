@@ -459,9 +459,9 @@ extension Route {
 
 	func responseContentType(for values: [OpenAPIValue]) -> MediaType {
 		guard !values.isEmpty else {
-			return .text(.plain)
+			return .any
 		}
-		var type = responseContentType(for: values[0])
+		let type = responseContentType(for: values[0])
 		var i = 1
 		while i < values.count, responseContentType(for: values[i]) == type {
 			i += 1

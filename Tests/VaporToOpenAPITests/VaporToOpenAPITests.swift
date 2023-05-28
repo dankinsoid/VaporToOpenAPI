@@ -28,8 +28,6 @@ final class VDTests: XCTestCase {
 				version: Version(1, 0, 0)
 			)
 		)
-
-		prettyPrint(api)
 	}
 
 	func testIssue1() {

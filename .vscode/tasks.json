@@ -1,0 +1,32 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "swift",
+			"args": [
+				"build",
+				"--build-tests"
+			],
+			"cwd": ".",
+			"disableTaskQueue": true,
+			"problemMatcher": [
+				"$swiftc"
+			],
+			"group": "build",
+			"label": "swift: Build All",
+			"detail": "swift build --build-tests"
+		},
+		{
+            "label": "swiftc with debug",
+            "type": "shell",
+            "command": "swiftc -g ${file}",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "panel": "dedicated"
+            }
+		}
+	]
+}
