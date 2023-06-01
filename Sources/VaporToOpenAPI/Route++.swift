@@ -454,6 +454,8 @@ extension Route {
 			}
 		case let .composite(values, _, _):
 			return responseContentType(for: values)
+		case .parameters:
+			return .application(.json)
 		}
 	}
 

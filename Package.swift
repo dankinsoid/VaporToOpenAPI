@@ -17,7 +17,8 @@ let package = Package(
 	dependencies: [
 		// 💧 A server-side Swift web framework.
 		.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.16.0"),
+		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.16.4"),
+		.package(url: "https://github.com/pointfreeco/swift-custom-dump.git", from: "0.10.3"),
 	],
 	targets: [
 		.target(
@@ -29,7 +30,10 @@ let package = Package(
 		),
 		.testTarget(
 			name: "VaporToOpenAPITests",
-			dependencies: ["VaporToOpenAPI"]
+			dependencies: [
+				"VaporToOpenAPI",
+				.product(name: "CustomDump", package: "swift-custom-dump"),
+			]
 		),
 	]
 )

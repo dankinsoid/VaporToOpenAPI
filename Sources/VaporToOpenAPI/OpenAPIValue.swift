@@ -86,18 +86,16 @@ public struct OpenAPIParameters {
 	/// Combines parameters into one.
 	static func all(of types: [OpenAPIParameters]) -> OpenAPIParameters {
 		var schemas: [String: ReferenceOr<SchemaObject>] = [:]
-		var properties: [String: ReferenceOr<SchemaObject>] = [:]
-		var required: Set<String> = []
+		var properties: [String: ParameterObject] = [:]
 		for type in types {
-			switch try? type.value.schema(schemas: &schemas).object?.type {
-			case let .object(props, req, _, _):
-				properties.merge(props ?? [:]) { _, new in new }
-				required.formUnion(req ?? [])
-			default:
+			guard let params = try? type.value.parameters(in: .query, schemas: &schemas) else {
 				continue
 			}
+			params.compactMap(\.object).forEach {
+				properties[$0.name] = $0
+			}
 		}
-		return OpenAPIParameters(value: .schema(.object(properties: properties, required: required)))
+		return OpenAPIParameters(value: .parameters(properties))
 	}
 }
 
@@ -111,7 +109,11 @@ extension OpenAPIParameters: ExpressibleByArrayLiteral {
 extension OpenAPIParameters: ExpressibleByDictionaryLiteral {
 
 	public init(dictionaryLiteral elements: (String, ReferenceOr<SchemaObject>)...) {
-		self = .schema(.object(properties: Dictionary(elements) { _, new in new }))
+		value = .parameters(
+			elements.reduce(into: [:]) { result, element in
+				result[element.0] = ParameterObject(name: element.0, in: .query, schema: element.1)
+			}
+		)
 	}
 }
 
@@ -120,6 +122,7 @@ indirect enum OpenAPIValue {
 	case example(Encodable)
 	case type(Decodable.Type)
 	case schema(SchemaObject)
+	case parameters([String: ParameterObject])
 	case composite([OpenAPIValue], CompositeType, discriminator: DiscriminatorObject?)
 
 	init?(_ value: Any) {
@@ -157,6 +160,11 @@ indirect enum OpenAPIValue {
 			return try .decodeSchema(decodable, into: &schemas)
 		case let .schema(schemaObject):
 			return .value(schemaObject)
+		case let .parameters(properties):
+			return .object(
+				properties: properties.compactMapValues { $0.schema },
+				required: []
+			)
 		case let .composite(array, compositeType, discriminator):
 			return try .value(
 				SchemaObject(
@@ -177,7 +185,7 @@ indirect enum OpenAPIValue {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, schemas: &schemas, examples: &examples)
-		case .schema, .composite, .type:
+		case .schema, .composite, .type, .parameters:
 			return try MediaTypeObject(schema: schema(schemas: &schemas))
 		}
 	}
@@ -210,6 +218,18 @@ indirect enum OpenAPIValue {
 			default:
 				return [:]
 			}
+		case let .parameters(properties):
+			return properties.mapValues {
+				.value(
+					HeaderObject(
+						description: $0.description,
+						required: $0.required,
+						schema: $0.schema,
+						example: $0.example,
+						examples: $0.examples
+					)
+				)
+			}
 		}
 	}
 
@@ -226,21 +246,31 @@ indirect enum OpenAPIValue {
 		case .schema, .composite:
 			switch try schema(schemas: &schemas).object?.type {
 			case let .object(props, required, _, _):
-				return props?.map {
-					.value(
-						ParameterObject(
-							name: $0.key,
-							in: location,
-							description: $0.value.object?.description,
-							required: location == .path || required?.contains($0.key) == true,
-							schema: $0.value,
-							example: $0.value.object?.example
+				return props?
+					.sorted { $0.key < $1.key }
+					.map {
+						.value(
+							ParameterObject(
+								name: $0.key,
+								in: location,
+								description: $0.value.object?.description,
+								required: location == .path || required?.contains($0.key) == true,
+								schema: $0.value,
+								example: $0.value.object?.example
+							)
 						)
-					)
-				} ?? []
+					} ?? []
 			default:
 				return []
 			}
+		case let .parameters(parameters):
+			return parameters
+				.sorted { $0.key < $1.key }
+				.map {
+					var result = $0.value
+					result.in = location
+					return .value(result)
+				}
 		}
 	}
 }
