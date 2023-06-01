@@ -10,22 +10,25 @@ public extension Route {
 	///   - tags: A list of tags for API documentation control. Tags can be used for logical grouping of operations by resources or any other qualifier.
 	///   - summary: A short summary of what the operation does.
 	///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
+	///   - operationId: Unique string used to identify the operation. The id MUST be unique among all operations described in the API. The operationId value is case-sensitive. Tools and libraries MAY use the operationId to uniquely identify an operation, therefore, it is RECOMMENDED to follow common programming naming conventions.
 	///   - externalDocs: Additional external documentation for this operation.
 	///   - query: Query parameters.
 	///   - headers: Request headers.
 	///   - path: Path parameters.
 	///   - cookies: Cookie parameters.
 	///   - body: Request body.
-	///   - bodyType: Request body content type
+	///   - contentType: Request body content type.
 	///   - response: Response body.
-	///   - responseType: Response body content type
-	///   - responseHeaders: Response headers
-	///   - responseDescription: Response description
+	///   - responseContentType: Response body content type.
+	///   - responseHeaders: Response headers.
+	///   - responseDescription: Response description.
+	///   - statusCode: Response status code.
+	///   - links: [Links](https://swagger.io/docs/specification/links).
 	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
-	///   - auth: Security requirements
-	///   - authScopes: Security scopes
+	///   - auth: Security requirements.
 	///   - servers: An alternative ```ServerObject``` to service this operation.
+	///   - extensions: Specification extensions.
 	/// - Returns: ```Route``` instance
 	@discardableResult
 	func openAPI(
@@ -360,6 +363,7 @@ extension Route {
 	var operationObject: OperationObject {
 		get {
 			values.operationObject ?? OperationObject(
+				tags: tags.map(\.name).nilIfEmpty ?? path.prefix(1).map(\.description),
 				description: description
 			)
 		}

@@ -6,7 +6,7 @@ import XCTest
 
 final class VDTests: XCTestCase {
 
-	func tests() throws {
+	func testGlobal() throws {
 		let routes = Routes()
 		routes
 			.groupedOpenAPI(auth: .basic, .apiKey())
@@ -28,6 +28,87 @@ final class VDTests: XCTestCase {
 				title: "Pets API",
 				version: Version(1, 0, 0)
 			)
+		)
+		XCTAssertNoDifference(
+			api,
+			OpenAPIObject(
+				info: InfoObject(
+					title: "Pets API",
+					version: Version(1, 0, 0)
+				),
+				paths: [
+					"/pets": .value(
+						PathItemObject(
+							[
+								.get: OperationObject(
+									tags: ["pets"],
+									description: "Get all pets",
+									operationId: "getPets",
+									parameters: [
+										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string, example: .string(PetQuery.example.filter ?? ""))),
+									],
+									responses: [
+										200: .value(
+											ResponseObject(
+												description: "OK",
+												content: [
+													.application(.json): MediaTypeObject(
+														schema: .array(of: .ref(components: \.schemas, Pet.self)),
+														examples: ["ArrayPet": .ref(components: \.examples, "ArrayPet")]
+													),
+												]
+											)
+										),
+										401: .value(
+											ResponseObject(
+												description: "Unauthorized",
+												content: [
+													.application(.json): MediaTypeObject(
+														schema: .ref(components: \.schemas, ErrorResponse.self),
+														examples: ["ErrorResponse": .ref(components: \.examples, ErrorResponse.self)]
+													),
+												]
+											)
+										),
+									],
+									security: [
+										SecurityRequirementObject("http_basic", []),
+										SecurityRequirementObject("apiKey_header", []),
+									]
+								).extended(with: [:]),
+							]
+						)
+					)
+				],
+				components: ComponentsObject(
+					schemas: [
+						"Pet": Pet.schema,
+						"ErrorResponse": .object(
+							properties: [
+								"error": .boolean,
+								"reason": .string
+							],
+							required: ["error", "reason"]
+						)
+					],
+					examples: [
+						"ArrayPet": .value(ExampleObject(value:  [Pet.exampleObject.object?.value ?? [:]])),
+						"ErrorResponse": .value(
+							ExampleObject(
+								value:  [
+									"error": .bool(ErrorResponse.example.error),
+									"reason": .string(ErrorResponse.example.reason)
+								]
+							)
+						)
+					],
+					securitySchemes: [
+						"apiKey_header": .apiKey(),
+						"http_basic": .basic
+					]
+				),
+				tags: ["pets"]
+			).extended(with: [:])
 		)
 	}
 
@@ -247,9 +328,48 @@ final class VDTests: XCTestCase {
 		)
 	}
 
-	static var allTests = [
-		("tests", tests),
-	]
+	func testGroupedOpenAPITags() throws {
+		let tag: TagObject = "test.com"
+		let routes = Routes()
+		let builder = routes.groupedOpenAPI(tags: [tag])
+		builder.get("test") { _ in "test" }
+		builder.post("test") { _ in "test" }
+
+		let openAPI = routes.openAPI(info: InfoObject(title: "Test", version: "1.0.0"))
+		XCTAssertNoDifference(
+			openAPI.tags,
+			[tag]
+		)
+		XCTAssertNoDifference(
+			openAPI.paths?.value.values.flatMap { $0.object?.operations.values.flatMap { $0.tags ?? [] } ?? [] },
+			[tag.name, tag.name]
+		)
+	}
+
+	func testGroupedOpenAPIResponse() throws {
+		let routes = Routes()
+		let builder = routes.groupedOpenAPIResponse(statusCode: .notFound, description: "Not found")
+		builder.get("test") { _ in "test" }
+		builder.post("test") { _ in "test" }
+
+		let openAPI = routes.openAPI(info: InfoObject(title: "Test", version: "1.0.0"))
+
+		let responses = openAPI.paths?.value.values.compactMap {
+			$0.object?.operations.values.reduce(into: [:]) {
+				$0.merge(
+					$1.responses?.value.compactMapValues(\.object) ?? [:]
+				) { _, new in new }
+			}
+		} ?? []
+
+		XCTAssertNoDifference(
+			responses,
+			[[ResponsesObject.Key.notFound: ResponseObject(description: "Not found")]]
+		)
+	}
+
+	func testPage() throws {
+	}
 }
 
 struct Group: WithExample, Content {
