@@ -178,7 +178,6 @@ final class VDTests: XCTestCase {
 		let api = authenticated.openAPI(
 			info: InfoObject(title: "Some API", version: "1.0.0")
 		)
-		prettyPrint(api)
 		XCTAssertEqual(authenticated.all.count, api.paths?.value.values.flatMap { $0.object?.operations ?? [:] }.count ?? 0)
 	}
 
@@ -336,10 +335,7 @@ final class VDTests: XCTestCase {
 		builder.post("test") { _ in "test" }
 
 		let openAPI = routes.openAPI(info: InfoObject(title: "Test", version: "1.0.0"))
-		XCTAssertNoDifference(
-			openAPI.tags,
-			[tag]
-		)
+		XCTAssertNoDifference(openAPI.tags, [tag])
 		XCTAssertNoDifference(
 			openAPI.paths?.value.values.flatMap { $0.object?.operations.values.flatMap { $0.tags ?? [] } ?? [] },
 			[tag.name, tag.name]
