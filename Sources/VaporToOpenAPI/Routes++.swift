@@ -140,17 +140,21 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addSchemas(routes: [Route]) {
-		addComponent(\.schemas, routes: routes, at: \.schemas)
+		addComponent(Route.schemas, at: \.schemas, routes: routes)
 	}
 
 	mutating func addExamples(routes: [Route]) {
-		addComponent(\.examples, routes: routes, at: \.examples)
+		addComponent(Route.examples, at: \.examples, routes: routes)
 	}
 
-	mutating func addComponent<T>(_ componentKeyPath: WritableKeyPath<ComponentsObject, [String: T]?>, routes: [Route], at routeKeyPath: KeyPath<Route, [String: T]>) {
+	mutating func addComponent<T>(
+		_ value: [String?: [String: T]],
+		at componentKeyPath: WritableKeyPath<ComponentsObject, [String: T]?>,
+		routes: [Route]
+	) {
 		var values = components?[keyPath: componentKeyPath] ?? [:]
 		values = routes.reduce(into: values) { components, route in
-			components.merge(route[keyPath: routeKeyPath]) { new, _ in new }
+			components.merge(value[route.specID] ?? [:]) { new, _ in new }
 		}
 		if components == nil {
 			components = ComponentsObject()

@@ -101,6 +101,7 @@ public extension Route {
 		description: String? = nil
 	) -> Route {
 		_response(
+			spec: specID,
 			statusCode: statusCode,
 			body: body?.value,
 			contentTypes: contentType,
@@ -201,8 +202,8 @@ public extension Route {
 				headers: OpenAPIValue.params(errorHeaders).map { headers in
 					errorResponses.mapKeys(ResponsesObject.Key.code) { _ in headers }
 				} ?? [:],
-				schemas: &schemas,
-				examples: &examples
+				schemas: &Route.schemas[spec, default: [:]],
+				examples: &Route.examples[spec, default: [:]]
 			)
 		}
 	}
@@ -285,10 +286,10 @@ extension Route {
 				externalDocs: externalDocs,
 				operationId: operationId ?? operationID,
 				parameters: [
-					try? query?.parameters(in: .query, schemas: &schemas),
-					try? headers?.parameters(in: .header, schemas: &schemas),
-					(try? path?.parameters(in: .path, schemas: &schemas))?.nilIfEmpty ?? pathParameters,
-					try? cookies?.parameters(in: .cookie, schemas: &schemas),
+					try? query?.parameters(in: .query, schemas: &Route.schemas[spec, default: [:]]),
+					try? headers?.parameters(in: .header, schemas: &Route.schemas[spec, default: [:]]),
+					(try? path?.parameters(in: .path, schemas: &Route.schemas[spec, default: [:]]))?.nilIfEmpty ?? pathParameters,
+					try? cookies?.parameters(in: .cookie, schemas: &Route.schemas[spec, default: [:]]),
 				]
 				.flatMap { $0 ?? [] }
 				.nilIfEmpty,
@@ -297,8 +298,8 @@ extension Route {
 					description: nil,
 					required: true,
 					types: bodyTypes,
-					schemas: &schemas,
-					examples: &examples
+					schemas: &Route.schemas[spec, default: [:]],
+					examples: &Route.examples[spec, default: [:]]
 				),
 				responses: operationObject.responses,
 				callbacks: callbacks,
@@ -315,6 +316,7 @@ extension Route {
 		.set(\.openAPIMethod, to: method)
 		.openAPI(custom: \.specificationExtensions, extensions)
 		._response(
+			spec: spec,
 			statusCode: statusCode,
 			body: response,
 			contentTypes: responseContentType.nilIfEmpty ?? response.map { [self.responseContentType(for: $0)] } ?? [],
@@ -324,6 +326,7 @@ extension Route {
 	}
 
 	func _response(
+		spec: String?,
 		statusCode: ResponsesObject.Key = 200,
 		body: OpenAPIValue? = nil,
 		contentTypes: [MediaType],
@@ -337,8 +340,8 @@ extension Route {
 				descriptions: description.map { [statusCode: $0] } ?? [:],
 				types: [statusCode: contentTypes],
 				headers: headers.map { [statusCode: $0] } ?? [:],
-				schemas: &schemas,
-				examples: &examples
+				schemas: &Route.schemas[spec, default: [:]],
+				examples: &Route.examples[spec, default: [:]]
 			)
 		}
 	}
@@ -370,16 +373,6 @@ extension Route {
 		set {
 			set(\.operationObject, to: newValue)
 		}
-	}
-
-	var schemas: [String: ReferenceOr<SchemaObject>] {
-		get { values.schemas ?? [:] }
-		set { set(\.schemas, to: newValue) }
-	}
-
-	var examples: [String: ReferenceOr<ExampleObject>] {
-		get { values.examples ?? [:] }
-		set { set(\.examples, to: newValue) }
 	}
 
 	var auths: [AuthSchemeObject] {
@@ -483,4 +476,10 @@ extension Route {
 			return .application(.json)
 		}
 	}
+}
+
+extension Route {
+	
+	static var schemas: [String?: [String: ReferenceOr<SchemaObject>]] = [nil: [:]]
+	static var examples: [String?: [String: ReferenceOr<ExampleObject>]] = [nil: [:]]
 }

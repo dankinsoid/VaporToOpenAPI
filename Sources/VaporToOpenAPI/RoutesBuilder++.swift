@@ -26,6 +26,7 @@ public extension RoutesBuilder {
 	) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
 			route._response(
+				spec: route.specID,
 				statusCode: statusCode,
 				body: body?.value,
 				contentTypes: contentType,

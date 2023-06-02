@@ -29,6 +29,7 @@ final class VDTests: XCTestCase {
 				version: Version(1, 0, 0)
 			)
 		)
+		
 		XCTAssertNoDifference(
 			api,
 			OpenAPIObject(
@@ -364,7 +365,32 @@ final class VDTests: XCTestCase {
 		)
 	}
 
-	func testPage() throws {
+	func testExamples() throws {
+		let example1 = Pet(name: "Persey", age: 2)
+		let example2 = Pet(name: "Sima", age: 4)
+		
+		let routes = Routes()
+		routes
+			.get("pets") { _ -> [Pet] in
+				[]
+			}
+			.openAPI(
+				description: "Get all pets",
+				body: .type(of: example2),
+				response: .type(of: example2)
+			)
+		
+		routes
+			.put("pets") { _ -> [Pet] in
+				[]
+			}
+			.openAPI(
+				description: "Get all pets",
+				body: .type(of: example1),
+				response: .type(of: example2)
+			)
+		
+		_ = routes.openAPI(info: InfoObject(title: "Pets", version: "1.0.0"))
 	}
 }
 
