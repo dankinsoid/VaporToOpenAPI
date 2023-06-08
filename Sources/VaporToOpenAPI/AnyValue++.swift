@@ -35,7 +35,7 @@ extension AnyValue {
 
 	private var flatten: [String: AnyValue] {
 		switch self {
-		case .string, .bool, .int, .double:
+		case .string, .bool, .int, .double, .null:
 			return [:]
 
 		case let .object(dictionary):
@@ -71,7 +71,7 @@ extension AnyValue {
 
 	func path(upTo key: String) -> [String] {
 		switch self {
-		case .string, .bool, .int, .double:
+		case .string, .bool, .int, .double, .null:
 			return []
 
 		case let .object(dictionary):
@@ -102,7 +102,7 @@ extension AnyValue {
 
 	func path(upTo value: AnyValue) -> [String] {
 		switch self {
-		case .string, .bool, .int, .double:
+		case .string, .bool, .int, .double, .null:
 			return []
 
 		case let .object(dictionary):
