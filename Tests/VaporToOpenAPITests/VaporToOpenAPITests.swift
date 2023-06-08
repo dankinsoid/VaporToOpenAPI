@@ -29,7 +29,16 @@ final class VDTests: XCTestCase {
 				version: Version(1, 0, 0)
 			)
 		)
-		
+
+		let simaExample = api.components?.examples?
+			.first(where: { $0.key == "Pet"})?
+			.value.object?.value
+		XCTAssertNotNil(simaExample)
+		let perseyExample = api.components?.examples?
+			.first(where: { $0.key == "Pet1"})?
+			.value.object?.value
+		XCTAssertNotNil(perseyExample)
+
 		XCTAssertNoDifference(
 			api,
 			OpenAPIObject(
@@ -101,7 +110,9 @@ final class VDTests: XCTestCase {
 									"reason": .string(ErrorResponse.example.reason)
 								]
 							)
-						)
+						),
+						"Pet": .value(ExampleObject(value: simaExample)),
+						"Pet1": .value(ExampleObject(value: perseyExample))
 					],
 					securitySchemes: [
 						"apiKey_header": .apiKey(),
