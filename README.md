@@ -1,5 +1,7 @@
 # VaporToOpenAPI
 
+[![build](https://github.com/dankinsoid/VaporToOpenAPI/actions/workflows/test.yml/badge.svg)](https://github.com/dankinsoid/VaporToOpenAPI/actions/workflows/test.yml)
+
 VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/).\
 The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAPI).
 
