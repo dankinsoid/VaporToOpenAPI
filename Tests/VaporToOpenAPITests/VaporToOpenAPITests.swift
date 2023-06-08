@@ -55,7 +55,7 @@ final class VDTests: XCTestCase {
 									description: "Get all pets",
 									operationId: "getPets",
 									parameters: [
-										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string, example: .string(PetQuery.example.filter ?? ""))),
+										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string(nullable: true), example: .string(PetQuery.example.filter ?? ""))),
 									],
 									responses: [
 										200: .value(
