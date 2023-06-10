@@ -479,7 +479,7 @@ extension Route {
 }
 
 extension Route {
-	
-	static var schemas: [String?: [String: ReferenceOr<SchemaObject>]] = [nil: [:]]
-	static var examples: [String?: [String: ReferenceOr<ExampleObject>]] = [nil: [:]]
+
+	static var schemas: [String?: OrderedDictionary<String, ReferenceOr<SchemaObject>>] = [nil: [:]]
+	static var examples: [String?: OrderedDictionary<String, ReferenceOr<ExampleObject>>] = [nil: [:]]
 }

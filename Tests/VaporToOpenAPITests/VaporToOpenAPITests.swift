@@ -30,15 +30,6 @@ final class VDTests: XCTestCase {
 			)
 		)
 
-		let simaExample = api.components?.examples?
-			.first(where: { $0.key == "Pet"})?
-			.value.object?.value
-		XCTAssertNotNil(simaExample)
-		let perseyExample = api.components?.examples?
-			.first(where: { $0.key == "Pet1"})?
-			.value.object?.value
-		XCTAssertNotNil(perseyExample)
-
 		XCTAssertNoDifference(
 			api,
 			OpenAPIObject(
@@ -55,7 +46,7 @@ final class VDTests: XCTestCase {
 									description: "Get all pets",
 									operationId: "getPets",
 									parameters: [
-										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string(nullable: true), example: .string(PetQuery.example.filter ?? ""))),
+										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string.with(\.nullable, true), example: .string(PetQuery.example.filter ?? ""))),
 									],
 									responses: [
 										200: .value(
@@ -88,35 +79,33 @@ final class VDTests: XCTestCase {
 								).extended(with: [:]),
 							]
 						)
-					)
+					),
 				],
 				components: ComponentsObject(
 					schemas: [
-						"Pet": Pet.schema,
 						"ErrorResponse": .object(
 							properties: [
 								"error": .boolean,
-								"reason": .string
+								"reason": .string,
 							],
 							required: ["error", "reason"]
-						)
+						),
+						"Pet": Pet.schema,
 					],
 					examples: [
-						"ArrayPet": .value(ExampleObject(value:  [Pet.exampleObject.object?.value ?? [:]])),
 						"ErrorResponse": .value(
 							ExampleObject(
-								value:  [
+								value: [
 									"error": .bool(ErrorResponse.example.error),
-									"reason": .string(ErrorResponse.example.reason)
+									"reason": .string(ErrorResponse.example.reason),
 								]
 							)
 						),
-						"Pet": .value(ExampleObject(value: simaExample)),
-						"Pet1": .value(ExampleObject(value: perseyExample))
+						"ArrayPet": .value(ExampleObject(value: [Pet.exampleObject.object?.value ?? [:]])),
 					],
 					securitySchemes: [
+						"http_basic": .basic,
 						"apiKey_header": .apiKey(),
-						"http_basic": .basic
 					]
 				),
 				tags: ["pets"]
@@ -194,8 +183,8 @@ final class VDTests: XCTestCase {
 	}
 
 	func testOpenAPIBodyDecodable() throws {
-		var schemas: [String: ReferenceOr<SchemaObject>] = [:]
-		var examples: [String: ReferenceOr<ExampleObject>] = [:]
+		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
+		var examples: OrderedDictionary<String, ReferenceOr<ExampleObject>> = [:]
 		let body: OpenAPIBody = .type(PetNoExample.self)
 
 		// Test type
@@ -231,8 +220,8 @@ final class VDTests: XCTestCase {
 
 	func testBodyExample() throws {
 		let body: OpenAPIBody = .type(Pet.self)
-		var schemas: [String: ReferenceOr<SchemaObject>] = [:]
-		var examples: [String: ReferenceOr<ExampleObject>] = [:]
+		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
+		var examples: OrderedDictionary<String, ReferenceOr<ExampleObject>> = [:]
 
 		// Test type
 		switch body.value {
@@ -255,7 +244,7 @@ final class VDTests: XCTestCase {
 					properties: [
 						"id": .string(format: .uuid),
 						"name": .string,
-						"age": .integer(format: .int32),
+						"age": .integer(format: .int64, range: 0...),
 					],
 					required: ["id", "name", "age"]
 				),
@@ -268,9 +257,9 @@ final class VDTests: XCTestCase {
 		XCTAssertNoDifference(
 			params,
 			[
-				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int32), example: .int(Int(Pet.example.age)))),
 				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
 				.value(ParameterObject(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
+				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
 			]
 		)
 		schemas = [:]
@@ -280,9 +269,9 @@ final class VDTests: XCTestCase {
 		XCTAssertNoDifference(
 			headers,
 			[
-				"age": .value(HeaderObject(required: true, schema: .integer(format: .int32), example: .int(Int(Pet.example.age)))),
 				"id": .value(HeaderObject(required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
 				"name": .value(HeaderObject(required: true, schema: .string, example: .string(Pet.example.name))),
+				"age": .value(HeaderObject(required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
 			]
 		)
 		schemas = [:]
@@ -296,7 +285,7 @@ final class VDTests: XCTestCase {
 	}
 
 	func testBodyOneOf() throws {
-		var schemas: [String: ReferenceOr<SchemaObject>] = [:]
+		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
 		let body: OpenAPIBody = .one(of: .type(Pet.self), .type(GroupDTO.self))
 
 		// Test schema
@@ -324,16 +313,16 @@ final class VDTests: XCTestCase {
 	}
 
 	func testParametersOneOf() throws {
-		var schemas: [String: ReferenceOr<SchemaObject>] = [:]
+		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
 		let parameters: OpenAPIParameters = .all(of: .type(Pet.self), .type(ErrorResponse.self))
 		let params = try parameters.value.parameters(in: .query, schemas: &schemas)
 		XCTAssertNoDifference(
 			params,
 			[
-				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int32), example: .int(Int(Pet.example.age)))),
-				.value(ParameterObject(name: "error", in: .query, required: true, schema: .boolean, example: .bool(ErrorResponse.example.error))),
 				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
 				.value(ParameterObject(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
+				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
+				.value(ParameterObject(name: "error", in: .query, required: true, schema: .boolean, example: .bool(ErrorResponse.example.error))),
 				.value(ParameterObject(name: "reason", in: .query, required: true, schema: .string, example: .string(ErrorResponse.example.reason))),
 			]
 		)
@@ -379,7 +368,7 @@ final class VDTests: XCTestCase {
 	func testExamples() throws {
 		let example1 = Pet(name: "Persey", age: 2)
 		let example2 = Pet(name: "Sima", age: 4)
-		
+
 		let routes = Routes()
 		routes
 			.get("pets") { _ -> [Pet] in
@@ -390,7 +379,7 @@ final class VDTests: XCTestCase {
 				body: .type(of: example2),
 				response: .type(of: example2)
 			)
-		
+
 		routes
 			.put("pets") { _ -> [Pet] in
 				[]
@@ -400,8 +389,17 @@ final class VDTests: XCTestCase {
 				body: .type(of: example1),
 				response: .type(of: example2)
 			)
-		
-		_ = routes.openAPI(info: InfoObject(title: "Pets", version: "1.0.0"))
+
+		let api = routes.openAPI(info: InfoObject(title: "Pets", version: "1.0.0"))
+
+		let simaExample = api.components?.examples?
+			.first(where: { $0.key == "Pet" })?
+			.value.object?.value
+		XCTAssertNotNil(simaExample)
+		let perseyExample = api.components?.examples?
+			.first(where: { $0.key == "Pet1" })?
+			.value.object?.value
+		XCTAssertNotNil(perseyExample)
 	}
 }
 
@@ -458,7 +456,7 @@ struct Pet: WithExample, Content, Equatable {
 			properties: [
 				"id": .string(format: .uuid),
 				"name": .string,
-				"age": .integer(format: .int32),
+				"age": .integer(format: .int64, range: 0...),
 			],
 			required: ["id", "name", "age"]
 		)
@@ -466,17 +464,17 @@ struct Pet: WithExample, Content, Equatable {
 
 	static var parameters: [ReferenceOr<ParameterObject>] {
 		[
-			.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int32))),
 			.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid))),
 			.value(ParameterObject(name: "name", in: .query, required: true, schema: .string)),
+			.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...))),
 		]
 	}
 
-	static var headers: [String: ReferenceOr<HeaderObject>] {
+	static var headers: OrderedDictionary<String, ReferenceOr<HeaderObject>> {
 		[
-			"age": .value(HeaderObject(required: true, schema: .integer(format: .int32))),
 			"id": .value(HeaderObject(required: true, schema: .string(format: .uuid))),
 			"name": .value(HeaderObject(required: true, schema: .string)),
+			"age": .value(HeaderObject(required: true, schema: .integer(format: .int64, range: 0...))),
 		]
 	}
 

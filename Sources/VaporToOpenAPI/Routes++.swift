@@ -148,8 +148,8 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addComponent<T>(
-		_ value: [String?: [String: T]],
-		at componentKeyPath: WritableKeyPath<ComponentsObject, [String: T]?>,
+		_ value: [String?: OrderedDictionary<String, T>],
+		at componentKeyPath: WritableKeyPath<ComponentsObject, OrderedDictionary<String, T>?>,
 		routes: [Route]
 	) {
 		var values = components?[keyPath: componentKeyPath] ?? [:]

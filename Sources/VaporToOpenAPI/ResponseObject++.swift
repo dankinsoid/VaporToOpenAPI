@@ -7,8 +7,8 @@ func response(
 	description: String,
 	contentTypes: [MediaType],
 	headers: OpenAPIValue?,
-	schemas: inout [String: ReferenceOr<SchemaObject>],
-	examples: inout [String: ReferenceOr<ExampleObject>]
+	schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>,
+	examples: inout OrderedDictionary<String, ReferenceOr<ExampleObject>>
 ) throws -> ResponseObject {
 	let object = try body?.mediaTypeObject(schemas: &schemas, examples: &examples)
 	return try ResponseObject(
@@ -28,8 +28,8 @@ func responses(
 	descriptions: [ResponsesObject.Key: String],
 	types: [ResponsesObject.Key: [MediaType]],
 	headers: [ResponsesObject.Key: OpenAPIValue],
-	schemas: inout [String: ReferenceOr<SchemaObject>],
-	examples: inout [String: ReferenceOr<ExampleObject>]
+	schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>,
+	examples: inout OrderedDictionary<String, ReferenceOr<ExampleObject>>
 ) -> ResponsesObject? {
 	var result: [ResponsesObject.Key: ResponsesObject.Value] = Dictionary(
 		Set(responses.keys).union(descriptions.keys).compactMap { key in
