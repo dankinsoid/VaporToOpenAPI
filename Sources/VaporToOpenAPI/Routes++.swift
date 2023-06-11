@@ -227,6 +227,10 @@ private extension OperationObject {
 		}
 		return result
 	}
+    
+    var allExamplesKeyPaths: [WritableKeyPath<OperationObject, ComponentsMap<ExampleObject>>] {
+        []
+    }
 }
 
 private func errorKey(_ key: ResponsesObject.Key) -> String {

@@ -85,7 +85,7 @@ public struct OpenAPIParameters {
 
 	/// Combines parameters into one.
 	static func all(of types: [OpenAPIParameters]) -> OpenAPIParameters {
-		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
+		var schemas: ComponentsMap<SchemaObject> = [:]
 		var properties: OrderedDictionary<String, ParameterObject> = [:]
 		for type in types {
 			guard let params = try? type.value.parameters(in: .query, schemas: &schemas) else {
@@ -151,7 +151,7 @@ indirect enum OpenAPIValue {
 	}
 
 	func schema(
-		schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>
+		schemas: inout ComponentsMap<SchemaObject>
 	) throws -> ReferenceOr<SchemaObject> {
 		switch self {
 		case let .example(encodable):
@@ -215,8 +215,8 @@ indirect enum OpenAPIValue {
 	}
 
 	func mediaTypeObject(
-		schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>,
-		examples: inout OrderedDictionary<String, ReferenceOr<ExampleObject>>
+		schemas: inout ComponentsMap<SchemaObject>,
+		examples: inout ComponentsMap<ExampleObject>
 	) throws -> MediaTypeObject {
 		switch self {
 		case let .example(encodable):
@@ -227,8 +227,8 @@ indirect enum OpenAPIValue {
 	}
 
 	func headers(
-		schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>
-	) throws -> OrderedDictionary<String, ReferenceOr<HeaderObject>> {
+		schemas: inout ComponentsMap<SchemaObject>
+	) throws -> ComponentsMap<HeaderObject> {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, schemas: &schemas)
@@ -272,8 +272,8 @@ indirect enum OpenAPIValue {
 	func parameters(
 		in location: ParameterObject.Location,
 		dateFormat: DateEncodingFormat = .default,
-		schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>
-	) throws -> [ReferenceOr<ParameterObject>] {
+		schemas: inout ComponentsMap<SchemaObject>
+	) throws -> ParametersList {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, in: location, dateFormat: dateFormat, schemas: &schemas)

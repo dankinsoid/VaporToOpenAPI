@@ -183,8 +183,8 @@ final class VDTests: XCTestCase {
 	}
 
 	func testOpenAPIBodyDecodable() throws {
-		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
-		var examples: OrderedDictionary<String, ReferenceOr<ExampleObject>> = [:]
+		var schemas: ComponentsMap<SchemaObject> = [:]
+		var examples: ComponentsMap<ExampleObject> = [:]
 		let body: OpenAPIBody = .type(PetNoExample.self)
 
 		// Test type
@@ -220,8 +220,8 @@ final class VDTests: XCTestCase {
 
 	func testBodyExample() throws {
 		let body: OpenAPIBody = .type(Pet.self)
-		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
-		var examples: OrderedDictionary<String, ReferenceOr<ExampleObject>> = [:]
+		var schemas: ComponentsMap<SchemaObject> = [:]
+		var examples: ComponentsMap<ExampleObject> = [:]
 
 		// Test type
 		switch body.value {
@@ -285,7 +285,7 @@ final class VDTests: XCTestCase {
 	}
 
 	func testBodyOneOf() throws {
-		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
+		var schemas: ComponentsMap<SchemaObject> = [:]
 		let body: OpenAPIBody = .one(of: .type(Pet.self), .type(GroupDTO.self))
 
 		// Test schema
@@ -313,7 +313,7 @@ final class VDTests: XCTestCase {
 	}
 
 	func testParametersOneOf() throws {
-		var schemas: OrderedDictionary<String, ReferenceOr<SchemaObject>> = [:]
+		var schemas: ComponentsMap<SchemaObject> = [:]
 		let parameters: OpenAPIParameters = .all(of: .type(Pet.self), .type(ErrorResponse.self))
 		let params = try parameters.value.parameters(in: .query, schemas: &schemas)
 		XCTAssertNoDifference(
@@ -462,7 +462,7 @@ struct Pet: WithExample, Content, Equatable {
 		)
 	}
 
-	static var parameters: [ReferenceOr<ParameterObject>] {
+	static var parameters: ParametersList {
 		[
 			.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid))),
 			.value(ParameterObject(name: "name", in: .query, required: true, schema: .string)),
@@ -470,7 +470,7 @@ struct Pet: WithExample, Content, Equatable {
 		]
 	}
 
-	static var headers: OrderedDictionary<String, ReferenceOr<HeaderObject>> {
+	static var headers: ComponentsMap<HeaderObject> {
 		[
 			"id": .value(HeaderObject(required: true, schema: .string(format: .uuid))),
 			"name": .value(HeaderObject(required: true, schema: .string)),

@@ -6,8 +6,8 @@ func request(
 	description: String?,
 	required: Bool?,
 	types: [MediaType],
-	schemas: inout OrderedDictionary<String, ReferenceOr<SchemaObject>>,
-	examples: inout OrderedDictionary<String, ReferenceOr<ExampleObject>>
+	schemas: inout ComponentsMap<SchemaObject>,
+	examples: inout ComponentsMap<ExampleObject>
 ) -> ReferenceOr<RequestBodyObject>? {
 	guard
 		let bodyObject = try? body?.mediaTypeObject(schemas: &schemas, examples: &examples)
