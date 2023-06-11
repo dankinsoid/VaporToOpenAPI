@@ -202,7 +202,7 @@ public extension Route {
 				headers: OpenAPIValue.params(errorHeaders).map { headers in
 					errorResponses.mapKeys(ResponsesObject.Key.code) { _ in headers }
 				} ?? [:],
-				schemas: &Route.schemas[spec, default: [:]],
+				schemas: &schemas[spec, default: [:]],
 				examples: &Route.examples[spec, default: [:]]
 			)
 		}
@@ -286,10 +286,10 @@ extension Route {
 				externalDocs: externalDocs,
 				operationId: operationId ?? operationID,
 				parameters: [
-					try? query?.parameters(in: .query, schemas: &Route.schemas[spec, default: [:]]),
-					try? headers?.parameters(in: .header, schemas: &Route.schemas[spec, default: [:]]),
-					(try? path?.parameters(in: .path, schemas: &Route.schemas[spec, default: [:]]))?.nilIfEmpty ?? pathParameters,
-					try? cookies?.parameters(in: .cookie, schemas: &Route.schemas[spec, default: [:]]),
+					try? query?.parameters(in: .query, schemas: &schemas[spec, default: [:]]),
+					try? headers?.parameters(in: .header, schemas: &schemas[spec, default: [:]]),
+					(try? path?.parameters(in: .path, schemas: &schemas[spec, default: [:]]))?.nilIfEmpty ?? pathParameters,
+					try? cookies?.parameters(in: .cookie, schemas: &schemas[spec, default: [:]]),
 				]
 				.flatMap { $0 ?? [] }
 				.nilIfEmpty,
@@ -298,7 +298,7 @@ extension Route {
 					description: nil,
 					required: true,
 					types: bodyTypes,
-					schemas: &Route.schemas[spec, default: [:]],
+					schemas: &schemas[spec, default: [:]],
 					examples: &Route.examples[spec, default: [:]]
 				),
 				responses: operationObject.responses,
@@ -340,7 +340,7 @@ extension Route {
 				descriptions: description.map { [statusCode: $0] } ?? [:],
 				types: [statusCode: contentTypes],
 				headers: headers.map { [statusCode: $0] } ?? [:],
-				schemas: &Route.schemas[spec, default: [:]],
+				schemas: &schemas[spec, default: [:]],
 				examples: &Route.examples[spec, default: [:]]
 			)
 		}
@@ -404,6 +404,15 @@ extension Route {
 		(responseType as? EventLoopType.Type)?.valueType ?? responseType
 	}
 
+	var schemas: [String?: ComponentsMap<SchemaObject>] {
+		get {
+			values.schemas ?? [nil: [:]]
+		}
+		set {
+			values.schemas = newValue
+		}
+	}
+
 	var openAPIResponseType: OpenAPIValue? {
 		switch bodyResponseType {
 		case let withExample as WithExample.Type:
@@ -432,16 +441,16 @@ extension Route {
 		case let .example(value):
 			return responseContentType(for: Swift.type(of: value))
 		case let .schema(object):
-            switch object.context {
+			switch object.context {
 			case .array, .object:
 				return .application(.json)
-            case nil:
+			case nil:
 				return .any
 			case let .composition(context):
-                let schemas = context.allOf ?? context.anyOf ?? context.oneOf ?? context.not.map { [$0] } ?? []
+				let schemas = context.allOf ?? context.anyOf ?? context.oneOf ?? context.not.map { [$0] } ?? []
 				return responseContentType(for: schemas.compactMap(\.object).map { .schema($0) })
-            case .string, .boolean, .integer, .number:
-                switch object.format {
+			case .string, .boolean, .integer, .number:
+				switch object.format {
 				case "html":
 					return .text(.html)
 				default:
@@ -479,6 +488,5 @@ extension Route {
 
 extension Route {
 
-	static var schemas: [String?: ComponentsMap<SchemaObject>] = [nil: [:]]
 	static var examples: [String?: ComponentsMap<ExampleObject>] = [nil: [:]]
 }

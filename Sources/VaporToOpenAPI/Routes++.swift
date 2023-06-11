@@ -140,21 +140,21 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addSchemas(routes: [Route]) {
-		addComponent(Route.schemas, at: \.schemas, routes: routes)
+		addComponent(\.schemas, at: \.schemas, routes: routes)
 	}
 
 	mutating func addExamples(routes: [Route]) {
-		addComponent(Route.examples, at: \.examples, routes: routes)
+		addComponent({ _ in Route.examples }, at: \.examples, routes: routes)
 	}
 
 	mutating func addComponent<T>(
-		_ value: [String?: OrderedDictionary<String, T>],
+		_ value: (Route) -> [String?: OrderedDictionary<String, T>],
 		at componentKeyPath: WritableKeyPath<ComponentsObject, OrderedDictionary<String, T>?>,
 		routes: [Route]
 	) {
 		var values = components?[keyPath: componentKeyPath] ?? [:]
 		values = routes.reduce(into: values) { components, route in
-			components.merge(value[route.specID] ?? [:]) { new, _ in new }
+			components.merge(value(route)[route.specID] ?? [:]) { new, _ in new }
 		}
 		if components == nil {
 			components = ComponentsObject()
@@ -227,10 +227,10 @@ private extension OperationObject {
 		}
 		return result
 	}
-    
-    var allExamplesKeyPaths: [WritableKeyPath<OperationObject, ComponentsMap<ExampleObject>>] {
-        []
-    }
+
+	var allExamplesKeyPaths: [WritableKeyPath<OperationObject, ComponentsMap<ExampleObject>>] {
+		[]
+	}
 }
 
 private func errorKey(_ key: ResponsesObject.Key) -> String {
