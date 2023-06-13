@@ -48,6 +48,7 @@ public struct Link: Hashable {
 		self.location = location
 	}
 
+    @available(*, deprecated, message: "Use init with string instead")
 	public init<T: WithExample>(_ name: WritableKeyPath<T, some DetectableType>, in location: Location) {
 		self.init(T.codingKey(for: name), in: location)
 	}
