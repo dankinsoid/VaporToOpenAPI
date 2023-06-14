@@ -76,7 +76,7 @@ final class VDTests: XCTestCase {
 										SecurityRequirementObject("http_basic", []),
 										SecurityRequirementObject("apiKey_header", []),
 									]
-								).extended(with: [:]),
+								),
 							]
 						)
 					),
@@ -109,7 +109,7 @@ final class VDTests: XCTestCase {
 					]
 				),
 				tags: ["pets"]
-			).extended(with: [:])
+			)
 		)
 	}
 
@@ -152,7 +152,7 @@ final class VDTests: XCTestCase {
 				body: .type(CreateGroup.self),
 				response: .type(GroupDTO.self),
 				links: [
-					Link(\GroupDTO.id, in: .response): GroupDTOID.self,
+					Link("id", in: .response): GroupDTOID.self,
 				]
 			)
 			.response(

@@ -33,42 +33,6 @@ extension AnyValue {
 		}
 	}
 
-	private var flatten: [String: AnyValue] {
-		switch self {
-		case .string, .bool, .int, .double, .null:
-			return [:]
-
-		case let .object(dictionary):
-			return Dictionary(
-				dictionary.flatMap { key, value in
-					let nested = value.flatten
-					if nested.isEmpty {
-						return [(key, value)]
-					} else {
-						return nested.map {
-							("\(key).\($0.key)", $0.value)
-						}
-					}
-				}
-			) { _, n in n }
-
-		case let .array(array):
-			return Dictionary(
-				array.indices.flatMap { i in
-					let nested = array[i].flatten
-					let key = "\(i)"
-					if nested.isEmpty {
-						return [(key, array[i])]
-					} else {
-						return nested.map {
-							("\(key).\($0.key)", $0.value)
-						}
-					}
-				}
-			) { _, n in n }
-		}
-	}
-
 	func path(upTo key: String) -> [String] {
 		switch self {
 		case .string, .bool, .int, .double, .null:

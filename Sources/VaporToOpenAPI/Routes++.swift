@@ -77,7 +77,7 @@ public extension Routes {
 		externalDocs: ExternalDocumentationObject? = nil,
 		map: (Route) -> Route = { $0 }
 	) -> OpenAPIObject {
-		openAPI(
+		var result = openAPI(
 			spec: spec,
 			info: info,
 			jsonSchemaDialect: jsonSchemaDialect,
@@ -90,6 +90,8 @@ public extension Routes {
 			extensions: [:],
 			map: map
 		).wrappedValue
+        result.specificationExtensions = nil
+        return result
 	}
 }
 

@@ -275,6 +275,66 @@ final class RouteTests: XCTestCase {
         }
     }
     
+    func testOpenAPIAuth() {
+        let name = "basic"
+        route {
+            $0.openAPI(auth: .basic(id: name))
+        } testOperation: {
+            XCTAssertNoDifference($0.security, [SecurityRequirementObject(name)])
+        } testDocument: { doc in
+            XCTAssertNoDifference(doc.components?.securitySchemes, [name: .basic])
+        }
+    }
+    
+    func testServers() {
+        let name = "server"
+        route {
+            $0.openAPI(servers: [ServerObject(url: name)])
+        } testOperation: {
+            XCTAssertNoDifference($0.servers, [ServerObject(url: name)])
+        }
+    }
+    
+    func testSpectificationExtensions() {
+        let extensions: SpecificationExtensions = ["some-value": 1]
+        route {
+            $0.openAPI(extensions: extensions)
+        } testOperation: {
+            XCTAssertNoDifference($0.specificationExtensions, extensions)
+        }
+        route {
+            $0.openAPI(extensions: [:])
+        } testOperation: {
+            XCTAssertNoDifference($0.specificationExtensions, nil)
+        }
+    }
+    
+    func testCallbacks() {
+        let value: [String: ReferenceOr<CallbackObject>] = [
+            "callback": [
+                "$expression": .ref(components: \.pathItems, "path")
+            ]
+        ]
+        route {
+            $0.openAPI(callbacks: value)
+        } testOperation: {
+            XCTAssertNoDifference($0.callbacks, value)
+        }
+    }
+    
+    func testDefaultContentType() {
+        route {
+            $0.openAPI(response: .type(String.self))
+        } testOperation: {
+            XCTAssertNoDifference($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text(.plain)])
+        }
+        route {
+            $0.openAPI(response: .type(Data.self))
+        } testOperation: {
+            XCTAssertNoDifference($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text("binary")])
+        }
+    }
+    
 	private func route(
 		openAPI: (Route) -> Route,
         testOperation: (OperationObject) -> Void = { _ in },
@@ -289,6 +349,7 @@ final class RouteTests: XCTestCase {
             return
         }
         testOperation(operation)
+        Route.examples = [:]
 	}
 }
 
