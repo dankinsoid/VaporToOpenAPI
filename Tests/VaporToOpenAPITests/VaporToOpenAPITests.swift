@@ -41,19 +41,19 @@ final class VDTests: XCTestCase {
 					"/pets": .value(
 						PathItemObject(
 							[
-								.get: OperationObject(
+								.get: OpenAPI.Operation(
 									tags: ["pets"],
 									description: "Get all pets",
 									operationId: "getPets",
 									parameters: [
-										.value(ParameterObject(name: "filter", in: .query, required: false, schema: .string.with(\.nullable, true), example: .string(PetQuery.example.filter ?? ""))),
+										.value(OpenAPI.Parameter(name: "filter", in: .query, required: false, schema: .string.with(\.nullable, true), example: .string(PetQuery.example.filter ?? ""))),
 									],
 									responses: [
 										200: .value(
-											ResponseObject(
+											OpenAPI.Response(
 												description: "OK",
 												content: [
-													.application(.json): MediaTypeObject(
+													.application(.json): OpenAPI.Content(
 														schema: .array(of: .ref(components: \.schemas, Pet.self)),
 														examples: ["ArrayPet": .ref(components: \.examples, "ArrayPet")]
 													),
@@ -61,10 +61,10 @@ final class VDTests: XCTestCase {
 											)
 										),
 										401: .value(
-											ResponseObject(
+											OpenAPI.Response(
 												description: "Unauthorized",
 												content: [
-													.application(.json): MediaTypeObject(
+													.application(.json): OpenAPI.Content(
 														schema: .ref(components: \.schemas, ErrorResponse.self),
 														examples: ["ErrorResponse": .ref(components: \.examples, ErrorResponse.self)]
 													),
@@ -94,14 +94,14 @@ final class VDTests: XCTestCase {
 					],
 					examples: [
 						"ErrorResponse": .value(
-							ExampleObject(
+							OpenAPI.Example(
 								value: [
 									"error": .bool(ErrorResponse.example.error),
 									"reason": .string(ErrorResponse.example.reason),
 								]
 							)
 						),
-						"ArrayPet": .value(ExampleObject(value: [Pet.exampleObject.object?.value ?? [:]])),
+						"ArrayPet": .value(OpenAPI.Example(value: [Pet.exampleObject.object?.value ?? [:]])),
 					],
 					securitySchemes: [
 						"http_basic": .basic,
@@ -183,8 +183,8 @@ final class VDTests: XCTestCase {
 	}
 
 	func testOpenAPIBodyDecodable() throws {
-		var schemas: ComponentsMap<SchemaObject> = [:]
-		var examples: ComponentsMap<ExampleObject> = [:]
+		var schemas: OpenAPI.ComponentDictionary<JSONSchema> = [:]
+		var examples: OpenAPI.ComponentDictionary<OpenAPI.Example> = [:]
 		let body: OpenAPIBody = .type(PetNoExample.self)
 
 		// Test type
@@ -211,8 +211,8 @@ final class VDTests: XCTestCase {
 		schemas = [:]
 
 		// Test media object
-		let media = try body.value.mediaTypeObject(schemas: &schemas, examples: &examples)
-		XCTAssertNoDifference(media, MediaTypeObject(schema: .ref(components: \.schemas, "PetNoExample")))
+		let media = try body.value.content(schemas: &schemas, examples: &examples)
+		XCTAssertNoDifference(media, OpenAPI.Content(schema: .ref(components: \.schemas, "PetNoExample")))
 		XCTAssertNoDifference(examples, [:])
 		schemas = [:]
 		examples = [:]
@@ -220,8 +220,8 @@ final class VDTests: XCTestCase {
 
 	func testBodyExample() throws {
 		let body: OpenAPIBody = .type(Pet.self)
-		var schemas: ComponentsMap<SchemaObject> = [:]
-		var examples: ComponentsMap<ExampleObject> = [:]
+		var schemas: OpenAPI.ComponentDictionary<JSONSchema> = [:]
+		var examples: OpenAPI.ComponentDictionary<OpenAPI.Example> = [:]
 
 		// Test type
 		switch body.value {
@@ -257,9 +257,9 @@ final class VDTests: XCTestCase {
 		XCTAssertNoDifference(
 			params,
 			[
-				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
-				.value(ParameterObject(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
-				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
+				.value(OpenAPI.Parameter(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
+				.value(OpenAPI.Parameter(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
+				.value(OpenAPI.Parameter(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
 			]
 		)
 		schemas = [:]
@@ -269,23 +269,23 @@ final class VDTests: XCTestCase {
 		XCTAssertNoDifference(
 			headers,
 			[
-				"id": .value(HeaderObject(required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
-				"name": .value(HeaderObject(required: true, schema: .string, example: .string(Pet.example.name))),
-				"age": .value(HeaderObject(required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
+				"id": .value(OpenAPI.Header(required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
+				"name": .value(OpenAPI.Header(required: true, schema: .string, example: .string(Pet.example.name))),
+				"age": .value(OpenAPI.Header(required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
 			]
 		)
 		schemas = [:]
 
 		// Test media object
-		let media = try body.value.mediaTypeObject(schemas: &schemas, examples: &examples)
-		XCTAssertNoDifference(media, MediaTypeObject(schema: .ref(components: \.schemas, "Pet"), examples: ["Pet": .ref(components: \.examples, "Pet")]))
+		let media = try body.value.content(schemas: &schemas, examples: &examples)
+		XCTAssertNoDifference(media, OpenAPI.Content(schema: .ref(components: \.schemas, "Pet"), examples: ["Pet": .ref(components: \.examples, "Pet")]))
 		XCTAssertNoDifference(examples, ["Pet": Pet.exampleObject])
 		schemas = [:]
 		examples = [:]
 	}
 
 	func testBodyOneOf() throws {
-		var schemas: ComponentsMap<SchemaObject> = [:]
+		var schemas: OpenAPI.ComponentDictionary<JSONSchema> = [:]
 		let body: OpenAPIBody = .one(of: .type(Pet.self), .type(GroupDTO.self))
 
 		// Test schema
@@ -313,23 +313,23 @@ final class VDTests: XCTestCase {
 	}
 
 	func testParametersOneOf() throws {
-		var schemas: ComponentsMap<SchemaObject> = [:]
+		var schemas: OpenAPI.ComponentDictionary<JSONSchema> = [:]
 		let parameters: OpenAPIParameters = .all(of: .type(Pet.self), .type(ErrorResponse.self))
 		let params = try parameters.value.parameters(in: .query, schemas: &schemas)
 		XCTAssertNoDifference(
 			params,
 			[
-				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
-				.value(ParameterObject(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
-				.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
-				.value(ParameterObject(name: "error", in: .query, required: true, schema: .boolean, example: .bool(ErrorResponse.example.error))),
-				.value(ParameterObject(name: "reason", in: .query, required: true, schema: .string, example: .string(ErrorResponse.example.reason))),
+				.value(OpenAPI.Parameter(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
+				.value(OpenAPI.Parameter(name: "name", in: .query, required: true, schema: .string, example: .string(Pet.example.name))),
+				.value(OpenAPI.Parameter(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...), example: .int(Int(Pet.example.age)))),
+				.value(OpenAPI.Parameter(name: "error", in: .query, required: true, schema: .boolean, example: .bool(ErrorResponse.example.error))),
+				.value(OpenAPI.Parameter(name: "reason", in: .query, required: true, schema: .string, example: .string(ErrorResponse.example.reason))),
 			]
 		)
 	}
 
 	func testGroupedOpenAPITags() throws {
-		let tag: TagObject = "test.com"
+		let tag: OpenAPI.Tag = "test.com"
 		let routes = Routes()
 		let builder = routes.groupedOpenAPI(tags: [tag])
 		builder.get("test") { _ in "test" }
@@ -361,7 +361,7 @@ final class VDTests: XCTestCase {
 
 		XCTAssertNoDifference(
 			responses,
-			[[ResponsesObject.Key.notFound: ResponseObject(description: "Not found")]]
+			[[OpenAPI.Response.Map.Key.notFound: OpenAPI.Response(description: "Not found")]]
 		)
 	}
 
@@ -452,7 +452,7 @@ struct Pet: WithExample, Content, Equatable {
 
 	static let example = Pet(name: "Persey", age: 2)
 
-	static var schema: ReferenceOr<SchemaObject> {
+	static var schema: ReferenceOr<JSONSchema> {
 		.object(
 			properties: [
 				"id": .string(format: .uuid),
@@ -463,25 +463,25 @@ struct Pet: WithExample, Content, Equatable {
 		)
 	}
 
-	static var parameters: ParametersList {
+	static var parameters: OpenAPI.Parameter.Array {
 		[
-			.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid))),
-			.value(ParameterObject(name: "name", in: .query, required: true, schema: .string)),
-			.value(ParameterObject(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...))),
+			.value(OpenAPI.Parameter(name: "id", in: .query, required: true, schema: .string(format: .uuid))),
+			.value(OpenAPI.Parameter(name: "name", in: .query, required: true, schema: .string)),
+			.value(OpenAPI.Parameter(name: "age", in: .query, required: true, schema: .integer(format: .int64, range: 0...))),
 		]
 	}
 
-	static var headers: ComponentsMap<HeaderObject> {
+	static var headers: OpenAPI.Header.Map {
 		[
-			"id": .value(HeaderObject(required: true, schema: .string(format: .uuid))),
-			"name": .value(HeaderObject(required: true, schema: .string)),
-			"age": .value(HeaderObject(required: true, schema: .integer(format: .int64, range: 0...))),
+			"id": .value(OpenAPI.Header(required: true, schema: .string(format: .uuid))),
+			"name": .value(OpenAPI.Header(required: true, schema: .string)),
+			"age": .value(OpenAPI.Header(required: true, schema: .integer(format: .int64, range: 0...))),
 		]
 	}
 
-	static var exampleObject: ReferenceOr<ExampleObject> {
+	static var exampleObject: ReferenceOr<OpenAPI.Example> {
 		.value(
-			ExampleObject(
+			OpenAPI.Example(
 				value: [
 					"id": .string(example.id.uuidString),
 					"name": .string(example.name),

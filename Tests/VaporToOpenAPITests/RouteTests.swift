@@ -100,7 +100,7 @@ final class RouteTests: XCTestCase {
             XCTAssertNoDifference(
                 $0.requestBody?.object?.content,
                 [
-                    .application(.json): MediaTypeObject(
+                    .application(.json): OpenAPI.Content(
                         schema: .ref(components: \.schemas, "TestType"),
                         examples: [
                             "TestType": .ref(components: \.examples, "TestType")
@@ -153,7 +153,7 @@ final class RouteTests: XCTestCase {
             XCTAssertNoDifference(
                 $0.responses?[.ok]?.object?.content,
                 [
-                    .application(.json): MediaTypeObject(
+                    .application(.json): OpenAPI.Content(
                         schema: .ref(components: \.schemas, "TestType"),
                         examples: [
                             "TestType": .ref(components: \.examples, "TestType")
@@ -289,9 +289,9 @@ final class RouteTests: XCTestCase {
     func testServers() {
         let name = "server"
         route {
-            $0.openAPI(servers: [ServerObject(url: name)])
+            $0.openAPI(servers: [OpenAPI.Server(url: name)])
         } testOperation: {
-            XCTAssertNoDifference($0.servers, [ServerObject(url: name)])
+            XCTAssertNoDifference($0.servers, [OpenAPI.Server(url: name)])
         }
     }
     
@@ -337,7 +337,7 @@ final class RouteTests: XCTestCase {
     
 	private func route(
 		openAPI: (Route) -> Route,
-        testOperation: (OperationObject) -> Void = { _ in },
+        testOperation: (OpenAPI.Operation) -> Void = { _ in },
         testDocument: (OpenAPIObject) -> Void = { _ in }
 	) {
 		let routes = Routes()
@@ -359,10 +359,10 @@ struct TestType: Codable, WithExample {
     
     static let example = TestType()
     
-    static func parameters(in location: ParameterObject.Location) -> ParametersList {
+    static func parameters(in location: OpenAPI.Parameter.Location) -> OpenAPI.Parameter.Array {
         [
             .value(
-                ParameterObject(
+                OpenAPI.Parameter(
                     name: CodingKeys.intValue.stringValue,
                     in: location,
                     required: true,
@@ -373,13 +373,13 @@ struct TestType: Codable, WithExample {
         ]
     }
     
-    static var headers: ComponentsMap<HeaderObject> {
+    static var headers: OpenAPI.Header.Map {
         [
-            CodingKeys.intValue.stringValue: .value(HeaderObject(required: true, schema: .integer, example: 0))
+            CodingKeys.intValue.stringValue: .value(OpenAPI.Header(required: true, schema: .integer, example: 0))
         ]
     }
     
-    static var schema: ReferenceOr<SchemaObject> {
+    static var schema: ReferenceOr<JSONSchema> {
         .object(properties: [CodingKeys.intValue.stringValue: .integer], required: [CodingKeys.intValue.stringValue])
     }
 }

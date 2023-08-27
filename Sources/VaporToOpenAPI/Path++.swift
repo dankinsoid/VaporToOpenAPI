@@ -2,34 +2,16 @@ import Foundation
 import SwiftOpenAPI
 import Vapor
 
-public extension PathElement {
-
-	init(_ pathComponent: PathComponent) {
-		switch pathComponent {
-		case let .constant(string):
-			self = .constant(string)
-		case let .parameter(string):
-			self = .variable(string)
-		case .anything:
-			self = .constant("*")
-		case .catchall:
-			self = .constant("**")
-		}
-	}
-}
-
 extension PathComponent {
 
-	var parameterObject: ParameterObject? {
+    var parameter: OpenAPI.Parameter? {
 		switch self {
 		case let .parameter(name):
-			return ParameterObject(
-				name: name,
-				in: .path,
-				required: true,
-				schema: .string,
-				example: nil
-			)
+            return OpenAPI.Parameter(
+                name: name,
+                context: .path,
+                schema: .string
+            )
 		default:
 			return nil
 		}
@@ -47,15 +29,24 @@ extension PathComponent {
 			return "__"
 		}
 	}
-
-	var pathParameter: ReferenceOr<ParameterObject>? {
-		parameterObject.map { .value($0) }
-	}
 }
 
-public extension Path {
+public extension OpenAPI.Path {
 
 	init(_ path: [PathComponent]) {
-		self.init(path.map { PathElement($0) })
+        self.init(
+            path.map {
+                switch $0 {
+                case let .parameter(name):
+                    return "{\(name)}"
+                case let .constant(string):
+                    return string
+                case .anything:
+                    return "*"
+                case .catchall:
+                    return "**"
+                }
+            }
+        )
 	}
 }

@@ -5,22 +5,22 @@ import Vapor
 public extension RoutesBuilder {
 
 	/// Group routes with OpenAPI tags
-	func groupedOpenAPI(tags: [TagObject]) -> RoutesBuilder {
+	func groupedOpenAPI(tags: [OpenAPI.Tag]) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
 			route.set(\.tags, to: (route.tags + tags).removeEquals(\.name))
 		}
 	}
 
 	/// Group routes with OpenAPI tags
-	func groupedOpenAPI(tags: TagObject...) -> RoutesBuilder {
+	func groupedOpenAPI(tags: OpenAPI.Tag...) -> RoutesBuilder {
 		groupedOpenAPI(tags: tags)
 	}
 
 	/// Group routes with OpenAPI response
 	func groupedOpenAPIResponse(
-		statusCode: ResponsesObject.Key = 200,
+		statusCode: OpenAPI.Response.Map.Key = 200,
 		body: OpenAPIBody? = nil,
-		contentType: MediaType...,
+		contentType: OpenAPI.ContentType...,
 		headers: OpenAPIParameters? = nil,
 		description: String? = nil
 	) -> RoutesBuilder {
@@ -37,7 +37,7 @@ public extension RoutesBuilder {
 	}
 
 	/// Group routes with OpenAPI server
-	func groupedOpenAPI(server: ServerObject) -> RoutesBuilder {
+	func groupedOpenAPI(server: OpenAPI.Server) -> RoutesBuilder {
 		HTTPRoutesGroup(root: self) { route in
 			route.openAPI(custom: \.servers) { servers in
 				servers = (servers ?? []) + [server]
@@ -46,13 +46,13 @@ public extension RoutesBuilder {
 	}
 
 	/// Creates a new Router that will automatically prepend the supplied tags as path components.
-	func group(tags: [TagObject], configure: (RoutesBuilder) throws -> Void) rethrows {
+	func group(tags: [OpenAPI.Tag], configure: (RoutesBuilder) throws -> Void) rethrows {
 		try groupedOpenAPI(tags: tags)
 			.group(tags.map { .constant($0.name) }, configure: configure)
 	}
 
 	/// Creates a new Router that will automatically prepend the supplied tags as path components.
-	func group(tags firsTag: TagObject, _ otherTags: TagObject..., configure: (RoutesBuilder) throws -> Void) rethrows {
+	func group(tags firsTag: OpenAPI.Tag, _ otherTags: OpenAPI.Tag..., configure: (RoutesBuilder) throws -> Void) rethrows {
 		try group(tags: [firsTag] + otherTags, configure: configure)
 	}
 

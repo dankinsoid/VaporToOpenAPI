@@ -3,30 +3,23 @@ import Vapor
 
 public protocol CustomContentType {
 
-	static var contentType: MediaType { get }
+    static var contentType: OpenAPI.ContentType { get }
 }
 
 extension View: OpenAPIType, CustomContentType {
 
-	public static var contentType: MediaType {
-		.text("html")
+	public static var contentType:  OpenAPI.ContentType {
+        .html
 	}
 
-	public static var openAPISchema: SchemaObject {
+	public static var openAPISchema: JSONSchema {
 		.string
 	}
 }
 
 extension String: CustomContentType {
 
-	public static var contentType: MediaType {
-		.text(.plain)
-	}
-}
-
-extension Data: CustomContentType {
-
-	public static var contentType: MediaType {
-		.text("binary")
+	public static var contentType: OpenAPI.ContentType {
+        .anyText
 	}
 }

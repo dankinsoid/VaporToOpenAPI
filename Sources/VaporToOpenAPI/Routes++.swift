@@ -8,7 +8,7 @@ public extension Routes {
 	///   - spec: Specification identifier, used to group specifications
 	///   - info: Provides metadata about the API. The metadata MAY be used by tooling as required.
 	///   - jsonSchemaDialect: The default value for the $schema keyword within ```SchemaObjects``` contained within this OAS document.
-	///   - servers: An array of ```ServerObject```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```ServerObject``` with a url value of /.
+	///   - servers: An array of ```OpenAPI.Server```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```OpenAPI.Server``` with a url value of /.
 	///   - paths: The available paths and operations for the API.
 	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
 	///   - components: An element to hold additional schemas for the document.
@@ -20,7 +20,7 @@ public extension Routes {
 		spec: String? = nil,
 		info: InfoObject,
 		jsonSchemaDialect: URL? = nil,
-		servers: [ServerObject]? = nil,
+		servers: [OpenAPI.Server]? = nil,
 		paths: PathsObject? = nil,
 		webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
 		components: ComponentsObject = ComponentsObject(),
@@ -57,7 +57,7 @@ public extension Routes {
 	///   - spec: Specification identifier, used to group specifications
 	///   - info: Provides metadata about the API. The metadata MAY be used by tooling as required.
 	///   - jsonSchemaDialect: The default value for the $schema keyword within ```SchemaObjects``` contained within this OAS document.
-	///   - servers: An array of ```ServerObject```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```ServerObject``` with a url value of /.
+	///   - servers: An array of ```OpenAPI.Server```, which provide connectivity information to a target server. If the servers property is not provided, or is an empty array, the default value would be a ```OpenAPI.Server``` with a url value of /.
 	///   - paths: The available paths and operations for the API.
 	///   - webhooks: The incoming webhooks that MAY be received as part of this API and that the API consumer MAY choose to implement.
 	///   - components: An element to hold additional schemas for the document.
@@ -69,7 +69,7 @@ public extension Routes {
 		spec: String? = nil,
 		info: InfoObject,
 		jsonSchemaDialect: URL? = nil,
-		servers: [ServerObject]? = nil,
+		servers: [OpenAPI.Server]? = nil,
 		paths: PathsObject? = nil,
 		webhooks: [String: ReferenceOr<PathItemObject>]? = nil,
 		components: ComponentsObject = ComponentsObject(),
@@ -219,9 +219,9 @@ private extension OpenAPIObject {
 	}
 }
 
-private extension OperationObject {
+private extension OpenAPI.Operation {
 
-	func withErrors(_ errors: ResponsesObject) -> OperationObject {
+	func withErrors(_ errors: OpenAPI.Response.Map) -> OpenAPI.Operation {
 		var result = self
 		result.responses = result.responses ?? [:]
 		for key in errors.value.keys where result.responses?[key] == nil {
@@ -230,11 +230,11 @@ private extension OperationObject {
 		return result
 	}
 
-	var allExamplesKeyPaths: [WritableKeyPath<OperationObject, ComponentsMap<ExampleObject>>] {
+	var allExamplesKeyPaths: [WritableKeyPath<OpenAPI.Operation, OpenAPI.ComponentDictionary<OpenAPI.Example>>] {
 		[]
 	}
 }
 
-private func errorKey(_ key: ResponsesObject.Key) -> String {
+private func errorKey(_ key: OpenAPI.Response.Map.Key) -> String {
 	"error-code-\(key.rawValue)"
 }

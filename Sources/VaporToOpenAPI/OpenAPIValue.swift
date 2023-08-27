@@ -1,5 +1,6 @@
 import Foundation
 import SwiftOpenAPI
+import OpenAPIKit
 
 public struct OpenAPIBody {
 
@@ -25,28 +26,28 @@ public struct OpenAPIBody {
 	}
 
 	/// Custom body schema.
-	public static func schema(_ schema: SchemaObject) -> OpenAPIBody {
+	public static func schema(_ schema: JSONSchema) -> OpenAPIBody {
 		OpenAPIBody(value: .schema(schema))
 	}
 
 	/// Body schema validates the value against all the subschemas
-	public static func all(of types: OpenAPIBody..., discriminator: DiscriminatorObject? = nil) -> OpenAPIBody {
-		OpenAPIBody(value: .composite(types.map(\.value), .allOf, discriminator: discriminator))
+    public static func all(of types: OpenAPIBody..., discriminator: OpenAPI.Discriminator? = nil) -> OpenAPIBody {
+        OpenAPIBody(value: .allOf(types.map(\.value), discriminator: discriminator))
 	}
 
 	/// Body schema validates the value against any (one or more) of the subschemas
-	public static func any(of types: OpenAPIBody..., discriminator: DiscriminatorObject? = nil) -> OpenAPIBody {
-		OpenAPIBody(value: .composite(types.map(\.value), .anyOf, discriminator: discriminator))
+	public static func any(of types: OpenAPIBody..., discriminator: OpenAPI.Discriminator? = nil) -> OpenAPIBody {
+		OpenAPIBody(value: .anyOf(types.map(\.value), discriminator: discriminator))
 	}
 
 	/// Body schema validates the value against exactly one of the subschemas
-	public static func one(of types: OpenAPIBody..., discriminator: DiscriminatorObject? = nil) -> OpenAPIBody {
-		OpenAPIBody(value: .composite(types.map(\.value), .oneOf, discriminator: discriminator))
+	public static func one(of types: OpenAPIBody..., discriminator: OpenAPI.Discriminator? = nil) -> OpenAPIBody {
+		OpenAPIBody(value: .oneOf(types.map(\.value), discriminator: discriminator))
 	}
 
 	/// Body schema that does not match the subschema
 	public static func not(_ type: OpenAPIBody) -> OpenAPIBody {
-		OpenAPIBody(value: .composite([type.value], .not, discriminator: nil))
+		OpenAPIBody(value: .not([type.value]))
 	}
 }
 
@@ -74,7 +75,7 @@ public struct OpenAPIParameters {
 	}
 
 	/// Custom parameters.
-	public static func schema(_ schema: SchemaObject) -> OpenAPIParameters {
+	public static func schema(_ schema: JSONSchema) -> OpenAPIParameters {
 		OpenAPIParameters(value: .schema(schema))
 	}
 
@@ -85,8 +86,9 @@ public struct OpenAPIParameters {
 
 	/// Combines parameters into one.
 	static func all(of types: [OpenAPIParameters]) -> OpenAPIParameters {
-		var schemas: ComponentsMap<SchemaObject> = [:]
-		var properties: OrderedDictionary<String, ParameterObject> = [:]
+		var schemas: OpenAPI.ComponentDictionary<JSONSchema> = [:]
+        
+		var properties: OpenAPI.Parameter.Array = []
 		for type in types {
 			guard let params = try? type.value.parameters(in: .query, schemas: &schemas) else {
 				continue
@@ -108,10 +110,10 @@ extension OpenAPIParameters: ExpressibleByArrayLiteral {
 
 extension OpenAPIParameters: ExpressibleByDictionaryLiteral {
 
-	public init(dictionaryLiteral elements: (String, ReferenceOr<SchemaObject>)...) {
+	public init(dictionaryLiteral elements: (String, ReferenceOr<JSONSchema>)...) {
 		value = .parameters(
 			elements.reduce(into: [:]) { result, element in
-				result[element.0] = ParameterObject(name: element.0, in: .query, schema: element.1)
+				result[element.0] = OpenAPI.Parameter(name: element.0, in: .query, schema: element.1)
 			}
 		)
 	}
@@ -121,9 +123,12 @@ indirect enum OpenAPIValue {
 
 	case example(Encodable)
 	case type(Decodable.Type)
-	case schema(SchemaObject)
-	case parameters(OrderedDictionary<String, ParameterObject>)
-	case composite([OpenAPIValue], CompositeType, discriminator: DiscriminatorObject?)
+	case schema(JSONSchema)
+    case parameters(OpenAPI.Parameter.Array)
+    case allOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
+    case anyOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
+    case oneOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
+    case not([OpenAPIValue])
 
 	init?(_ value: Any) {
 		switch value {
@@ -133,7 +138,7 @@ indirect enum OpenAPIValue {
 			self = .example(withExample.example)
 		case let type as Decodable.Type:
 			self = .type(type)
-		case let schema as SchemaObject:
+		case let schema as JSONSchema:
 			self = .schema(schema)
 		default:
 			return nil
@@ -151,8 +156,8 @@ indirect enum OpenAPIValue {
 	}
 
 	func schema(
-		schemas: inout ComponentsMap<SchemaObject>
-	) throws -> ReferenceOr<SchemaObject> {
+		schemas: inout OpenAPI.ComponentDictionary<JSONSchema>
+	) throws -> JSONSchema {
 		switch self {
 		case let .example(encodable):
 			return try .encodeSchema(encodable, into: &schemas)
@@ -169,7 +174,7 @@ indirect enum OpenAPIValue {
 			switch compositeType {
 			case .oneOf:
 				return try .value(
-					SchemaObject(
+					JSONSchema(
 						context: .composition(
 							.one(
 								of: array.map { try $0.schema(schemas: &schemas) },
@@ -180,7 +185,7 @@ indirect enum OpenAPIValue {
 				)
 			case .allOf:
 				return try .value(
-					SchemaObject(
+					JSONSchema(
 						context: .composition(
 							.all(
 								of: array.map { try $0.schema(schemas: &schemas) },
@@ -191,7 +196,7 @@ indirect enum OpenAPIValue {
 				)
 			case .anyOf:
 				return try .value(
-					SchemaObject(
+					JSONSchema(
 						context: .composition(
 							.any(
 								of: array.map { try $0.schema(schemas: &schemas) },
@@ -202,7 +207,7 @@ indirect enum OpenAPIValue {
 				)
 			case .not:
 				return try .value(
-					SchemaObject(
+					JSONSchema(
 						context: .composition(
 							.not(
 								a: array.first.map { try $0.schema(schemas: &schemas) } ?? .any
@@ -214,21 +219,21 @@ indirect enum OpenAPIValue {
 		}
 	}
 
-	func mediaTypeObject(
-		schemas: inout ComponentsMap<SchemaObject>,
-		examples: inout ComponentsMap<ExampleObject>
-	) throws -> MediaTypeObject {
+	func content(
+		schemas: inout OpenAPI.ComponentDictionary<JSONSchema>,
+		examples: inout OpenAPI.ComponentDictionary<OpenAPI.Example>
+	) throws -> OpenAPI.Content {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, schemas: &schemas, examples: &examples)
 		case .schema, .composite, .type, .parameters:
-			return try MediaTypeObject(schema: schema(schemas: &schemas))
+			return try OpenAPI.Content(schema: schema(schemas: &schemas))
 		}
 	}
 
 	func headers(
-		schemas: inout ComponentsMap<SchemaObject>
-	) throws -> ComponentsMap<HeaderObject> {
+		schemas: inout OpenAPI.ComponentDictionary<JSONSchema>
+	) throws -> OpenAPI.Header.Map {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, schemas: &schemas)
@@ -241,8 +246,8 @@ indirect enum OpenAPIValue {
 					context.properties?.map {
 						(
 							$0.key,
-							ReferenceOr<HeaderObject>.value(
-								HeaderObject(
+							ReferenceOr<OpenAPI.Header>.value(
+								OpenAPI.Header(
 									description: $0.value.object?.description,
 									required: context.required?.contains($0.key) == true,
 									schema: $0.value
@@ -257,7 +262,7 @@ indirect enum OpenAPIValue {
 		case let .parameters(properties):
 			return properties.mapValues {
 				.value(
-					HeaderObject(
+					OpenAPI.Header(
 						description: $0.description,
 						required: $0.required,
 						schema: $0.schema,
@@ -270,10 +275,10 @@ indirect enum OpenAPIValue {
 	}
 
 	func parameters(
-		in location: ParameterObject.Location,
+        in location: OpenAPI.Parameter.Context.Location,
 		dateFormat: DateEncodingFormat = .default,
-		schemas: inout ComponentsMap<SchemaObject>
-	) throws -> ParametersList {
+		schemas: inout OpenAPI.ComponentDictionary<JSONSchema>
+	) throws -> OpenAPI.Parameter.Array {
 		switch self {
 		case let .example(encodable):
 			return try .encode(encodable, in: location, dateFormat: dateFormat, schemas: &schemas)
@@ -285,7 +290,7 @@ indirect enum OpenAPIValue {
 				return context.properties?
 					.map {
 						.value(
-							ParameterObject(
+							OpenAPI.Parameter(
 								name: $0.key,
 								in: location,
 								description: $0.value.object?.description,

@@ -1,16 +1,17 @@
 import Foundation
 import SwiftOpenAPI
+import OpenAPIKit
 
 public protocol LinkKey {
 
 	static var description: String? { get }
-	static var server: ServerObject? { get }
+    static var server: OpenAPI.Server? { get }
 }
 
 public extension LinkKey {
 
 	static var description: String? { nil }
-	static var server: ServerObject? { nil }
+	static var server: OpenAPI.Server? { nil }
 
 	internal static var object: LinkKeyObject {
 		LinkKeyObject(type: Self.self)
@@ -39,18 +40,32 @@ public struct Link: Hashable {
 		"\(location.description).\(name)".components(separatedBy: ["."]).map(\.upFirst).joined()
 	}
 
-	public var expression: RuntimeExpression {
-		"$\(location)#/\(name)"
+    public var expression: OpenAPI.RuntimeExpression {
+        switch location {
+        case .request(let requestLocation):
+            switch requestLocation {
+            case .query:
+                return .request(.query(name: name))
+            case .header:
+                return .request(.header(name: name))
+            case .path:
+                return .request(.path(name: name))
+            case .body:
+                return .request(.body(.component(name: name)))
+            }
+        case .response(let responseLocation):
+            switch responseLocation {
+            case .header:
+                return .request(.header(name: name))
+            case .body:
+                return .request(.body(.component(name: name)))
+            }
+        }
 	}
 
 	public init(_ name: String, in location: Location) {
 		self.name = name
 		self.location = location
-	}
-
-    @available(*, deprecated, message: "Use init with string instead")
-	public init<T: WithExample>(_ name: WritableKeyPath<T, some DetectableType>, in location: Location) {
-		self.init(T.codingKey(for: name), in: location)
 	}
 
 	public enum Location: Hashable, CustomStringConvertible {
@@ -77,11 +92,11 @@ public struct Link: Hashable {
 
 	public enum RequestLocation: String {
 
-		case query, header, path, cookie, body
+		case query, header, path, body
 	}
 
 	public enum ResponseLocation: String {
 
-		case header, cookie, body
+		case header, body
 	}
 }

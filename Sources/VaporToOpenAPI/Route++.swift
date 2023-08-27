@@ -1,4 +1,5 @@
 import SwiftOpenAPI
+import OpenAPIKit
 import Vapor
 
 public extension Route {
@@ -27,14 +28,14 @@ public extension Route {
 	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
 	///   - auth: Security requirements.
-	///   - servers: An alternative ```ServerObject``` to service this operation.
+	///   - servers: An alternative ```OpenAPI.Server``` to service this operation.
 	///   - extensions: Specification extensions.
 	/// - Returns: ```Route``` instance
 	@discardableResult
 	func openAPI(
 		customMethod: PathItemObject.Method? = nil,
 		spec: String? = nil,
-		tags: TagObject...,
+		tags: OpenAPI.Tag...,
 		summary: String? = nil,
 		description: String = "",
 		operationId: String? = nil,
@@ -44,17 +45,17 @@ public extension Route {
 		path: OpenAPIParameters? = nil,
 		cookies: OpenAPIParameters? = nil,
 		body: OpenAPIBody? = nil,
-		contentType: MediaType...,
+		contentType: OpenAPI.ContentType...,
 		response: OpenAPIBody? = nil,
-		responseContentType: MediaType...,
+		responseContentType: OpenAPI.ContentType...,
 		responseHeaders: OpenAPIParameters? = nil,
 		responseDescription: String? = nil,
-		statusCode: ResponsesObject.Key = 200,
+		statusCode: OpenAPI.Response.Map.Key = 200,
 		links: [Link: LinkKey.Type] = [:],
 		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
 		deprecated: Bool? = nil,
 		auth: AuthSchemeObject...,
-		servers: [ServerObject]? = nil,
+		servers: [OpenAPI.Server]? = nil,
 		extensions: SpecificationExtensions = [:]
 	) -> Route {
 		_openAPI(
@@ -94,9 +95,9 @@ public extension Route {
 	///  - description: Response description
 	@discardableResult
 	func response(
-		statusCode: ResponsesObject.Key = 200,
+		statusCode: OpenAPI.Response.Map.Key = 200,
 		body: OpenAPIBody? = nil,
-		contentType: MediaType...,
+		contentType: OpenAPI.ContentType...,
 		headers: OpenAPIParameters? = nil,
 		description: String? = nil
 	) -> Route {
@@ -118,23 +119,23 @@ public extension Route {
 	///   - summary: A short summary of what the operation does.
 	///   - description: A verbose explanation of the operation behavior. CommonMark syntax MAY be used for rich text representation.
 	///   - externalDocs: Additional external documentation for this operation.
-	///   - query: Query parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
-	///   - headers: Request headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
-	///   - path: Path parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
-	///   - cookies: Cookie parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
-	///   - body: Request body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - query: Query parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
+	///   - headers: Request headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
+	///   - path: Path parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
+	///   - cookies: Cookie parameters. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
+	///   - body: Request body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
 	///   - bodyType: Request body content type
-	///   - response: Response body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - response: Response body. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
 	///   - responseType: Response body content type
 	///   - responseHeaders: Response headers
-	///   - errorResponses: Error responses example. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - errorResponses: Error responses example. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
 	///   - errorType: Error response content type
-	///   - errorHeaders: Error response headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `SchemaObject` are allowed
+	///   - errorHeaders: Error response headers. `Encodable` example, `Decodable.Type`, `WithExample.Type` and `JSONSchema` are allowed
 	///   - callbacks: A map of possible out-of band callbacks related to the parent operation. The key is a unique identifier for the Callback Object. Each value in the map is a Callback Object that describes a request that may be initiated by the API provider and the expected responses. The key value used to identify the callback object is an expression, evaluated at runtime, that identifies a URL to use for the callback operation.
 	///   - deprecated: Declares this operation to be deprecated. Usage of the declared operation should be refrained. Default value is false.
 	///   - auth: Security requirements
 	///   - authScopes: Security scopes
-	///   - servers: An alternative ```ServerObject``` to service this operation.
+	///   - servers: An alternative ```OpenAPI.Server``` to service this operation.
 	/// - Returns: ```Route``` instance
 	@_disfavoredOverload
 	@available(*, deprecated, message: "Use new `openAPI` and `response` methods")
@@ -142,7 +143,7 @@ public extension Route {
 	func openAPI(
 		customMethod: PathItemObject.Method? = nil,
 		spec: String? = nil,
-		tags: TagObject...,
+		tags: OpenAPI.Tag...,
 		summary: String? = nil,
 		description: String = "",
 		operationId: String? = nil,
@@ -152,20 +153,20 @@ public extension Route {
 		path: Any...,
 		cookies: Any...,
 		body: Any? = nil,
-		bodyType: MediaType...,
+		bodyType: OpenAPI.ContentType...,
 		response: Any? = nil,
-		responseType: MediaType...,
+		responseType: OpenAPI.ContentType...,
 		responseHeaders: Any...,
-		successStatusCode: ResponsesObject.Key = 200,
+		successStatusCode: OpenAPI.Response.Map.Key = 200,
 		errorResponses: [Int: Any] = [:],
 		errorDescriptions: [Int: String] = [:],
-		errorType: MediaType...,
+		errorType: OpenAPI.ContentType...,
 		errorHeaders: Any...,
 		links: [Link: LinkKey.Type] = [:],
 		callbacks: [String: ReferenceOr<CallbackObject>]? = nil,
 		deprecated: Bool? = nil,
 		auth: AuthSchemeObject...,
-		servers: [ServerObject]? = nil
+		servers: [OpenAPI.Server]? = nil
 	) -> Route {
 		_openAPI(
 			method: customMethod,
@@ -196,11 +197,11 @@ public extension Route {
 		.openAPI(custom: \.responses) { value in
 			value = responses(
 				current: value,
-				responses: errorResponses.mapKeys(ResponsesObject.Key.code) { OpenAPIValue($0) }.compactMapValues { $0 },
-				descriptions: errorDescriptions.mapKeys(ResponsesObject.Key.code),
-				types: errorResponses.mapKeys(ResponsesObject.Key.code) { _ in errorType },
+				responses: errorResponses.mapKeys(OpenAPI.Response.Map.Key.code) { OpenAPIValue($0) }.compactMapValues { $0 },
+				descriptions: errorDescriptions.mapKeys(OpenAPI.Response.Map.Key.code),
+				types: errorResponses.mapKeys(OpenAPI.Response.Map.Key.code) { _ in errorType },
 				headers: OpenAPIValue.params(errorHeaders).map { headers in
-					errorResponses.mapKeys(ResponsesObject.Key.code) { _ in headers }
+					errorResponses.mapKeys(OpenAPI.Response.Map.Key.code) { _ in headers }
 				} ?? [:],
 				schemas: &schemas[spec, default: [:]],
 				examples: &Route.examples[spec, default: [:]]
@@ -228,7 +229,7 @@ public extension Route {
 	///   - value: Property value
 	/// - Returns: ```Route``` instance
 	@discardableResult
-	func openAPI<T>(custom keyPath: WritableKeyPath<OperationObject, T>, _ value: T) -> Route {
+	func openAPI<T>(custom keyPath: WritableKeyPath<OpenAPI.Operation, T>, _ value: T) -> Route {
 		var operation = operationObject
 		operation[keyPath: keyPath] = value
 		return set(\.operationObject, to: operation)
@@ -241,7 +242,7 @@ public extension Route {
 	///   - value: Closure to modify property value
 	/// - Returns: ```Route``` instance
 	@discardableResult
-	func openAPI<T>(custom keyPath: WritableKeyPath<OperationObject, T>, _ value: (inout T) -> Void) -> Route {
+	func openAPI<T>(custom keyPath: WritableKeyPath<OpenAPI.Operation, T>, _ value: (inout T) -> Void) -> Route {
 		var operation = operationObject
 		value(&operation[keyPath: keyPath])
 		return set(\.operationObject, to: operation)
@@ -253,7 +254,7 @@ extension Route {
 	func _openAPI(
 		method: PathItemObject.Method?,
 		spec: String?,
-		tags: [TagObject],
+		tags: [OpenAPI.Tag],
 		summary: String?,
 		description: String,
 		operationId: String?,
@@ -263,23 +264,23 @@ extension Route {
 		path: OpenAPIValue?,
 		cookies: OpenAPIValue?,
 		body: OpenAPIValue?,
-		bodyTypes: [MediaType],
+		bodyTypes: [OpenAPI.ContentType],
 		response: OpenAPIValue?,
-		responseContentType: [MediaType],
+		responseContentType: [OpenAPI.ContentType],
 		responseHeaders: OpenAPIValue?,
 		responseDescription: String?,
-		statusCode: ResponsesObject.Key,
+		statusCode: OpenAPI.Response.Map.Key,
 		links: [Link: LinkKey.Type],
 		callbacks: [String: ReferenceOr<CallbackObject>]?,
 		deprecated: Bool?,
 		auth: [AuthSchemeObject],
-		servers: [ServerObject]?,
+		servers: [OpenAPI.Server]?,
 		extensions: SpecificationExtensions
 	) -> Route {
-		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { TagObject(name: $0.description) }
+		let newTags = (self.tags + tags).removeEquals(\.name).nilIfEmpty ?? self.path.prefix(1).map { OpenAPI.Tag(name: $0.description) }
 		return set(
 			\.operationObject,
-			to: OperationObject(
+			to: OpenAPI.Operation(
 				tags: newTags.map(\.name),
 				summary: summary,
 				description: description,
@@ -332,9 +333,9 @@ extension Route {
 
 	func _response(
 		spec: String?,
-		statusCode: ResponsesObject.Key = 200,
+		statusCode: OpenAPI.Response.Map.Key = 200,
 		body: OpenAPIValue? = nil,
-		contentTypes: [MediaType],
+		contentTypes: [OpenAPI.ContentType],
 		headers: OpenAPIValue? = nil,
 		description: String? = nil
 	) -> Route {
@@ -364,13 +365,13 @@ extension Route {
 		"#paths/\(Path(path).stringValue.replacingOccurrences(of: "/", with: "~1"))/\(method.rawValue.lowercased())"
 	}
 
-	var pathParameters: ParametersList {
+	var pathParameters: OpenAPI.Parameter.Array {
 		path.compactMap(\.pathParameter)
 	}
 
-	var operationObject: OperationObject {
+	var operationObject: OpenAPI.Operation {
 		get {
-			values.operationObject ?? OperationObject(
+			values.operationObject ?? OpenAPI.Operation(
 				tags: tags.map(\.name).nilIfEmpty ?? path.prefix(1).map(\.description),
 				description: description
 			)
@@ -385,7 +386,7 @@ extension Route {
 		set { set(\.auths, to: newValue) }
 	}
 
-	var tags: [TagObject] {
+	var tags: [OpenAPI.Tag] {
 		values.tags ?? []
 	}
 
@@ -409,7 +410,7 @@ extension Route {
 		(responseType as? EventLoopType.Type)?.valueType ?? responseType
 	}
 
-	var schemas: [String?: ComponentsMap<SchemaObject>] {
+	var schemas: [String?: OpenAPI.ComponentDictionary<JSONSchema>] {
 		get {
 			values.schemas ?? [nil: [:]]
 		}
@@ -435,11 +436,11 @@ extension Route {
 		}
 	}
 
-	var defaultResponseContentType: MediaType {
+	var defaultResponseContentType: OpenAPI.ContentType {
 		responseContentType(for: bodyResponseType)
 	}
 
-	func responseContentType(for value: OpenAPIValue) -> MediaType {
+	func responseContentType(for value: OpenAPIValue) -> OpenAPI.ContentType {
 		switch value {
 		case let .type(type):
 			return responseContentType(for: type)
@@ -469,7 +470,7 @@ extension Route {
 		}
 	}
 
-	func responseContentType(for values: [OpenAPIValue]) -> MediaType {
+	func responseContentType(for values: [OpenAPIValue]) -> OpenAPI.ContentType {
 		guard !values.isEmpty else {
 			return .any
 		}
@@ -481,7 +482,7 @@ extension Route {
 		return i == values.count ? type : .any
 	}
 
-	func responseContentType(for type: Any.Type) -> MediaType {
+	func responseContentType(for type: Any.Type) -> OpenAPI.ContentType {
 		switch type {
 		case let custom as CustomContentType.Type:
 			return custom.contentType
@@ -493,5 +494,5 @@ extension Route {
 
 extension Route {
 
-	static var examples: [String?: ComponentsMap<ExampleObject>] = [nil: [:]]
+	static var examples: [String?: OpenAPI.ComponentDictionary<OpenAPI.Example>] = [nil: [:]]
 }

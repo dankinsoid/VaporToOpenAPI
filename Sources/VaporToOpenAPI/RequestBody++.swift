@@ -4,22 +4,22 @@ import SwiftOpenAPI
 func request(
 	body: OpenAPIValue?,
 	description: String?,
-	required: Bool?,
-	types: [MediaType],
-	schemas: inout ComponentsMap<SchemaObject>,
-	examples: inout ComponentsMap<ExampleObject>
-) -> ReferenceOr<RequestBodyObject>? {
+	required: Bool,
+	types: [OpenAPI.ContentType],
+	schemas: inout OpenAPI.ComponentDictionary<JSONSchema>,
+	examples: inout OpenAPI.ComponentDictionary<OpenAPI.Example>
+) -> Either<OpenAPI.Reference<OpenAPI.Request>, OpenAPI.Request>? {
 	guard
-		let bodyObject = try? body?.mediaTypeObject(schemas: &schemas, examples: &examples)
+		let bodyObject = try? body?.content(schemas: &schemas, examples: &examples)
 	else {
 		return nil
 	}
-	return .value(
-		RequestBodyObject(
+	return .b(
+        OpenAPI.Request(
 			description: description,
-			content: ContentObject(
-				dictionaryElements: (types.nilIfEmpty ?? [.application(.json)]).map { ($0, bodyObject) }
-			),
+            content: OpenAPI.Content.Map(
+				(types.nilIfEmpty ?? [.json]).map { ($0, bodyObject) }
+            ) { _, new in new },
 			required: required
 		)
 	)

@@ -87,7 +87,7 @@ import SwiftOpenAPI
 
 struct Color: Codable, OpenAPIType {
     
-    static var openAPISchema: SchemaObject {
+    static var openAPISchema: JSONSchema {
         .string(format: "hex", description: "Color in hex format")
     }
 }
