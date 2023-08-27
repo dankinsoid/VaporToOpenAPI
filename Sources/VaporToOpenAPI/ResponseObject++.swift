@@ -49,9 +49,9 @@ func responses(
 			)
 		}
 	) { _, new in new }
-    result = result.merging(current?.value ?? [:]) { new, _ in
-		new
-	}
+    for (key, value) in (current ?? [:]) {
+        result[key] = result[key] ?? value
+    }
 	guard !result.isEmpty else { return nil }
 	return result
 }

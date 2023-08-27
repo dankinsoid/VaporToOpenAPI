@@ -47,7 +47,7 @@ public struct OpenAPIBody {
 
 	/// Body schema that does not match the subschema
 	public static func not(_ type: OpenAPIBody) -> OpenAPIBody {
-		OpenAPIBody(value: .not([type.value]))
+		OpenAPIBody(value: .not(type.value))
 	}
 }
 
@@ -93,9 +93,7 @@ public struct OpenAPIParameters {
 			guard let params = try? type.value.parameters(in: .query, schemas: &schemas) else {
 				continue
 			}
-			params.compactMap(\.object).forEach {
-				properties[$0.name] = $0
-			}
+            properties += params
 		}
 		return OpenAPIParameters(value: .parameters(properties))
 	}
@@ -110,10 +108,10 @@ extension OpenAPIParameters: ExpressibleByArrayLiteral {
 
 extension OpenAPIParameters: ExpressibleByDictionaryLiteral {
 
-	public init(dictionaryLiteral elements: (String, ReferenceOr<JSONSchema>)...) {
+	public init(dictionaryLiteral elements: (String, JSONSchema)...) {
 		value = .parameters(
-			elements.reduce(into: [:]) { result, element in
-				result[element.0] = OpenAPI.Parameter(name: element.0, in: .query, schema: element.1)
+			elements.reduce(into: []) { result, element in
+                result.append(.b(OpenAPI.Parameter(name: element.0, context: .query, schema: element.1)))
 			}
 		)
 	}
@@ -128,7 +126,7 @@ indirect enum OpenAPIValue {
     case allOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
     case anyOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
     case oneOf([OpenAPIValue], discriminator: OpenAPI.Discriminator?)
-    case not([OpenAPIValue])
+    case not(OpenAPIValue)
 
 	init?(_ value: Any) {
 		switch value {
@@ -158,65 +156,42 @@ indirect enum OpenAPIValue {
 	func schema(
 		schemas: inout OpenAPI.ComponentDictionary<JSONSchema>
 	) throws -> JSONSchema {
-		switch self {
-		case let .example(encodable):
-			return try .encodeSchema(encodable, into: &schemas)
-		case let .type(decodable):
-			return try .decodeSchema(decodable, into: &schemas)
-		case let .schema(schemaObject):
-			return .value(schemaObject)
-		case let .parameters(properties):
-			return .object(
-				properties: properties.compactMapValues { $0.schema },
-				required: []
-			)
-		case let .composite(array, compositeType, discriminator):
-			switch compositeType {
-			case .oneOf:
-				return try .value(
-					JSONSchema(
-						context: .composition(
-							.one(
-								of: array.map { try $0.schema(schemas: &schemas) },
-								discriminator: discriminator
-							)
-						)
-					)
-				)
-			case .allOf:
-				return try .value(
-					JSONSchema(
-						context: .composition(
-							.all(
-								of: array.map { try $0.schema(schemas: &schemas) },
-								discriminator: discriminator
-							)
-						)
-					)
-				)
-			case .anyOf:
-				return try .value(
-					JSONSchema(
-						context: .composition(
-							.any(
-								of: array.map { try $0.schema(schemas: &schemas) },
-								discriminator: discriminator
-							)
-						)
-					)
-				)
-			case .not:
-				return try .value(
-					JSONSchema(
-						context: .composition(
-							.not(
-								a: array.first.map { try $0.schema(schemas: &schemas) } ?? .any
-							)
-						)
-					)
-				)
-			}
-		}
+        switch self {
+        case let .example(encodable):
+            return try .encode(encodable, into: &schemas)
+        case let .type(decodable):
+            return try .decode(decodable, into: &schemas)
+        case let .schema(schemaObject):
+            return schemaObject
+        case let .parameters(properties):
+            return .object(
+                properties: OrderedDictionary(
+                    properties.compactMap { props -> (String, JSONSchema)? in
+                        guard let param = props.b else { return nil }
+                        return (param.schemaOrContent.a?.schema.b).map {
+                            (param.name, $0)
+                        }
+                    }
+                ) { _, new in new }
+            )
+        case let .oneOf(array, discriminator):
+            return try .one(
+                of: array.map { try $0.schema(schemas: &schemas) },
+                core: .init(discriminator: discriminator)
+            )
+        case let .allOf(array, discriminator):
+            return try .all(
+                of: array.map { try $0.schema(schemas: &schemas) },
+                core: .init(discriminator: discriminator)
+            )
+        case let .anyOf(array, discriminator):
+            return try .any(
+                of: array.map { try $0.schema(schemas: &schemas) },
+                core: .init(discriminator: discriminator)
+            )
+        case let .not(value):
+            return try .not(value.schema(schemas: &schemas))
+        }
 	}
 
 	func content(
@@ -307,7 +282,7 @@ indirect enum OpenAPIValue {
 			return parameters
 				.map {
 					var result = $0.value
-					result.in = location
+					result.context = location
 					return .value(result)
 				}
 		}
