@@ -2,16 +2,14 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
+@OpenAPIAutoDescriptable
+/// Login query
 public struct LoginQuery: Codable, WithExample, OpenAPIDescriptable {
 
+    /// Username
 	public var username: String?
+    /// Password
 	public var password: String?
 
 	public static let example = LoginQuery(username: "Dan", password: "12345")
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>()
-			.add(for: .username, "Username")
-			.add(for: .password, "Password")
-	}
 }

@@ -3,13 +3,21 @@ import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
 
+@OpenAPIAutoDescriptable
+/// Order
 public struct Order: Codable, Equatable, Content, WithExample, OpenAPIDescriptable {
 
+    /// Unique identifier for the order
 	public var id: Int
+    /// Pet sold to
 	public var petId: Int
+     /// Quantity sold
 	public var quantity: Int32?
+    /// Estimated ship date
 	public var shipDate: Date?
+    /// Order Status
 	public var status: OrderStatus
+    /// Is the order complete?
 	public var complete: Bool?
 
 	public static let example = Order(
@@ -20,14 +28,4 @@ public struct Order: Codable, Equatable, Content, WithExample, OpenAPIDescriptab
 		status: .approved,
 		complete: false
 	)
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>("Order")
-			.add(for: .id, "Unique identifier for the order")
-			.add(for: .petId, "Pet sold to")
-			.add(for: .quantity, "Quantity sold")
-			.add(for: .shipDate, "Estimated ship date")
-			.add(for: .status, "Order Status")
-			.add(for: .complete, "Is the order complete?")
-	}
 }

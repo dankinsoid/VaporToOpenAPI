@@ -2,11 +2,17 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
+/// Address
+@OpenAPIAutoDescriptable
 public struct Address: Codable, WithExample, OpenAPIDescriptable {
 
+    /// Street address
 	public var street: String?
+    /// City name
 	public var city: String?
+    /// State name
 	public var state: String?
+    /// Zip code
 	public var zip: String?
 
 	public static let example = Address(
@@ -15,12 +21,4 @@ public struct Address: Codable, WithExample, OpenAPIDescriptable {
 		state: "CA",
 		zip: "94301"
 	)
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>("Address")
-			.add(for: .street, "Street address")
-			.add(for: .city, "City name")
-			.add(for: .state, "State name")
-			.add(for: .zip, "Zip code")
-	}
 }

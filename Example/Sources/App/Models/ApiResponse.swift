@@ -3,10 +3,15 @@ import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
 
+/// Api response body
+@OpenAPIAutoDescriptable
 public struct ApiResponse: Codable, Content, WithExample, OpenAPIDescriptable {
 
+    /// Response code
 	public var code: Int32?
+    /// Response type
 	public var type: String?
+    /// Response message
 	public var message: String?
 
 	public static var example = ApiResponse(
@@ -14,11 +19,4 @@ public struct ApiResponse: Codable, Content, WithExample, OpenAPIDescriptable {
 		type: "error",
 		message: "Not found"
 	)
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>("ApiResponse")
-			.add(for: .code, "Response code")
-			.add(for: .type, "Response type")
-			.add(for: .message, "Response message")
-	}
 }

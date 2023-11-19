@@ -2,10 +2,15 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
+@OpenAPIAutoDescriptable
+/// Customer
 public struct Customer: Codable, Identifiable, WithExample, OpenAPIDescriptable {
 
+    /// Customer identifier
 	public var id: Int
+    /// Customer username
 	public var username: String
+    /// Customer addresses list
 	public var address: [Address]
 
 	public static let example = Customer(
@@ -13,11 +18,4 @@ public struct Customer: Codable, Identifiable, WithExample, OpenAPIDescriptable 
 		username: "fehguy",
 		address: [.example]
 	)
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>("Customer")
-			.add(for: .id, "Customer identifier")
-			.add(for: .username, "Customer username")
-			.add(for: .address, "Customer address")
-	}
 }

@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 import PackageDescription
 
 let package = Package(
@@ -12,7 +12,7 @@ let package = Package(
 	],
 	dependencies: [
 		.package(url: "https://github.com/vapor/vapor.git", from: "4.70.0"),
-		.package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.2.0"),
+		.package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "5.0.3"),
 	],
 	targets: [
 		.target(

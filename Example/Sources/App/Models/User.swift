@@ -3,15 +3,25 @@ import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
 
+@OpenAPIAutoDescriptable
+/// User model
 public struct User: Codable, Content, Identifiable, WithExample, OpenAPIDescriptable {
 
+    /// Unique identifier for the user
 	public var id: Int
+    /// The name that needs to be fetched. Use user1 for testing.
 	public var username: String
+    /// User's first name
 	public var firstName: String?
+    /// User's last name
 	public var lastName: String?
+    /// User's email
 	public var email: String?
+    /// User's password
 	public var password: String?
+    /// User's phone number
 	public var phone: String?
+    /// User Status
 	public var userStatus: Int32?
 
 	public static let example = User(
@@ -24,16 +34,4 @@ public struct User: Codable, Content, Identifiable, WithExample, OpenAPIDescript
 		phone: "12345",
 		userStatus: 1
 	)
-
-	public static var openAPIDescription: OpenAPIDescriptionType? {
-		OpenAPIDescription<CodingKeys>("User")
-			.add(for: .id, "Unique identifier for the user")
-			.add(for: .username, "The name that needs to be fetched. Use user1 for testing.")
-			.add(for: .firstName, "User's first name")
-			.add(for: .lastName, "User's last name")
-			.add(for: .email, "User's email")
-			.add(for: .password, "User's password")
-			.add(for: .phone, "User's phone number")
-			.add(for: .userStatus, "User Status")
-	}
 }
