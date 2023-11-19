@@ -65,19 +65,31 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 
 #### Customizing OpenAPI schemas and parameters
 You can customize OpenAPI schemas and parameters result by implementing `OpenAPIDescriptable` and `OpenAPIType` protocols.
-1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties.
+1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties. `@OpenAPIAutoDescriptable` macro implements this protocol with your comments.
 ```swift
 import SwiftOpenAPI
 
+@OpenAPIAutoDescriptable
+/// Login request body.
+struct LoginBody: Codable {
+    
+    /// Username string.
+    let username: String
+    /// Password string. Encoded.
+    let password: String
+}
+```
+Manually:
+```swift
 struct LoginBody: Codable, OpenAPIDescriptable {
     
     let username: String
     let password: String
     
     static var openAPIDescription: OpenAPIDescriptionType? {
-        OpenAPIDescription<CodingKeys>("Login body")
-            .add(for: .username, "Username")
-            .add(for: .password, "Password")
+        OpenAPIDescription<CodingKeys>("Login request body.")
+            .add(for: .username, "Username string.")
+            .add(for: .password, "Password string. Encoded.")
     }
 }
 ```
@@ -193,13 +205,13 @@ routes.get("Swagger", "swagger.json") { req in
 
 Create a `Package.swift` file.
 ```swift
-// swift-tools-version:5.7
+// swift-tools-version:5.9
 import PackageDescription
 
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.3.6")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "5.0.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
