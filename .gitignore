@@ -4,3 +4,4 @@
 .build
 .idea
 .DS_Store
+.swiftpm/xcode/xcuserdata/danil.xcuserdatad/xcschemes/xcschememanagement.plist
