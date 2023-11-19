@@ -11,12 +11,6 @@ on:
 
 jobs:
   build:
-
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        swift: ["5.9"]
-        
     runs-on: macos-latest
 
     steps:
@@ -25,6 +19,7 @@ jobs:
         swift-version: "5.9"
     - name: Get swift version
       run: swift --version # Swift 5.9
+    - uses: actions/checkout@v4
     - name: Build
       run: swift build -v
     - name: Run tests
