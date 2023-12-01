@@ -18,7 +18,7 @@ jobs:
       with:
         swift-version: "5.9"
     - name: Get swift version
-      run: swift --version # Swift 5.8
+      run: swift --version
     - uses: actions/checkout@v4
     - name: Build
       run: swift build -v
