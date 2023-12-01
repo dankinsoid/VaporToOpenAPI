@@ -1,4 +1,4 @@
-// swift-tools-version:5.7
+// swift-tools-version: 5.9
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
@@ -16,8 +16,8 @@ let package = Package(
 	],
 	dependencies: [
 		.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.18.4"),
-		.package(url: "https://github.com/pointfreeco/swift-custom-dump.git", from: "0.10.3"),
+		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.19.0"),
+		.package(url: "https://github.com/pointfreeco/swift-custom-dump.git", from: "0.10.3")
 	],
 	targets: [
 		.target(
