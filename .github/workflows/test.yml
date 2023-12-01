@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: swift-actions/setup-swift@v1
       with:
-        swift-version: "5.8"
+        swift-version: "5.9"
     - name: Get swift version
       run: swift --version # Swift 5.8
     - uses: actions/checkout@v4
