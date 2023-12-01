@@ -5,7 +5,7 @@ import VaporToOpenAPI
 
 /// Api response body
 @OpenAPIAutoDescriptable
-public struct ApiResponse: Codable, Content, WithExample, OpenAPIDescriptable {
+public struct ApiResponse: Codable, Content, WithExample {
 
     /// Response code
 	public var code: Int32?

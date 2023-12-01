@@ -4,7 +4,7 @@ import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
 /// Customer
-public struct Customer: Codable, Identifiable, WithExample, OpenAPIDescriptable {
+public struct Customer: Codable, Identifiable, WithExample {
 
     /// Customer identifier
 	public var id: Int

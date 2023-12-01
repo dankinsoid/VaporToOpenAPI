@@ -4,7 +4,7 @@ import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
 /// Login query
-public struct LoginQuery: Codable, WithExample, OpenAPIDescriptable {
+public struct LoginQuery: Codable, WithExample {
 
     /// Username
 	public var username: String?

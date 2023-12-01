@@ -48,9 +48,9 @@ struct UserController: RouteCollection {
 					"Success"
 				}
 				.openAPI(
-					summary: "Logs out current logged in user session",
-					response: "successful operation"
+					summary: "Logs out current logged in user session"
 				)
+                .response(description: "successful operation")
 
 				routes.group(":username") { routes in
 					routes.get { _ in

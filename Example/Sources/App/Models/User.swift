@@ -5,7 +5,7 @@ import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
 /// User model
-public struct User: Codable, Content, Identifiable, WithExample, OpenAPIDescriptable {
+public struct User: Codable, Content, Identifiable, WithExample {
 
     /// Unique identifier for the user
 	public var id: Int

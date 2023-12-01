@@ -5,7 +5,7 @@ import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
 /// Order
-public struct Order: Codable, Equatable, Content, WithExample, OpenAPIDescriptable {
+public struct Order: Codable, Equatable, Content, WithExample {
 
     /// Unique identifier for the order
 	public var id: Int

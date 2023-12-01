@@ -4,7 +4,7 @@ import VaporToOpenAPI
 
 /// Address
 @OpenAPIAutoDescriptable
-public struct Address: Codable, WithExample, OpenAPIDescriptable {
+public struct Address: Codable, WithExample {
 
     /// Street address
 	public var street: String?

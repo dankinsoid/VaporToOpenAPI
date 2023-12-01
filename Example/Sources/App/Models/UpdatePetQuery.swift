@@ -3,7 +3,7 @@ import SwiftOpenAPI
 import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
-public struct UpdatePetQuery: Codable, Equatable, WithExample, OpenAPIDescriptable {
+public struct UpdatePetQuery: Codable, Equatable, WithExample {
 
     /// Updated name of the pet
 	public var name: String?

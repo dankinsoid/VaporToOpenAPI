@@ -4,7 +4,7 @@ import VaporToOpenAPI
 
 @OpenAPIAutoDescriptable
 /// Category
-public struct Category: Codable, Identifiable, WithExample, OpenAPIDescriptable {
+public struct Category: Codable, Identifiable, WithExample {
 
     /// Unique identifier for the category
 	public var id: Int
