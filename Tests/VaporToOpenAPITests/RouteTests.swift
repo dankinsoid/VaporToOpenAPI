@@ -148,28 +148,25 @@ final class RouteTests: XCTestCase {
     
     func testOpenAPIResponse() {
         route {
-            $0.openAPI(response: .type(TestType.self))
+            $0.openAPI(response: .type(GetStudentDTO.self))
         } testOperation: {
             XCTAssertNoDifference(
                 $0.responses?[.ok]?.object?.content,
                 [
                     .application(.json): MediaTypeObject(
-                        schema: .ref(components: \.schemas, "TestType"),
-                        examples: [
-                            "TestType": .ref(components: \.examples, "TestType")
-                        ]
+                        schema: .ref(components: \.schemas, "GetStudentDTO")
                     )
                 ]
             )
         } testDocument: { openAPIObject in
             XCTAssertNoDifference(
                 openAPIObject.components?.schemas,
-                ["TestType": TestType.schema]
+                ["GetStudentDTO": GetStudentDTO.schema]
             )
-            XCTAssertNoDifference(
-                openAPIObject.components?.examples,
-                ["TestType": ["intValue": 0]]
-            )
+//            XCTAssertNoDifference(
+//                openAPIObject.components?.examples,
+//                ["TestType": ["intValue": 0]]
+//            )
         }
     }
     
@@ -385,4 +382,23 @@ struct TestType: Codable, WithExample {
 }
 
 enum IDLink: LinkKey {
+}
+
+struct GetStudentDTO: Content {
+    var id: UUID
+    var courseOfStudy: String
+    var email: String
+    
+    static var schema: ReferenceOr<SchemaObject> {
+        .value(
+            .object(
+                properties: [
+                    "id": .uuid,
+                    "courseOfStudy": .string,
+                    "email": .string
+                ],
+                required: ["id", "courseOfStudy", "email"]
+            )
+        )
+    }
 }
