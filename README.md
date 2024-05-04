@@ -6,7 +6,11 @@ VaporToOpenAPI is a Swift library which can generate output compatible with [Ope
 The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAPI).
 
 ## Usage
-### Base usage
+
+### [Stoplight](https://stoplight.io) setup
+1. Add a route  via the `routes.stoplightDocumentation` to return an `OpenAPIObject` instance via the `routes.openAPI` method.
+
+### [Swagger](https://swagger.io) setup
 1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
 2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
 3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
@@ -213,7 +217,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.0")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.1")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
