@@ -60,7 +60,9 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 - `openAPINoAuth`: This method is used to specify that an operation does not require any authentication.
    
 - `openAPI(custom:)`: These methods are used to customize a specific aspect of the OpenAPI metadata for a Vapor route, such as a specific security scheme or callback.
-   
+
+- `stoplightDocumentation(openAPI:)`: These methods are used to generate a [Stoplight documentation](https://stoplight.io/) from your Vapor routes.
+
 - `operationID` and `operationRef`: These properties are used to generate unique identifiers for OpenAPI operations and to create references to them in other parts of the specification.
 
 #### Customizing OpenAPI schemas and parameters

@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 /// Login query
 public struct LoginQuery: Codable, WithExample {
 

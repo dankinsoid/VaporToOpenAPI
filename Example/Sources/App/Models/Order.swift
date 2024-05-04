@@ -3,7 +3,7 @@ import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 /// Order
 public struct Order: Codable, Equatable, Content, WithExample {
 

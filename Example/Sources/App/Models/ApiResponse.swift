@@ -4,7 +4,7 @@ import Vapor
 import VaporToOpenAPI
 
 /// Api response body
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 public struct ApiResponse: Codable, Content, WithExample {
 
     /// Response code

@@ -3,7 +3,7 @@ import SwiftOpenAPI
 import Vapor
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 /// User model
 public struct User: Codable, Content, Identifiable, WithExample {
 

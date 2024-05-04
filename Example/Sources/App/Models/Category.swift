@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 /// Category
 public struct Category: Codable, Identifiable, WithExample {
 

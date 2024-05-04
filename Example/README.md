@@ -9,9 +9,14 @@ run project
 swift run
 ```
 
-and open `http://127.0.0.1:8080/swagger/` (don't miss the last `/`)
+if you run project through XCode you need to set the working directory to the project root directory.
+Edit Scheme -> Options -> Use custom working directory
+
+and open:
+- Swagger: `http://127.0.0.1:8080/swagger/` (don't miss the trailing `/`)
+- Stoplight: `http://127.0.0.1:8080/doc`
 
 ## Requirements 📝
 
-- Language: Swift 5.7+
+- Language: Swift 5.9+
 - Toolkit: [Vapor](https://docs.vapor.codes/) 4.70.0

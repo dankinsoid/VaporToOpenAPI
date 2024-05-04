@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 public struct UpdatePetQuery: Codable, Equatable, WithExample {
 
     /// Updated name of the pet

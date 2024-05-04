@@ -2,7 +2,7 @@ import Foundation
 import SwiftOpenAPI
 import VaporToOpenAPI
 
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 public struct UploadImageQuery: Codable, Equatable, WithExample {
 
     /// Additional data to pass to server

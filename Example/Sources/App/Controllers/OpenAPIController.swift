@@ -31,7 +31,7 @@ struct OpenAPIController: RouteCollection {
             )
         }
         .excludeFromOpenAPI()
-        
-        routes.grouped("docs").registerOpenAPIElements(path: "/swagger/swagger.json")
+
+        routes.stoplightDocumentation("docs", openAPIPath: "/swagger/swagger.json")
     }
 }

@@ -3,7 +3,7 @@ import SwiftOpenAPI
 import VaporToOpenAPI
 
 /// Address
-@OpenAPIAutoDescriptable
+@OpenAPIDescriptable
 public struct Address: Codable, WithExample {
 
     /// Street address
