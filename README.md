@@ -8,7 +8,8 @@ The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAP
 ## Usage
 
 ### [Stoplight](https://stoplight.io) setup
-1. Add a route  via the `routes.stoplightDocumentation` to return an `OpenAPIObject` instance via the `routes.openAPI` method.
+1. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
+2. Add a route  via the `routes.stoplightDocumentation` to return an `OpenAPIObject` instance via the `routes.openAPI` method.
 
 ### [Swagger](https://swagger.io) setup
 1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
@@ -217,7 +218,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.3")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.4")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
