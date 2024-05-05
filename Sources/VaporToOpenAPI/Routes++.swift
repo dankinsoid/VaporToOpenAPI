@@ -90,8 +90,8 @@ public extension Routes {
 			extensions: [:],
 			map: map
 		).wrappedValue
-        result.specificationExtensions = nil
-        return result
+		result.specificationExtensions = nil
+		return result
 	}
 }
 

@@ -6,11 +6,11 @@ import VaporToOpenAPI
 /// Customer
 public struct Customer: Codable, Identifiable, WithExample {
 
-    /// Customer identifier
+	/// Customer identifier
 	public var id: Int
-    /// Customer username
+	/// Customer username
 	public var username: String
-    /// Customer addresses list
+	/// Customer addresses list
 	public var address: [Address]
 
 	public static let example = Customer(

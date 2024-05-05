@@ -7,21 +7,21 @@ import VaporToOpenAPI
 /// User model
 public struct User: Codable, Content, Identifiable, WithExample {
 
-    /// Unique identifier for the user
+	/// Unique identifier for the user
 	public var id: Int
-    /// The name that needs to be fetched. Use user1 for testing.
+	/// The name that needs to be fetched. Use user1 for testing.
 	public var username: String
-    /// User's first name
+	/// User's first name
 	public var firstName: String?
-    /// User's last name
+	/// User's last name
 	public var lastName: String?
-    /// User's email
+	/// User's email
 	public var email: String?
-    /// User's password
+	/// User's password
 	public var password: String?
-    /// User's phone number
+	/// User's phone number
 	public var phone: String?
-    /// User Status
+	/// User Status
 	public var userStatus: Int32?
 
 	public static let example = User(

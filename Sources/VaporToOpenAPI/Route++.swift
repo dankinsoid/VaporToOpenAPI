@@ -314,12 +314,12 @@ extension Route {
 		.set(\.links, to: links)
 		.set(\.tags, to: newTags)
 		.set(\.openAPIMethod, to: method)
-        .openAPI(custom: \.specificationExtensions) {
-            $0 = SpecificationExtensions(fields: extensions.fields.merging($0?.fields ?? [:]) { new, _ in new })
-            if $0?.fields.isEmpty == true {
-                $0 = nil
-            }
-        }
+		.openAPI(custom: \.specificationExtensions) {
+			$0 = SpecificationExtensions(fields: extensions.fields.merging($0?.fields ?? [:]) { new, _ in new })
+			if $0?.fields.isEmpty == true {
+				$0 = nil
+			}
+		}
 		._response(
 			spec: spec,
 			statusCode: statusCode,

@@ -91,8 +91,8 @@ public struct OpenAPIParameters {
 			guard let params = try? type.value.parameters(in: .query, schemas: &schemas) else {
 				continue
 			}
-			params.compactMap(\.object).forEach {
-				properties[$0.name] = $0
+			for param in params.compactMap(\.object) {
+				properties[param.name] = param
 			}
 		}
 		return OpenAPIParameters(value: .parameters(properties))

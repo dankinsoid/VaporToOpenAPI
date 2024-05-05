@@ -12,7 +12,7 @@ let package = Package(
 	],
 	dependencies: [
 		.package(url: "https://github.com/vapor/vapor.git", from: "4.70.0"),
-        .package(path: "../")
+		.package(path: "../"),
 	],
 	targets: [
 		.target(

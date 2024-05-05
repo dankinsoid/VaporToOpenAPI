@@ -14,7 +14,7 @@ Edit Scheme -> Options -> Use custom working directory
 
 and open:
 - Swagger: `http://127.0.0.1:8080/swagger/` (don't miss the trailing `/`)
-- Stoplight: `http://127.0.0.1:8080/doc`
+- Stoplight: `http://127.0.0.1:8080/stoplight`
 
 ## Requirements 📝
 

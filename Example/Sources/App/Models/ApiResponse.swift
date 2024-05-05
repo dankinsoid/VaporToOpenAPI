@@ -7,11 +7,11 @@ import VaporToOpenAPI
 @OpenAPIDescriptable
 public struct ApiResponse: Codable, Content, WithExample {
 
-    /// Response code
+	/// Response code
 	public var code: Int32?
-    /// Response type
+	/// Response type
 	public var type: String?
-    /// Response message
+	/// Response message
 	public var message: String?
 
 	public static var example = ApiResponse(

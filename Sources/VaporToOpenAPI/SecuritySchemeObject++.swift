@@ -37,7 +37,7 @@ public extension AuthSchemeObject {
 		id: String? = nil,
 		description: String? = nil
 	) -> AuthSchemeObject {
-        AuthSchemeObject(id: id, scheme: .basic(description: description))
+		AuthSchemeObject(id: id, scheme: .basic(description: description))
 	}
 
 	/// An API key is a token that a client provides when making API calls

@@ -6,9 +6,9 @@ import VaporToOpenAPI
 /// Login query
 public struct LoginQuery: Codable, WithExample {
 
-    /// Username
+	/// Username
 	public var username: String?
-    /// Password
+	/// Password
 	public var password: String?
 
 	public static let example = LoginQuery(username: "Dan", password: "12345")

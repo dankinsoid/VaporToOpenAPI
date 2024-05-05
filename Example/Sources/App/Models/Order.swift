@@ -7,17 +7,17 @@ import VaporToOpenAPI
 /// Order
 public struct Order: Codable, Equatable, Content, WithExample {
 
-    /// Unique identifier for the order
+	/// Unique identifier for the order
 	public var id: Int
-    /// Pet sold to
+	/// Pet sold to
 	public var petId: Int
-     /// Quantity sold
+	/// Quantity sold
 	public var quantity: Int32?
-    /// Estimated ship date
+	/// Estimated ship date
 	public var shipDate: Date?
-    /// Order Status
+	/// Order Status
 	public var status: OrderStatus
-    /// Is the order complete?
+	/// Is the order complete?
 	public var complete: Bool?
 
 	public static let example = Order(
