@@ -72,7 +72,7 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 
 #### Customizing OpenAPI schemas and parameters
 You can customize OpenAPI schemas and parameters result by implementing `OpenAPIDescriptable` and `OpenAPIType` protocols.
-1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties. `@OpenAPIAutoDescriptable` macro implements this protocol with your comments.
+1. `OpenAPIDescriptable` protocol allows you to provide a custom description for the type and its properties. `@OpenAPIDescriptable` macro implements this protocol with your comments.
 ```swift
 import SwiftOpenAPI
 
@@ -218,7 +218,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.5")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.6")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
