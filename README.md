@@ -17,7 +17,8 @@ The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAP
 3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
 4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the `swagger.json` URL in your SwaggerUI page method.
 
-⚠️ All enums in your models must implement `CaseIterable`.
+> [!IMPORTANT]
+All enums in your models must implement `CaseIterable`.
 
 ### Advanced Usage
 VaporToOpenAPI includes several advanced features that allow you to customize the generated OpenAPI documentation in various ways. Some of these features include:
