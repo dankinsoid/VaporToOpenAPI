@@ -12,21 +12,12 @@
 			"problemMatcher": [
 				"$swiftc"
 			],
-			"group": "build",
+			"group": {
+					"kind": "build",
+					"isDefault": true
+			},
 			"label": "swift: Build All",
 			"detail": "swift build --build-tests"
-		},
-		{
-            "label": "swiftc with debug",
-            "type": "shell",
-            "command": "swiftc -g ${file}",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "panel": "dedicated"
-            }
 		}
 	]
 }

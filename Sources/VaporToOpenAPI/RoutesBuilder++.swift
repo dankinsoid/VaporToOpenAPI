@@ -78,6 +78,13 @@ public extension RoutesBuilder {
 			route.set(\.specID, to: spec)
 		}
 	}
+
+	/// Exclude routes from OpenAPI
+	func excludeFromOpenAPI() -> RoutesBuilder {
+		HTTPRoutesGroup(root: self) { route in
+			route.excludeFromOpenAPI()
+		}
+	}
 }
 
 /// Groups routes

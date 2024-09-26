@@ -60,7 +60,7 @@ let routes = app.routes.groupedOpenAPI(auth: .apiKey())
 
 - `groupedOpenAPI(server:)`: These methods are used to group Vapor routes together based on common servers.
 
-- `excludeFromOpenAPI`: This method is used to exclude a Vapor route from the generated OpenAPI specification.
+- `excludeFromOpenAPI`: This method is used to exclude a Vapor route or routes group from the generated OpenAPI specification.
    
 - `openAPINoAuth`: This method is used to specify that an operation does not require any authentication.
    
@@ -218,7 +218,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.6.6")
+    .package(url: "https://github.com/dankinsoid/VaporToOpenAPI.git", from: "4.7.0")
   ],
   targets: [
     .target(name: "SomeProject", dependencies: ["VaporToOpenAPI"])
