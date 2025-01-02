@@ -8,7 +8,7 @@ struct OpenAPIController: RouteCollection {
 
 	func boot(routes: RoutesBuilder) throws {
 
-		// generate OpenAPI documentation
+		// Generate an OpenAPI documentation JSON
 		routes.get("swagger", "swagger.json") { req in
 			req.application.routes.openAPI(
 				info: InfoObject(
@@ -32,6 +32,7 @@ struct OpenAPIController: RouteCollection {
 		}
 		.excludeFromOpenAPI()
 
+		// Generate a Stoplight page with the OpenAPI documentation
 		routes.stoplightDocumentation(
 			"stoplight",
 			openAPIPath: "/swagger/swagger.json"

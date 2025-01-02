@@ -7,37 +7,8 @@ The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAP
 
 ## Usage
 
-### [Stoplight](https://stoplight.io) setup
-1. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
-2. Add a route  via the `routes.stoplightDocumentation` to return an `OpenAPIObject` instance via the `routes.openAPI` method.
-
-### [Swagger](https://swagger.io) setup
-1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
-2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
-3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
-4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the `swagger.json` URL in your SwaggerUI page method.
-
-> [!IMPORTANT]
-All enums in your models must implement `CaseIterable`.
-
-### Advanced Usage
-VaporToOpenAPI includes several advanced features that allow you to customize the generated OpenAPI documentation in various ways. Some of these features include:
-
-- `openAPI`: This method is used to add OpenAPI metadata to a single Vapor route. It takes a variety of parameters, such as a summary and description of the operation, request and response bodies, query parameters, and more.\
-Here's an example of how you might use it to document a POST request:
-```swift
-routes.post("users") { req -> EventLoopFuture<User> in
-    let user = try req.content.decode(User.self)
-    return user.save(on: req.db).map { user }
-}
-.openAPI(
-    summary: "Create User",
-    description: "Create a new user with the provided data",
-    body: .type(User.self),
-    response: .type(User.self)
-)
-```
-- `openAPI` (on Routes): This method is used to generate an entire OpenAPI specification from your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
+### Create a route with an `OpenAPI` specification.
+Add a route to return an `OpenAPIObject` via the `app.routes.openAPI` method. This method is used to generate an entire OpenAPI specification from all your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
 ```swift
 // generate OpenAPI documentation
 routes.get("Swagger", "swagger.json") { req in
@@ -51,6 +22,32 @@ routes.get("Swagger", "swagger.json") { req in
 }
 .excludeFromOpenAPI()
 ```
+You also can configure a web page:
+- Use `stoplightDocumentation(openAPI:)` helper method to generate a [Stoplight](https://stoplight.io) page. This method also can return an `OpenAPIObject`.
+- [Here is an example](##short-example) how to configure SwaggerUI.
+
+### Specify all details for routes
+Add `.openAPI` modifier to a route to specify a variety of parameters, such as a summary and description of the operation, request and response bodies, query parameters, headers and more.\
+  Here's an example of how you might use it to document a `POST` request:
+```swift
+routes.post("users") { req -> EventLoopFuture<User> in
+    let user = try req.content.decode(User.self)
+    return user.save(on: req.db).map { user }
+}
+.openAPI(
+    summary: "Create User",
+    description: "Create a new user with the provided data",
+    body: .type(User.self),
+    response: .type(User.self)
+)
+```
+
+> [!IMPORTANT]
+All enums in your models must implement `CaseIterable`.
+
+## Advanced Usage
+VaporToOpenAPI includes several advanced features that allow you to customize the generated OpenAPI documentation in various ways. Some of these features include:
+
 - `response`: This method is used to specify an additional response body for a Vapor route. It takes a variety of parameters, such as the status code, description, and response body type.
 - `groupedOpenAPI`: These methods are used to group Vapor routes together based on OpenAPI metadata, such as tags or security requirements.\
 Here's an example of how you might use it to group routes with the same security requirements:
@@ -113,7 +110,7 @@ struct Color: Codable, OpenAPIType {
 }
 ```
 
-#### Links
+#### Link
 Links are one of the new features of OpenAPI 3.0. Using links, you can describe how various values returned by one operation can be used as input for other operations.
 To create a Link:
 1. create `LinkKey` type identifying some reusable parameter.
@@ -126,7 +123,7 @@ enum PetID: LinkKey {
 ```swift
 route.get("pet", use: getPet).openAPI(
   links: [
-    Link(\Pet.id, in: .response): PetID.self
+    Link("id", in: .response): PetID.self
   ]
 )
 
@@ -139,8 +136,14 @@ route.post("pet", ":petID", use: renamePer).openAPI(
 
 ## [Example project](Example/)
 ## Short example
-### 1. SwaggerUI page
-Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
+### 1. SwaggerUI page 
+
+1. Set up a [SwaggerUI page](https://github.com/swagger-api/swagger-ui) in your Vapor project downloading the `dist` folder and placing its content in the `Public/Swagger` directory.
+2. Describe all of your routes and register all controllers as described in [Vapor docs](https://docs.vapor.codes/basics/routing). Add OpenAPI details to each route using the `route.openAPI` method.
+3. Add a route to return a [SwaggerUI index.html](https://github.com/swagger-api/swagger-ui/blob/master/dist/index.html). Or configure your middlewares to use 'index.html' as default page.
+4. Add a route to return an `OpenAPIObject` instance via the `app.routes.openAPI` method. Make sure the path of this route matches the `swagger.json` URL in your SwaggerUI page method.
+
+5. Change `url` in [`swagger-initializer.js`](https://github.com/swagger-api/swagger-ui/blob/master/dist/swagger-initializer.js)
 ```js
 window.onload = function() {
   //<editor-fold desc="Changeable Configuration Block">
