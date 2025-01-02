@@ -2,13 +2,13 @@
 
 [![build](https://github.com/dankinsoid/VaporToOpenAPI/actions/workflows/test.yml/badge.svg)](https://github.com/dankinsoid/VaporToOpenAPI/actions/workflows/test.yml)
 
-VaporToOpenAPI is a Swift library which can generate output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use generated file in [Swagger UI](https://swagger.io/swagger-ui/) or [Stoplight](https://stoplight.io).\
+VaporToOpenAPI is a Swift library that generates output compatible with [OpenAPI version 3.0.1](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.1.md) from Vapor code. You can use the generated files with [Swagger UI](https://swagger.io/swagger-ui/) or [Stoplight](https://stoplight.io).
 The library is based on [SwiftOpenAPI](https://github.com/dankinsoid/SwiftOpenAPI).
 
 ## Usage
 
 ### Create a route with an `OpenAPI` specification.
-Add a route to return an `OpenAPIObject` via the `app.routes.openAPI` method. This method is used to generate an entire OpenAPI specification from all your Vapor routes. It takes a variety of parameters, such as the title and description of your API, the available paths and operations, security requirements, and more.
+Add a route that returns an `OpenAPIObject` using the `app.routes.openAPI` method. This method generates a complete OpenAPI specification from your Vapor routes. It accepts parameters like your API's title, description, available paths, operations, and security requirements.
 ```swift
 // generate OpenAPI documentation
 routes.get("Swagger", "swagger.json") { req in
@@ -27,7 +27,7 @@ You also can configure a web page:
 - [Here is an example](##short-example) how to configure SwaggerUI.
 
 ### Specify all details for routes
-Add `.openAPI` modifier to a route to specify a variety of parameters, such as a summary and description of the operation, request and response bodies, query parameters, headers and more.\
+Use the `.openAPI` modifier on routes to specify parameters like operation summaries, descriptions, request/response bodies, query parameters, and headers.
   Here's an example of how you might use it to document a `POST` request:
 ```swift
 routes.post("users") { req -> EventLoopFuture<User> in
@@ -46,7 +46,7 @@ routes.post("users") { req -> EventLoopFuture<User> in
 All enums in your models must implement `CaseIterable`.
 
 ## Advanced Usage
-VaporToOpenAPI includes several advanced features that allow you to customize the generated OpenAPI documentation in various ways. Some of these features include:
+VaporToOpenAPI offers several advanced features for customizing your OpenAPI documentation:
 
 - `response`: This method is used to specify an additional response body for a Vapor route. It takes a variety of parameters, such as the status code, description, and response body type.
 - `groupedOpenAPI`: These methods are used to group Vapor routes together based on OpenAPI metadata, such as tags or security requirements.\
