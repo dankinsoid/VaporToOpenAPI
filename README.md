@@ -22,7 +22,7 @@ routes.get("Swagger", "swagger.json") { req in
 }
 .excludeFromOpenAPI()
 ```
-You also can configure a web page:
+#### Configure a web page
 - Use `stoplightDocumentation(openAPI:)` helper method to generate a [Stoplight](https://stoplight.io) page. This method also can return an `OpenAPIObject`.
 - [Here is an example](##short-example) how to configure SwaggerUI.
 
