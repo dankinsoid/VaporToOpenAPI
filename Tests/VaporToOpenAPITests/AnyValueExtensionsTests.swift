@@ -1,4 +1,3 @@
-import CustomDump
 import SwiftOpenAPI
 import Vapor
 @testable import VaporToOpenAPI
@@ -16,8 +15,8 @@ final class AnyValueTests: XCTestCase {
 		let a = AnyValue.object(["a": 1, "b": "hello", "c": true])
 		let b = AnyValue.object(["d": 2, "e": "world", "f": false])
 		let c = AnyValue.object(["g": 1, "h": b, "j": a])
-		XCTAssertNoDifference(c.path(upTo: "a"), ["j", "a"])
-		XCTAssertNoDifference(c.path(upTo: "f"), ["h", "f"])
-		XCTAssertNoDifference(c.path(upTo: "c"), ["j", "c"])
+		XCTAssertEqual(c.path(upTo: "a"), ["j", "a"])
+        XCTAssertEqual(c.path(upTo: "f"), ["h", "f"])
+        XCTAssertEqual(c.path(upTo: "c"), ["j", "c"])
 	}
 }

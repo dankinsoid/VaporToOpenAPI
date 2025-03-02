@@ -1,4 +1,3 @@
-import CustomDump
 import SwiftOpenAPI
 import Vapor
 @testable import VaporToOpenAPI

@@ -1,4 +1,3 @@
-import CustomDump
 import SwiftOpenAPI
 import Vapor
 @testable import VaporToOpenAPI
@@ -65,7 +64,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(query: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.parameters, TestType.parameters(in: .query))
+            XCTAssertEqual($0.parameters, TestType.parameters(in: .query))
 		}
 	}
 
@@ -73,7 +72,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(headers: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.parameters, TestType.parameters(in: .header))
+            XCTAssertEqual($0.parameters, TestType.parameters(in: .header))
 		}
 	}
 
@@ -81,7 +80,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(path: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.parameters, TestType.parameters(in: .path))
+            XCTAssertEqual($0.parameters, TestType.parameters(in: .path))
 		}
 	}
 
@@ -89,7 +88,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(cookies: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.parameters, TestType.parameters(in: .cookie))
+            XCTAssertEqual($0.parameters, TestType.parameters(in: .cookie))
 		}
 	}
 
@@ -97,7 +96,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(body: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.requestBody?.object?.content,
 				[
 					.application(.json): MediaTypeObject(
@@ -124,7 +123,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(body: .schema(.string), contentType: .text(.html))
 		} testOperation: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.requestBody?.object?.content.value.first?.key,
 				.text(.html)
 			)
@@ -150,7 +149,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(response: .type(GetStudentDTO.self))
 		} testOperation: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.responses?[.ok]?.object?.content,
 				[
 					.application(.json): MediaTypeObject(
@@ -159,7 +158,7 @@ final class RouteTests: XCTestCase {
 				]
 			)
 		} testDocument: { openAPIObject in
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				openAPIObject.components?.schemas,
 				["GetStudentDTO": GetStudentDTO.schema]
 			)
@@ -174,7 +173,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(response: .schema(.string), responseContentType: .text(.html))
 		} testOperation: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.responses?[.ok]?.object?.content?.value.keys.map { $0 },
 				[.text(.html)]
 			)
@@ -200,7 +199,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(response: .schema(.string), responseHeaders: .type(TestType.self))
 		} testOperation: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.responses?[.ok]?.object?.headers,
 				TestType.headers
 			)
@@ -250,7 +249,7 @@ final class RouteTests: XCTestCase {
 				]
 			)
 		} testDocument: {
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				$0.components?.links,
 				[
 					"ResponseBodyIdGetCustomRequestBodyIds": .value(
@@ -277,9 +276,9 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(auth: .basic(id: name))
 		} testOperation: {
-			XCTAssertNoDifference($0.security, [SecurityRequirementObject(name)])
+            XCTAssertEqual($0.security, [SecurityRequirementObject(name)])
 		} testDocument: { doc in
-			XCTAssertNoDifference(doc.components?.securitySchemes, [name: .basic])
+            XCTAssertEqual(doc.components?.securitySchemes, [name: .basic])
 		}
 	}
 
@@ -288,7 +287,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(servers: [ServerObject(url: name)])
 		} testOperation: {
-			XCTAssertNoDifference($0.servers, [ServerObject(url: name)])
+            XCTAssertEqual($0.servers, [ServerObject(url: name)])
 		}
 	}
 
@@ -297,12 +296,12 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(extensions: extensions)
 		} testOperation: {
-			XCTAssertNoDifference($0.specificationExtensions, extensions)
+            XCTAssertEqual($0.specificationExtensions, extensions)
 		}
 		route {
 			$0.openAPI(extensions: [:])
 		} testOperation: {
-			XCTAssertNoDifference($0.specificationExtensions, nil)
+            XCTAssertEqual($0.specificationExtensions, nil)
 		}
 	}
 
@@ -315,7 +314,7 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(callbacks: value)
 		} testOperation: {
-			XCTAssertNoDifference($0.callbacks, value)
+            XCTAssertEqual($0.callbacks, value)
 		}
 	}
 
@@ -323,12 +322,12 @@ final class RouteTests: XCTestCase {
 		route {
 			$0.openAPI(response: .type(String.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text(.plain)])
+            XCTAssertEqual($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text(.plain)])
 		}
 		route {
 			$0.openAPI(response: .type(Data.self))
 		} testOperation: {
-			XCTAssertNoDifference($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text("binary")])
+            XCTAssertEqual($0.responses?[.ok]?.object?.content?.value.keys.map { $0 }, [.text("binary")])
 		}
 	}
 

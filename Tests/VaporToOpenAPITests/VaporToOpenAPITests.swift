@@ -1,4 +1,3 @@
-import CustomDump
 import SwiftOpenAPI
 import Vapor
 @testable import VaporToOpenAPI
@@ -30,7 +29,7 @@ final class VDTests: XCTestCase {
 			)
 		)
 
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			api,
 			OpenAPIObject(
 				info: InfoObject(
@@ -197,23 +196,23 @@ final class VDTests: XCTestCase {
 
 		// Test schema
 		_ = try body.value.schema(schemas: &schemas)
-		XCTAssertNoDifference(schemas, ["PetNoExample": Pet.schema])
+		XCTAssertEqual(schemas, ["PetNoExample": Pet.schema])
 		schemas = [:]
 
 		// Test parameters
 		let params = try body.value.parameters(in: .query, schemas: &schemas)
-		XCTAssertNoDifference(params, Pet.parameters)
+		XCTAssertEqual(params, Pet.parameters)
 		schemas = [:]
 
 		// Test headers
 		let headers = try body.value.headers(schemas: &schemas)
-		XCTAssertNoDifference(headers, Pet.headers)
+		XCTAssertEqual(headers, Pet.headers)
 		schemas = [:]
 
 		// Test media object
 		let media = try body.value.mediaTypeObject(schemas: &schemas, examples: &examples)
-		XCTAssertNoDifference(media, MediaTypeObject(schema: .ref(components: \.schemas, "PetNoExample")))
-		XCTAssertNoDifference(examples, [:])
+		XCTAssertEqual(media, MediaTypeObject(schema: .ref(components: \.schemas, "PetNoExample")))
+		XCTAssertEqual(examples, [:])
 		schemas = [:]
 		examples = [:]
 	}
@@ -227,7 +226,7 @@ final class VDTests: XCTestCase {
 		switch body.value {
 		case let .example(example):
 			if let pet = example as? Pet {
-				XCTAssertNoDifference(pet, Pet.example)
+				XCTAssertEqual(pet, Pet.example)
 			} else {
 				XCTFail("Expected Pet.example")
 			}
@@ -237,7 +236,7 @@ final class VDTests: XCTestCase {
 
 		// Test schema
 		_ = try body.value.schema(schemas: &schemas)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			schemas,
 			[
 				"Pet": .object(
@@ -254,7 +253,7 @@ final class VDTests: XCTestCase {
 
 		// Test parameters
 		let params = try body.value.parameters(in: .query, schemas: &schemas)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			params,
 			[
 				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
@@ -266,7 +265,7 @@ final class VDTests: XCTestCase {
 
 		// Test headers
 		let headers = try body.value.headers(schemas: &schemas)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			headers,
 			[
 				"id": .value(HeaderObject(required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
@@ -278,8 +277,8 @@ final class VDTests: XCTestCase {
 
 		// Test media object
 		let media = try body.value.mediaTypeObject(schemas: &schemas, examples: &examples)
-		XCTAssertNoDifference(media, MediaTypeObject(schema: .ref(components: \.schemas, "Pet"), examples: ["Pet": .ref(components: \.examples, "Pet")]))
-		XCTAssertNoDifference(examples, ["Pet": Pet.exampleObject])
+		XCTAssertEqual(media, MediaTypeObject(schema: .ref(components: \.schemas, "Pet"), examples: ["Pet": .ref(components: \.examples, "Pet")]))
+		XCTAssertEqual(examples, ["Pet": Pet.exampleObject])
 		schemas = [:]
 		examples = [:]
 	}
@@ -290,13 +289,13 @@ final class VDTests: XCTestCase {
 
 		// Test schema
 		let schema = try body.value.schema(schemas: &schemas)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			schema,
 			.one(of:
 				.ref(components: \.schemas, Pet.self),
 				.ref(components: \.schemas, GroupDTO.self))
 		)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			schemas,
 			[
 				"Pet": Pet.schema,
@@ -316,7 +315,7 @@ final class VDTests: XCTestCase {
 		var schemas: ComponentsMap<SchemaObject> = [:]
 		let parameters: OpenAPIParameters = .all(of: .type(Pet.self), .type(ErrorResponse.self))
 		let params = try parameters.value.parameters(in: .query, schemas: &schemas)
-		XCTAssertNoDifference(
+		XCTAssertEqual(
 			params,
 			[
 				.value(ParameterObject(name: "id", in: .query, required: true, schema: .string(format: .uuid), example: .string(Pet.example.id.uuidString))),
@@ -336,8 +335,8 @@ final class VDTests: XCTestCase {
 		builder.post("test") { _ in "test" }
 
 		let openAPI = routes.openAPI(info: InfoObject(title: "Test", version: "1.0.0"))
-		XCTAssertNoDifference(openAPI.tags, [tag])
-		XCTAssertNoDifference(
+        XCTAssertEqual(openAPI.tags, [tag])
+        XCTAssertEqual(
 			openAPI.paths?.value.values.flatMap { $0.object?.operations.values.flatMap { $0.tags ?? [] } ?? [] },
 			[tag.name, tag.name]
 		)
@@ -359,7 +358,7 @@ final class VDTests: XCTestCase {
 			}
 		} ?? []
 
-		XCTAssertNoDifference(
+        XCTAssertEqual(
 			responses,
 			[[ResponsesObject.Key.notFound: ResponseObject(description: "Not found")]]
 		)
