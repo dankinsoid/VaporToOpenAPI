@@ -16,7 +16,7 @@ let package = Package(
 	],
 	dependencies: [
 		.package(url: "https://github.com/vapor/vapor.git", from: "4.0.0"),
-		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.23.0"),
+		.package(url: "https://github.com/dankinsoid/SwiftOpenAPI.git", from: "2.24.0"),
 	],
 	targets: [
 		.target(
