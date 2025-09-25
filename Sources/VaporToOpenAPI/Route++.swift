@@ -203,7 +203,7 @@ public extension Route {
 					errorResponses.mapKeys(ResponsesObject.Key.code) { _ in headers }
 				} ?? [:],
 				schemas: &schemas[spec, default: [:]],
-				examples: &Route.examples[spec, default: [:]]
+				examples: &examples[spec, default: [:]]
 			)
 		}
 	}
@@ -299,7 +299,7 @@ extension Route {
 					required: true,
 					types: bodyTypes,
 					schemas: &schemas[spec, default: [:]],
-					examples: &Route.examples[spec, default: [:]]
+					examples: &examples[spec, default: [:]]
 				),
 				responses: operationObject.responses,
 				callbacks: callbacks,
@@ -346,7 +346,7 @@ extension Route {
 				types: [statusCode: contentTypes],
 				headers: headers.map { [statusCode: $0] } ?? [:],
 				schemas: &schemas[spec, default: [:]],
-				examples: &Route.examples[spec, default: [:]]
+				examples: &examples[spec, default: [:]]
 			)
 		}
 	}
@@ -417,6 +417,15 @@ extension Route {
 			values.schemas = newValue
 		}
 	}
+    
+    var examples: [String?: ComponentsMap<ExampleObject>] {
+        get {
+            values.examples ?? [nil: [:]]
+        }
+        set {
+            values.examples = newValue
+        }
+    }
 
 	var openAPIResponseType: OpenAPIValue? {
 		switch bodyResponseType {
@@ -489,9 +498,4 @@ extension Route {
 			return .application(.json)
 		}
 	}
-}
-
-extension Route {
-
-	static var examples: [String?: ComponentsMap<ExampleObject>] = [nil: [:]]
 }

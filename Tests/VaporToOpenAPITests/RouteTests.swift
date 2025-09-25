@@ -108,11 +108,11 @@ final class RouteTests: XCTestCase {
 				]
 			)
 		} testDocument: { openAPIObject in
-			XCTAssertNoDifference(
+			XCTAssertEqual(
 				openAPIObject.components?.schemas,
 				["TestType": TestType.schema]
 			)
-			XCTAssertNoDifference(
+            XCTAssertEqual(
 				openAPIObject.components?.examples,
 				["TestType": ["intValue": 0]]
 			)
@@ -345,7 +345,6 @@ final class RouteTests: XCTestCase {
 			return
 		}
 		testOperation(operation)
-		Route.examples = [:]
 	}
 }
 

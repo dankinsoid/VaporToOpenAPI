@@ -399,7 +399,6 @@ final class VDTests: XCTestCase {
 			.first(where: { $0.key == "Pet1" })?
 			.value.object?.value
 		XCTAssertNotNil(perseyExample)
-		Route.examples = [:]
 	}
 }
 

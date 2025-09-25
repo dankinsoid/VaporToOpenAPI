@@ -146,7 +146,7 @@ private extension OpenAPIObject {
 	}
 
 	mutating func addExamples(routes: [Route]) {
-		addComponent({ _ in Route.examples }, at: \.examples, routes: routes)
+		addComponent(\.examples, at: \.examples, routes: routes)
 	}
 
 	mutating func addComponent<T>(
