@@ -95,7 +95,7 @@ public struct OpenAPIParameters {
 				properties[param.name] = param
 			}
 		}
-		return OpenAPIParameters(value: .parameters(properties))
+		return OpenAPIParameters(value: .parameters(properties, schemas: schemas))
 	}
 }
 
@@ -112,7 +112,8 @@ extension OpenAPIParameters: ExpressibleByDictionaryLiteral {
 		value = .parameters(
 			elements.reduce(into: [:]) { result, element in
 				result[element.0] = ParameterObject(name: element.0, in: .query, schema: element.1)
-			}
+			},
+			schemas: [:]
 		)
 	}
 }
@@ -122,7 +123,10 @@ indirect enum OpenAPIValue {
 	case example(Encodable)
 	case type(Decodable.Type)
 	case schema(SchemaObject)
-	case parameters(OrderedDictionary<String, ParameterObject>)
+	/// `schemas` carries the component schemas referenced by the parameters' `$ref`s, so that
+	/// combining parameters via `OpenAPIParameters.all(of:)` doesn't drop the reflected payload
+	/// schemas (otherwise the spec emits dangling `$ref`s to undefined components).
+	case parameters(OrderedDictionary<String, ParameterObject>, schemas: ComponentsMap<SchemaObject>)
 	case composite([OpenAPIValue], CompositeType, discriminator: DiscriminatorObject?)
 
 	init?(_ value: Any) {
@@ -160,7 +164,8 @@ indirect enum OpenAPIValue {
 			return try .decodeSchema(decodable, into: &schemas)
 		case let .schema(schemaObject):
 			return .value(schemaObject)
-		case let .parameters(properties):
+		case let .parameters(properties, nestedSchemas):
+			schemas.merge(nestedSchemas) { _, new in new }
 			return .object(
 				properties: properties.compactMapValues { $0.schema },
 				required: []
@@ -254,7 +259,8 @@ indirect enum OpenAPIValue {
 			default:
 				return [:]
 			}
-		case let .parameters(properties):
+		case let .parameters(properties, nestedSchemas):
+			schemas.merge(nestedSchemas) { _, new in new }
 			return properties.mapValues {
 				.value(
 					HeaderObject(
@@ -298,7 +304,8 @@ indirect enum OpenAPIValue {
 			default:
 				return []
 			}
-		case let .parameters(parameters):
+		case let .parameters(parameters, nestedSchemas):
+			schemas.merge(nestedSchemas) { _, new in new }
 			return parameters
 				.map {
 					var result = $0.value
