@@ -14,7 +14,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - uses: swift-actions/setup-swift@v2
+    # Xcode's bundled Swift always matches the runner's SDK; standalone
+    # toolchains from setup-swift drift behind and fail to build Foundation.
     - name: Get swift version
       run: swift --version
     - uses: actions/checkout@v4
